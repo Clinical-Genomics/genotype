@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/Clinical-Genomics/taboo">
-    <img width="120px" height="90px" src="artwork/icon.png"/>
+    <img width="240px" height="180px" src="artwork/icon.png"/>
   </a>
 </p>
 
