@@ -1,0 +1,9 @@
+-r ../requirements.txt
+
+bumpversion
+coverage
+coveralls
+flake8
+invoke
+pytest
+wheel>=0.23.0

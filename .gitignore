@@ -1,3 +1,6 @@
+# Mac OSX hidden files
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -5,34 +8,29 @@ __pycache__/
 # C extensions
 *.so
 
-# Distribution / packaging
-.Python
-env/
-bin/
-build/
-develop-eggs/
-dist/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
+# Packages
 *.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
 
 # Installer logs
 pip-log.txt
-pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
-.tox/
 .coverage
-.cache
+.tox
 nosetests.xml
-coverage.xml
+htmlcov
 
 # Translations
 *.mo
@@ -41,14 +39,21 @@ coverage.xml
 .mr.developer.cfg
 .project
 .pydevproject
+.env
+TRASH*
+*.tar.gz
+.vagrant
 
-# Rope
-.ropeproject
+# SublimeText: workspace files are user-specific
+*.sublime-workspace
 
-# Django stuff:
-*.log
-*.pot
+# project files should be version controlled, unless a significant
+# proportion of contributors will probably not be using SublimeText
+# *.sublime-project
 
-# Sphinx documentation
-docs/_build/
+# Complexity
+output/*.html
+output/*/index.html
 
+# Sphinx docs
+docs/_build
