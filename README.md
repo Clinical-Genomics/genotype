@@ -1,21 +1,28 @@
 # Taboo ID Typing Pipeline [![PyPI version][fury-image]][fury-url] [![Build Status][travis-image]][travis-url]
 Taboo provides an automated pipipeline for comparing genotypes from different assays.
 
-Taboo consist of a range of tools to compare id typing using both standard sequencing analysis pipline (VCF) with old-school microarray (MA) genotyping results.
+## Goal
+This project intends to automate a pipeline for processing and comparing 1) a MAF generated Excel-book with genotypes and 2) multiple MIP generated VCF-files.
 
-MA results arrive in an Excel sheet and is transformed to be comparable with VCF results. They meet halfway in a new format that can be used for the comparison.
+## Scope
+The project will be immidiatly usable internally and I don't intend to generalize the functionality until I've implemented all functionality I need.
 
-Question: combine all samples in one large VCF-file or split into sample specific...
+To be honest, documentation will probably also suffer a bit which is why I indend to make it as simple as to not require more than a README with usage instructions. This is not initially indented as a community project.
 
-Step 1: Consolidate formats for comparison
-- The MAF Excel sheet will go through processing steps to convert it to a VCF-file.
+## Components
+Each component is a separate call and entry point in the CLI.
 
-1. Convert MAF Excel book to 1 VCF-file per sample
-2. Fetch/symlink MIP VCF-file (1 per sample)
-    - Always store up-to-date folder of all MIP sample VCFs (cronjob)
-3. Compare each sample using dict (sample names)
-4. Consolidate comparison across all samples
+1. Converting a MAF Excel file to the standard VCF-format.
+2. Splitting a VCF-file with multiple samples into multiple files with one sample each.
+3. Extracting a subset of variants based on RS-number from a VCF-file.
+4. Comparing a pair of VCF-files.
+5. Translating sample ids through a JSON dictionary.
 
+## Roadmap
+These are some points that I would like to get to eventually but that I intentionally decide to put off for now.
+
+1. Make it more generalized, possibly by using a config file in a smart way.
+2. Logging events, especially ones that alter things in the file system.
 
 ## Install for development
 
@@ -23,39 +30,10 @@ Step 1: Consolidate formats for comparison
 $ pip install --editable .
 ```
 
-
-## Workflow
-
-### Preparing MIP files
-for FILE in *.vcf; do taboo extract ../rsnumbers.fm3.txt $FILE | taboo filter | vcf-sort >| "slim/$FILE"; done
-
-### bgzip and tabix
-bgzip /path/to/some.vcf
-tabix -p vcf /path/to/some.vcf.gz
-vcf-merge [vcf_file] | bgzip -c > ./merged.vcf.gz
-
-1. List of samples with genotypes
-    - ``0;ID-000026T;0;0;0;0;C C;C C;T T;T C;G G;C T``
-
-2. Reduced list of samples with genotypes
-    - ``ID-000026T;C C;C C;T T;T C;G G;C T``
-
-3. List of variants with sample genotypes
-    - ``rs10069050;A T;T T;T T;A A``
-
-    + Store/Write list of samples with VCF header
-
-4. List of VCF rows
-    - ``5;89820984;rs10069050;T;C;.;.;.;GT;A/T;T/T;T/T;A/A``
-
-    + rs10069050          => ``5;89820984;rs10069050;T;C;.;.;.``
-    + ``A T;T T;T T;A A`` => ``GT;A/T;T/T;T/T;A/A``
-
-Dependencies:
+## Dependencies:
 - [Convertion table][biomart-link] (RS -> Pos)
 
-
-### VCFTools & Tabix
+### VCFTools
 Download [vcftools](http://sourceforge.net/projects/vcftools/files/).
 
 ```bash
@@ -64,54 +42,7 @@ $ make
 $ make install
 # Copy files in ./bin to $PATH
 # Copy files in lib/perl5/site_perl to .../site/lib
-$ brew install tabix
 ```
-
-## Uploading a package to Pypi (securely)
-1. Create some distributions in the normal way:
-```bash
-$ python setup.py sdist bdist_wheel
-```
-
-2. Upload with twine:
-```bash
-$ twine upload dist/*
-```
-
-3. Done!
-
-# Tips
-
-## Assertions vs. exceptions
-Asserts should be used to test conditions that should never happen. The purpose is to crash early in the case of a corrupt program state.
-
-Exceptions should be used for errors that can conceivably happen, and you should almost always create your own Exception classes.
-
-For example, if you're writing a function to read from a configuration file into a dict, improper formatting in the file should raise a ConfigurationSyntaxError, while you can assert that you're not about to return None.
-
-Assertions shouldn't determine control-flow and should be possible to optimize away without stopping the code from working.
-
-You can use assertions to test for errors that happen as a result of your own code. Use exceptions when dealing with input from a user or external file.
-
-Assertions in some sense test for errors that should be impossible. Anything that you haven't planned for to possibly happen. Exceptions test for possible but exceptional errors.
-
-Ref: http://stackoverflow.com/questions/944592
-
-## Use from __future__ import ...
-In whatever script you need it, not just in one single location
-
-## Bump version
-bumpversion [patch, minor, major] --commit --tag
-
-## String interpolation
-
-### Reusable string interpolation
-"Hello %(name)s" % dict(name='Robin')
-
-
-## Contributing
-Anyone can help make this project better - read [CONTRIBUTION][CONTRIBUTION.md] to get started!
-
 
 ## License
 MIT. See the [LICENSE](LICENSE) file for more details.
