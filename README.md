@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://github.com/Clinical-Genomics/taboo">
+    <img width="120px" height="90px" src="artwork/icon.png"/>
+  </a>
+</p>
+
 # Taboo ID Typing Pipeline [![PyPI version][fury-image]][fury-url] [![Build Status][travis-image]][travis-url]
 Taboo provides an automated pipipeline for comparing genotypes from different assays.
 
