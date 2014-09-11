@@ -67,9 +67,6 @@ setup(
   # installed, specify them here.
   include_package_data=True,
   zip_safe=False,
-  package_data={
-    '': ['README.md', 'LICENSE', 'AUTHORS'],
-  },
 
   # Although 'package_data' is the preferred approach, in some case you
   # may need to place data files outside of your packages.

@@ -11,7 +11,7 @@ cd ..
 mkdir -p mip_samples/slim/singles
 cd mip_samples
 for FILE in *.vcf; do
-  taboo extract ../../meta/rsnumbers.fm3.txt $FILE | taboo filter | vcf-sort >| "slim/${FILE}"
+  taboo extract ../meta/rsnumbers.fm3.txt $FILE | taboo filter | vcf-sort >| "slim/${FILE}"
 done
 
 cd slim
