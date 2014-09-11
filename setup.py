@@ -77,7 +77,8 @@ setup(
   install_requires=[
     'Click',
     'setuptools',
-    'xlrd'
+    'xlrd',
+    'toolz'
   ],
   tests_require=[
     'pytest',
