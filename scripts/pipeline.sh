@@ -1,4 +1,4 @@
-taboo vcfify meta/base.vcf ID_FM3_SUMMARY_140604_MD_KD.xlsx | taboo rename meta/internal2customer.json >| fm3.customer.vcf
+taboo vcfify ID_FM3_SUMMARY_140604_MD_KD.xlsx meta/base.vcf | taboo rename meta/internal2customer.json >| fm3.customer.vcf
 
 mkdir -p maf_samples/sorted
 taboo split --out=maf_samples/ fm3.customer.vcf

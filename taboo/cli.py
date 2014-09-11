@@ -16,7 +16,7 @@ from .vcfify import pipeline as vcfify_pipeline
 from .utils import namebase
 
 vcf_file_argument = click.argument(
-  'vcf_file', type=click.File(), default='-', required=False)
+  'vcf_file', type=click.File(encoding='utf-8'), default='-', required=False)
 out_option = click.option('--out', type=click.File('w'), default='-')
 
 
@@ -38,7 +38,7 @@ def vcfify(maf_file, vcf_file, out):
 
 @cli.command()
 @out_option
-@click.argument('rsnumbers_file', type=click.File())
+@click.argument('rsnumbers_file', type=click.File(encoding='utf-8'))
 @vcf_file_argument
 def extract(rsnumbers_file, vcf_file, out):
   """Extract variants matching a list of RS numbers."""
@@ -105,7 +105,7 @@ def split(vcf_path, sample, out, pattern):
 @out_option
 @click.argument('samples_json', type=click.File(encoding='utf-8'))
 @click.argument(
-  'vcf_file', type=click.File(), default='-', required=False)
+  'vcf_file', type=click.File(encoding='utf-8'), default='-', required=False)
 def rename(samples_json, vcf_file, remove, out):
   """Convert sample names using mapping information in a JSON file."""
   for line in rename_pipeline(vcf_file, samples_json, remove_string=remove):
