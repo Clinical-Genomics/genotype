@@ -91,11 +91,25 @@ setup(
   # "scripts" keyword. Entry points provide cross-platform support and
   # allow pip to create the appropriate form of executable for the
   # target platform.
-  entry_points=dict(
-    console_scripts=[
+  entry_points={
+    'console_scripts': [
       'taboo = taboo.__main__:cli',
     ],
-  ),
+    'taboo.subcommand': [
+      'compare = taboo.compare:compare',
+      'extract = taboo.extract:extract',
+      'filter = taboo.filter_vcf:filter_vcf',
+      'rename = taboo.rename:rename',
+      'vcfify = taboo.vcfify:vcfify'
+    ],
+    'taboo.comparator': [
+      'concordance = taboo.compare.plugins:concordance',
+      'gt-type = taboo.compare.plugins:gt_type',
+      'identity = taboo.compare.plugins:identity',
+      'quality = taboo.compare.plugins:quality',
+      'samples = taboo.compare.plugins:samples',
+    ]
+  },
 
   # See: http://pypi.python.org/pypi?%3Aaction=list_classifiers
   classifiers=[

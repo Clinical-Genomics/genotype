@@ -1,26 +1,43 @@
 # -*- coding: utf-8 -*-
-from toolz import countby, pipe
-from toolz.curried import drop, map
+from __future__ import absolute_import, unicode_literals
+import itertools
+from pkg_resources import iter_entry_points
 
-from .stages import read_vcf, match_variants
-from .._compat import split
+from .._compat import text_type, zip
+from .utils import read_vcfs
 
 
-def pipeline(vcf_stream_ref, vcf_stream_alt):
-  """Count identical/distinct genotypes between two VCF files.
+def compare_vcfs(*streams, **kwargs):
+  """Compare multiple samples in VCF files using a set of comparators.
 
-  Returns:
-    dict: counts for ``True`` matches and ``False`` non-matches.
+  Args:
+    \*stream (iterable): VCF file stream
+    plugins (list of str): names of plugin comparators to use
+
+  Yields:
+    list: output from each plugin for a single variant position
   """
-  complete, incomplete = read_vcf(vcf_stream_ref), read_vcf(vcf_stream_alt)
+  # replicate common kwarg functionality with default value
+  plugins = kwargs.get('plugins', ['identity', 'concordance'])
 
-  genotype_sets = pipe(
-    match_variants(complete, incomplete),  # matchup RS numbers
-    map(drop(3)),                          # keep GT * 2
-    map(map(split(sep='/'))),              # "0/0" -> ["0", "0"]
-    map(map(set)),                         # convert both sides to sets
-    map(list)                              # resolve inner ``map``s
-  )
+  # load all requested comparators via entry point system
+  # if "plugins" is ``None``, load all installed plugins
+  entry_points = [entry_point
+                  for entry_point in iter_entry_points('taboo.comparator')
+                  if (plugins is None) or (entry_point.name in plugins)]
 
-  # tally up overall results (reduce)
-  return countby(lambda alleles: alleles[0] == alleles[1], genotype_sets)
+  comparators = [entry_point.load() for entry_point in entry_points]
+
+  # yield first line as a header
+  # the name value is not unicode so I need to convert ASAP
+  yield [text_type(entry_point.name) for entry_point in entry_points]
+
+  # loop over each variant position covered across the VCF streams
+  for samples in read_vcfs(*streams):
+
+    # make enough independent iterators to cover all comparators
+    samples_copies = itertools.tee(samples, len(comparators))
+
+    # run each comparator on one of the samples copies
+    yield [comparator(samples_copy)
+           for comparator, samples_copy in zip(comparators, samples_copies)]
