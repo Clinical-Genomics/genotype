@@ -7,3 +7,4 @@ flake8
 invoke
 pytest
 wheel>=0.23.0
+sphinx
