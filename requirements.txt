@@ -1,5 +1,6 @@
 -r requirements/conda.txt
 
-Click
+click
 toolz
 xlrd
+PyVCF

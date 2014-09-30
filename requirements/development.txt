@@ -7,4 +7,8 @@ flake8
 invoke
 pytest
 wheel>=0.23.0
-sphinx
+Sphinx
+sphinx-bootstrap-theme
+sphinxcontrib-napoleon
+ipdb
+ipython
