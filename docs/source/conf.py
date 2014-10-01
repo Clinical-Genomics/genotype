@@ -114,7 +114,7 @@ html_theme = 'bootstrap'
 html_theme_options = {
   # Navigation bar title. (Default: ``project`` value)
   'navbar_title': 'taboo',
-  'bootswatch_theme': 'Flatly',
+  'bootswatch_theme': 'flatly',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
