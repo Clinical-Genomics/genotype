@@ -14,7 +14,7 @@ Motivation
 ------------
 Comparing variants between samples and VCF files is a common task. However, I haven't found *the* VCF comparison tool.
 
-Program that are `often recommended <https://www.biostars.org/p/59591/>`_ include *vcf-compare*, *vcfgtcompare*, *BEDTools*, and *GATK*. For convenience reasons I like to be independent of Java depedencies for doing simple stuff like this. I also think the output from VCFTools (vcf-compare) is confusing.
+Program that are `often recommended <https://www.biostars.org/p/59591/>`_ include *vcf-compare*, *vcfgtcompare*, *BEDTools*, and *GATK*. For convenience reasons I like to be independent of Java depedencies for doing simple stuff like this. I also don't like that VCFTools (vcf-compare) isn't pipeable. Vcflib is pipeable but just confusing, i.e. not simple enough.
 
 Therefore I decided to develop my own **simple** genotype comparison tools in Python. I will value transparency and easy of use.
 
@@ -72,9 +72,7 @@ Clinical Genomics
 Initially, some parts of the package will deal with tasks more or less specific to Clinical Genomics.
 
 	1. A MAF Excel report can be converted to a VCF file. This enables standardized comparison of 2 VCFs.
-
 	2. Trimming of large VCF files down to the variants of interest. This will use RS numbers as identifiers but could be expanded to chromosome, start, ref(, and alt).
-
 	3. Splitting of multi-sample VCFs into multiple single-sample VCFs. This feature might not be needed in the future.
 
 
@@ -101,10 +99,12 @@ Overview
 
 	1. Parse/read VCF(s)
 	2. Pass a list of genotype calls for each variant to a set of plugins
+
 	  - each plugin gets a list of genotypes for a variant and returns some serializable data
 	  - each plugin output is concatenated and builds the overall output
 	  - examples: identical/different, hetero/homozygote (per sample), quality per sample etc.
 	  - Taboo will be opinionated about how to serialize output data to make the tool more flexible (the serializer could also be a plugin...)
+
 	3. Print each line to the console stdout
 
 Building plugins
