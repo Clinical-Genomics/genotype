@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from itertools import tee
 
 from toolz import concat, concatv, pipe
 from toolz.curried import map, pluck
@@ -9,9 +10,23 @@ from .utils import encode_genotype, rsnumber_converter, vcf_headers
 
 
 def pipeline(excel_path, base_vcf_stream):
+  # export last sheet
+  (excel_sheet_copy,
+   excel_sheet) = tee(export_excel_sheet(excel_path, sheet_id=-1))
+
+  # figure our where SNP columns begin
+  snp_start = next(index for index, column in
+                   enumerate(next(excel_sheet_copy))
+                   if column.startswith('rs'))
+
+  # pick out valid sample rows
+  sample_rows = (row for row in excel_sheet
+                 if row[1].startswith('ID')  # sample rows
+                 or row[1] == 'SAMPLE')      # header row
+
   transposed_rows = pipe(
-    export_excel_sheet(excel_path, sheet_id=-1),  # export last sheet
-    pluck([slice(1,2), slice(9, None)]),
+    sample_rows,
+    pluck([slice(1,2), slice(snp_start, None)]),
     map(concat),
     transpose
   )

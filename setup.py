@@ -78,7 +78,9 @@ setup(
     'Click',
     'setuptools',
     'xlrd',
-    'toolz'
+    'toolz',
+    'PyVCF',
+    'sqlalchemy'
   ],
   tests_require=[
     'pytest',
@@ -96,18 +98,20 @@ setup(
       'taboo = taboo.__main__:cli',
     ],
     'taboo.subcommand': [
-      'compare = taboo.compare:compare',
-      'extract = taboo.extract:extract',
-      'filter = taboo.filter_vcf:filter_vcf',
-      'rename = taboo.rename:rename',
-      'vcfify = taboo.vcfify:vcfify'
+      'compare = taboo.subcommands:compare',
+      'extract = taboo.subcommands:extract',
+      'filter = taboo.subcommands:filter_vcf',
+      'rename = taboo.subcommands:rename',
+      'vcfify = taboo.subcommands:vcfify',
+      'split = taboo.subcommands:split',
+      'load = taboo.subcommands:load'
     ],
     'taboo.comparator': [
-      'concordance = taboo.compare.plugins:concordance',
-      'gt-type = taboo.compare.plugins:gt_type',
-      'identity = taboo.compare.plugins:identity',
-      'quality = taboo.compare.plugins:quality',
-      'samples = taboo.compare.plugins:samples',
+      'concordance = taboo.subcommands:concordance',
+      'gt-type = taboo.subcommands:gt_type',
+      'identity = taboo.subcommands:identity',
+      'quality = taboo.subcommands:quality',
+      'samples = taboo.subcommands:samples',
     ]
   },
 

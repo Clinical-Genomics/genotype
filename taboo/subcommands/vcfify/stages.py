@@ -2,7 +2,7 @@
 from toolz import curry, map
 import xlrd
 
-from .._compat import range, zip
+from ..._compat import range, zip
 
 
 @curry

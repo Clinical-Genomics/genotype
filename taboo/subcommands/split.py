@@ -7,7 +7,7 @@ import subprocess
 
 import click
 
-from .utils import namebase
+from ..utils import namebase
 
 
 @click.command()

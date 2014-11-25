@@ -4,8 +4,8 @@ import csv
 from itertools import tee
 import re
 
-from .._compat import filterfalse
-from ..utils import startswith, track_rows
+from ..._compat import filterfalse
+from ...utils import startswith, track_rows
 
 
 def pipeline(vcf_stream):

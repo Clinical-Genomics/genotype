@@ -6,7 +6,7 @@ from toolz import pipe
 from toolz.curried import filter, map
 
 from .stages import match_field
-from ..utils import track_rows
+from ...utils import track_rows
 
 
 def pipeline(vcf_stream, rsnumbers_stream):
