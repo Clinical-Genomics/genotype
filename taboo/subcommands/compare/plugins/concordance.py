@@ -6,6 +6,8 @@ import operator
 from toolz import complement, curry, isdistinct, pipe
 from toolz.curried import groupby, map, valmap
 
+from ...._compat import text_type
+
 get_alleles = operator.attrgetter('gt_alleles')
 
 
@@ -41,7 +43,7 @@ def concordance(samples):
   """
   try:
     results = pipe(
-      samples,
+      (sample for sample in samples if not isinstance(sample, text_type)),
       map(get_alleles),             # get alleles (ex: 0/1)
       map(set),                     # reduce homozyg. + normalize "order"
       map(''.join),                 # enable comparison

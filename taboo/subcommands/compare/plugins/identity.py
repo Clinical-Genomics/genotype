@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from toolz import pipe, unique
+from toolz import unique
 from toolz.curried import map
+
+from ...._compat import text_type
 
 # class OutOfSyncError(StandardError):
 #   """"""
@@ -38,12 +40,12 @@ def identity(samples):
   Returns:
     list: all unique variant ids (should be only one)
   """
-  identifiers = pipe(
-    samples,
-    map(get_variant_id),  # get unique variant ids
-    unique,               # merge identical ids
-    list                  # unwind them (usually *it*)
-  )
+  # get unique variant ids
+  identifiers = (get_variant_id(sample) for sample in samples
+                 if not isinstance(sample, text_type))
+
+  # merge identical ids
+  unique_ids = unique(identifiers)
 
   # if len(identifiers) > 1:
   #   raise OutOfSyncError(
@@ -53,4 +55,5 @@ def identity(samples):
   #   return identifiers[0]
 
   # normally returns just a single identifier, but just in case
-  return identifiers
+  # unwind them (usually *it*)
+  return list(unique_ids)

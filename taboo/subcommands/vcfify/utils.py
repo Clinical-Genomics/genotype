@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-import csv
 from datetime import date
 
 from toolz import map
 
-from .. import __version__
-from .._compat import text_type
+from ... import __version__
+from ..._compat import text_type
 
 
 def vcf_headers(samples):
   # meta data
-  yield '##fileformat=VCFv4.2'
+  yield '##fileformat=VCFv4.1'
   yield "##fileDate=%s" % text_type(date.today()).replace('-', '')
   yield "##source=typerV%s" % __version__
   yield "##reference=unknown"
@@ -56,7 +55,9 @@ def rsnumber_converter(vcf_stream):
   """Convert from a given rsnumber to genomic positions."""
   # build dict mapping rsnumbers to variant lines (list)
   dictionary = {}
-  for variant in csv.reader(vcf_stream, delimiter='\t'):
+  variant_stream = (line.strip().split('\t') for line in vcf_stream
+                    if not line.startswith('#'))
+  for variant in variant_stream:
     dictionary[variant[2]] = variant
 
   def getter(rsnumber, default=None):

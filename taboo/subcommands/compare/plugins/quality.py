@@ -2,6 +2,8 @@
 from __future__ import absolute_import, unicode_literals
 import operator
 
+from ...._compat import text_type
+
 get_gq = operator.attrgetter('data.GQ')
 
 
@@ -14,5 +16,16 @@ def quality(samples):
   Returns:
     list: all GT types (only one if fully concordant)
   """
-  return [get_gq(sample) if hasattr(sample.data, 'GQ') else None
-          for sample in samples]
+  qualities = []
+  for sample in samples:
+
+    if isinstance(sample, text_type):
+      qualities.append('unknown')
+
+    elif hasattr(sample.data, 'GQ'):
+      qualities.append(get_gq(sample))
+
+    else:
+      qualities.append('unknown')
+
+  return qualities

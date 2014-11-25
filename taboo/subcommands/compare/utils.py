@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
+from ..._compat import zip
 
 from toolz import concat
 import vcf.utils
@@ -21,11 +22,20 @@ def read_vcfs(*streams):
   """
   # create VCF readers for each stream
   readers = [vcf.Reader(stream) for stream in streams]
+  all_samples = list(concat((reader.samples for reader in readers)))
 
   # iterate the readers in tandem
-  combo_sequence = vcf.utils.walk_together(*readers)
+  positions = vcf.utils.walk_together(*readers)
 
   # concat samples for each variant
   # FYI: this step will obfuscate when variants are not found in a VCF
-  return (concat(variant.samples for variant in combo if variant)
-          for combo in combo_sequence)
+  for position in positions:
+    variants = []
+    for variant, sample in zip(position, all_samples):
+      if variant is None:
+        variants.append([sample])
+
+      else:
+        variants.append(variant.samples)
+
+    yield concat(variants)
