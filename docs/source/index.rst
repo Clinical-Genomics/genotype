@@ -4,26 +4,24 @@
    contain the root `toctree` directive.
 
 Taboo
-=======
-Taboo is simple genotype comparison tool. It can handle multiple VCF files with multiple samples. Taboo is extendible to allow for plugins that customize the output of the comparison.
+=====
+Taboo is a simple genotype comparison tool. It can handle multiple VCF files with multiple samples. Taboo is extendible to allow for plugins that customize the output of the comparison.
 
-Taboo is mainly a command line utility. I might specify a Python API in the future but for now only the CLI will stay reliably stable post release 1.0.
+Taboo is exclusively a command line utility.
 
 
 Motivation
-------------
-Comparing variants between samples and VCF files is a common task. However, I haven't found *the* VCF comparison tool.
+----------
+Comparing variants between samples and VCF files is a common task. However, I haven't found *the* VCF comparison tool yet.
 
-Program that are `often recommended <https://www.biostars.org/p/59591/>`_ include *vcf-compare*, *vcfgtcompare*, *BEDTools*, and *GATK*. For convenience reasons I like to be independent of Java depedencies for doing simple stuff like this. I also don't like that VCFTools (vcf-compare) isn't pipeable. Vcflib is pipeable but just confusing, i.e. not simple enough.
+Programs that are `often recommended <https://www.biostars.org/p/59591/>`_ include *vcf-compare*, *vcfgtcompare*, *BEDTools*, and *GATK*. VCFTools had wierd output and wrote most useful data to a log file and therefore data couldn't be piped to a subsequent filter process. Vcflib was difficult to set up and required VCF files to be gzipped and indexed. GATK seemed too heavy-handed for such a simple task.
 
-Therefore I decided to develop my own **simple** genotype comparison tools in Python. I will value transparency and easy of use.
+Therefore I decided to develop my own **simple** genotype comparison tools in Python. It will focus on transparency and easy of use.
 
 
 Installation
 --------------
-Taboo is not currently on *pip* but I intend on registering it once I work out more specifically the scope of the package.
-
-For now, install as:
+Taboo is not distributed on *pip*, so to install it run:
 
 .. code-block:: console
 
@@ -39,9 +37,7 @@ Dependencies
 
 Usage
 ------
-The main objective of the package is comparison of genotypes between samples. The package handles multi-sample VCFs as well as multiple VCFs.
-
-The important thing is that they are sorted using the same key. The simplest way to do so is to use "vcf-sort" from the VCFTools library:
+The main objective of the package is comparison of genotypes between samples. The package handles multi-sample VCFs as well as multiple single-sample VCFs. The important thing is that they are sorted using the same key. The simplest way to do so is to use "vcf-sort" from the VCFTools library:
 
 .. code-block:: console
 
@@ -76,39 +72,6 @@ Initially, some parts of the package will deal with tasks more or less specific 
 	3. Splitting of multi-sample VCFs into multiple single-sample VCFs. This feature might not be needed in the future.
 
 
-Roadmap & Wish list
----------------------
-
-	- General approach to comparing genotypes across samples
-
-		- Pipeable interface to filter results step-by-step
-
-	- Phase out functionality specific to Clinical Genomics
-
-	- Handle comparison of subsets of samples in multi-sample VCFs
-
-	- Introduce logging into the module to include extra information (verbose mode)
-
-
 Contributing
 --------------
 There's no point in contributing at the moment. I need to first make sure I have a grasp on the scope of the project.
-
-Overview
-~~~~~~~~~~~
-
-	1. Parse/read VCF(s)
-	2. Pass a list of genotype calls for each variant to a set of plugins
-
-	  - each plugin gets a list of genotypes for a variant and returns some serializable data
-	  - each plugin output is concatenated and builds the overall output
-	  - examples: identical/different, hetero/homozygote (per sample), quality per sample etc.
-	  - Taboo will be opinionated about how to serialize output data to make the tool more flexible (the serializer could also be a plugin...)
-
-	3. Print each line to the console stdout
-
-Building plugins
-~~~~~~~~~~~~~~~~~
-I will implement the plugins as entry points so that someone eles can write a plugin that will be easily installed to extend the output. Think like Flask Blueprints if that helps.
-
-Further details to come at a later stage.
