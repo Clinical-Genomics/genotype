@@ -4,7 +4,7 @@
 # https://github.com/inodb/snakemake-uppmax-demo
 
 rule targets:
-  message: 'Pseudo rule: MAF'
+  message: 'Pseudo rule'
   input: 'analysis/completed/000134T.ID3.ID3_FM3.completed'
 
 # +--------------------------------------------------------------------+
@@ -18,13 +18,13 @@ rule vcfify:
 
 rule sort_faux:
   message: 'Sort faux VCF using VCFTools'
-  input: 'maf/vcfs/{plate}.vcf'
+  input: rules.vcfify.output
   output: 'maf/vcfs/{plate}.sorted.vcf'
   shell: 'vcf-sort {input} > {output}'
 
 rule split:
   message: 'Split multi-sample VCF into single sample VCF'
-  input: 'maf/vcfs/{plate}.sorted.vcf'
+  input: rules.sort_faux.output
   output: 'maf/samples/{tag}-{sample}.{plate}.sorted.vcf'
   shell: 'taboo split --out=maf/samples/ {input}'
 
