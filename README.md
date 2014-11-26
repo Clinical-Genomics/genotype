@@ -4,41 +4,33 @@
   </a>
 </p>
 
-# Taboo ID Typing Pipeline [![PyPI version][fury-img]][fury-url] [![Build Status][travis-img]][travis-url] [![Documentation Status][readthedocs-img]][readthedocs-url]
-
-Taboo provides an automated pipipeline for comparing genotypes from different assays.
+# Taboo genotype comparison pipeline [![Documentation Status][readthedocs-img]][readthedocs-url]
+Taboo provides an automated pipipeline for comparing genotypes between different VCFs.
 
 ## Goal
-This project intends to automate a pipeline for processing and comparing 1) a MAF generated Excel-book with genotypes and 2) multiple MIP generated VCF-files.
+This project intends to automate a pipeline for processing and comparing 1) a MAF generated Excel-book with genotypes and 2) multiple NGS generated VCF-files.
 
 ## Scope
-The project will be immidiatly usable internally and I don't intend to generalize the functionality until I've implemented all functionality I need.
-
-To be honest, documentation will probably also suffer a bit which is why I indend to make it as simple as to not require more than a README with usage instructions. This is not initially indented as a community project.
+The project will be immediately usable internally at Clinical Genomics. I don't intend to generalize the functionality further in the near future.
 
 ## Components
-Each component is a separate call and entry point in the CLI.
+Each component is a separate command line call.
 
 1. Converting a MAF Excel file to the standard VCF-format.
 2. Splitting a VCF-file with multiple samples into multiple files with one sample each.
 3. Extracting a subset of variants based on RS-number from a VCF-file.
-4. Comparing a pair of VCF-files.
+4. Comparing genotypes across VCF-files.
 5. Translating sample ids through a JSON dictionary.
-
-## Roadmap
-These are some points that I would like to get to eventually but that I intentionally decide to put off for now.
-
-1. Make it more generalized, possibly by using a config file in a smart way.
-2. Logging events, especially ones that alter things in the file system.
 
 ## Install for development
 
 ```bash
+$ git clone https://github.com/Clinical-Genomics/taboo && cd taboo
 $ pip install --editable .
 ```
 
 ## Dependencies:
-- [Convertion table][biomart-link] (RS -> Pos)
+- [Convertion table][biomart-link] (RS number -> Genomic position and more)
 
 ### VCFTools
 Download [vcftools](http://sourceforge.net/projects/vcftools/files/).
@@ -55,11 +47,6 @@ $ make install
 MIT. See the [LICENSE](LICENSE) file for more details.
 
 
-[fury-url]: http://badge.fury.io/py/taboo
-[fury-img]: https://badge.fury.io/py/taboo.png
-
-[travis-url]: https://travis-ci.org/robinandeer/taboo
-[travis-img]: https://travis-ci.org/robinandeer/taboo.png?branch=develop
 
 [readthedocs-url]: https://readthedocs.org/projects/taboo/?badge=latest
 [readthedocs-img]: https://readthedocs.org/projects/taboo/badge/?version=latest
