@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 from codecs import open
 
-from taboo.vcfify.utils import rsnumber_converter
+from taboo.subcommands.vcfify import rsnumber_converter
 
 
 class TestConfig:

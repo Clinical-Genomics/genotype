@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from toolz import map
+
 from taboo._compat import split
-from taboo.utils import namebase, track_rows
+from taboo.utils import namebase, track_rows, startswith
 
 
 def test_namebase():
@@ -25,3 +27,8 @@ def test_track_rows():
 
   assert headers == lines[:2]
   assert next(rows) == [lines[3]]
+
+
+def test_startswith():
+  assert startswith('#CHROM', '#CHROM\tRSNUMBER\tPOS') is True
+  assert startswith('i', 'ePod') is False
