@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 from taboo.subcommands.vcfify import transpose, export_excel_sheet
 
 
@@ -42,7 +42,8 @@ def test_export_excel_sheet():
 
   # Select sheet by name
   rows = list(
-    export_excel_sheet('tests/fixtures/multi.xlsx', sheet_id=b'Sheet3')
+    export_excel_sheet('tests/fixtures/multi.xlsx',
+                        sheet_id='Sheet3')
   )
   assert len(rows) == 9
   assert len(rows[2]) == 13

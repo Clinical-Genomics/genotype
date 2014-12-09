@@ -5,36 +5,15 @@
 
 rule targets:
   message: 'Pseudo rule'
-  input: 'analysis/completed/000134T.ID3.ID3_FM3.completed'
+  input: 'analysis/completed/000134T.completed'
 
 # +--------------------------------------------------------------------+
-# | MAF preprocessing
-# +--------------------------------------------------------------------+
-rule vcfify:
-  message: 'Turn Excel report into faux VCF'
-  input: 'maf/reports/{plate}.xlsx'
-  output: 'maf/vcfs/{plate}.vcf'
-  shell: 'taboo vcfify {input} references/base.vcf > {output}'
-
-rule sort_faux:
-  message: 'Sort faux VCF using VCFTools'
-  input: rules.vcfify.output
-  output: 'maf/vcfs/{plate}.sorted.vcf'
-  shell: 'vcf-sort {input} > {output}'
-
-rule split:
-  message: 'Split multi-sample VCF into single sample VCF'
-  input: rules.sort_faux.output
-  output: 'maf/samples/{tag}-{sample}.{plate}.sorted.vcf'
-  shell: 'taboo split --out=maf/samples/ {input}'
-
-# +--------------------------------------------------------------------+
-# | MIP preprocessing
+# | Sequencing variants preprocessing
 # +--------------------------------------------------------------------+
 rule extract:
   message: 'Extract variants based on RS numbers and ensure synced sorting'
-  input: 'mip/{sample}.vcf'
-  output: 'mip/{sample}.slim.vcf'
+  input: '../VARIANT/samples/{sample}.vcf'
+  output: 'sequencing/{sample}.slim.vcf'
   shell: """
     taboo extract references/rsnumbers.txt {input} \
       | taboo filter \
@@ -47,9 +26,9 @@ rule extract:
 # +--------------------------------------------------------------------+
 rule compare:
   message: 'Compare genotype between VCFs from the same sample'
-  input: mip='mip/{sample}.slim.vcf', maf='maf/samples/{tag}-{sample}.{plate}.sorted.vcf'
-  output: 'analysis/{sample}.{tag}.{plate}.tsv'
-  shell: 'taboo compare {input.mip} {input.maf} > {output}'
+  input: seq='sequencing/{sample}.slim.vcf', maf='maf/samples/{sample}.vcf'
+  output: 'analysis/{sample}.tsv'
+  shell: 'taboo compare {input.seq} {input.maf} > {output}'
 
 # +--------------------------------------------------------------------+
 # | Load results into database
@@ -57,7 +36,7 @@ rule compare:
 rule load:
   message: 'Load results into the database'
   input: rules.compare.output
-  output: 'analysis/completed/{sample}.{tag}.{plate}.completed'
+  output: 'analysis/completed/{sample}.completed'
   shell: """
     taboo load --uri=./temp-test.sqlite3 {input} && \
     touch {output}
