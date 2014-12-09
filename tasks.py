@@ -52,10 +52,15 @@ def coverage():
 @task(clean)
 def publish(test=False):
   """publish - package and upload a release to the cheeseshop."""
-  if test:
-    run('python setup.py register -r test sdist upload -r test')
-  else:
-    run('python setup.py register bdist_wheel upload')
-    run('python setup.py register sdist upload')
+  run('python setup.py register bdist_wheel upload')
+  run('python setup.py register sdist upload')
 
   log.info('published new release')
+
+
+@task
+def docs():
+  """docs - build Sphinx documentation and display in browser."""
+  run('make -C docs html')
+  run('open docs/_build/html/index.html')
+  log.info('built and displayed documentation')

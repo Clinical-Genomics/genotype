@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 taboo.utils
-~~~~~~~~~~~~
+~~~~~~~~~~~
 
 Various general functionality used (possibly) across the package.
 """
@@ -18,7 +18,7 @@ namebase = compose(first, os.path.splitext, os.path.basename)
 
 
 def track_rows(rows, start='#'):
-  """Move an iterator until lines don't start with a specific pattern.
+  """Progress an iterator until lines no longer begin with a pattern.
 
   Works by introducing a ``break`` when the pattern no longer returns a
   match.
@@ -41,5 +41,15 @@ def track_rows(rows, start='#'):
 
 @curry
 def startswith(prefix, string):
-  """Match prefix pattern in the beginning of a string."""
+  """Match prefix pattern in the beginning of a string.
+
+  Functional version of ``str.startswith`` method.
+
+  Args:
+    prefix (str): pattern to match against
+    string (str): string to validate if it matches the pattern
+
+  Returns:
+    bool: ``True`` if matching, else ``False``
+  """
   return string.startswith(prefix)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 taboo.cli
-~~~~~~~~~~
+~~~~~~~~~
 
 Command line interface (console entry points). Based on Click.
 """
@@ -16,10 +16,10 @@ from . import __version__
 @click.group()
 @click.version_option(__version__)
 def cli():
-  """VCF genotype utilities."""
+  """Provide entry point for VCF genotype comparison utilities."""
   pass
 
 
-# add subcommand dynamically to the CLI
+# add subcommands dynamically to the CLI
 for entry_point in iter_entry_points('taboo.subcommand'):
   cli.add_command(entry_point.load())

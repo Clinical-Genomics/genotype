@@ -10,8 +10,6 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import sys
 
-import taboo
-
 # Shortcut for building/publishing to Pypi
 if sys.argv[-1] == 'publish':
   os.system('python setup.py sdist bdist_wheel upload')
@@ -43,23 +41,24 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
-  name=taboo.__title__,
+  name='taboo',
 
   # Versions should comply with PEP440. For a discussion on
   # single-sourcing the version across setup.py and the project code,
   # see http://packaging.python.org/en/latest/tutorial.html#version
-  version=taboo.__version__,
+  version='0.0.1',
 
-  description=taboo.__summary__,
+  description=("Taboo provides an automated pipipeline for comparing"
+               "genotypes from different assays."),
   long_description=long_description,
   # What does your project relate to? Separate with spaces.
   keywords='taboo development',
-  author=taboo.__author__,
-  author_email=taboo.__email__,
-  license=taboo.__license__,
+  author='Robin Andeer',
+  author_email='robin.andeer@scilifelab.se',
+  license='MIT',
 
   # The project's main homepage
-  url=taboo.__uri__,
+  url='https://github.com/robinandeer/taboo',
 
   packages=find_packages(exclude=('tests*', 'docs', 'examples')),
 
@@ -75,7 +74,7 @@ setup(
   # data_files=[('my_data', ['data/data_file'])],
 
   install_requires=[
-    'Click',
+    'click',
     'setuptools',
     'xlrd',
     'toolz',

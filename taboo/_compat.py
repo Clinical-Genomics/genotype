@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 taboo._compat
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 Python 2.7.x, 3.2+ compatability module.
 """

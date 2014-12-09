@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 taboo
-~~~~~~~~~~~~~
+~~~~~
 
-Taboo provides an automated pipipeline for comparing genotypes from different assays.
+Taboo provides an automated pipipeline for comparing genotypes from
+different assays.
 
 :copyright: (c) 2014 by Robin Andeer
 :licence: MIT, see LICENCE for more details
@@ -12,7 +13,7 @@ from __future__ import absolute_import, unicode_literals
 
 __all__ = [
   '__title__', '__summary__', '__uri__', '__version__', '__author__',
-  '__email__', '__license__', '__copyright__'
+  '__email__', '__license__', '__copyright__', '__banner__'
 ]
 
 # Generate your own AsciiArt at:
