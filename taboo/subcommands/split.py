@@ -11,12 +11,13 @@ from ..utils import namebase
 
 
 @click.command()
-@click.option('--out', type=click.Path(exists=True), default='./')
-@click.option('--pattern', default="%(sample)s.%(base)s.vcf",
-  help='Sample file naming pattern')
-@click.option('--sample', type=str, help='Single sample id to extract')
+@click.option('-o', '--out', type=click.Path(exists=True), default='./',
+              help='Base path where to write out-files to')
+@click.option('-p', '--pattern', default="%(sample)s.%(base)s.vcf",
+              help='Sample-file naming pattern')
+@click.option('-s', '--sample', type=str, help='Single sample ID to extract')
 @click.argument('vcf_path', type=click.Path(exists=True))
-def split(vcf_path, sample, out, pattern):
+def split(vcf_path, out, pattern, sample):
   """Split VCF-file into multiple single sample VCF-files.
 
   \b
@@ -30,7 +31,7 @@ def split(vcf_path, sample, out, pattern):
   file_base = namebase(vcf_path)
 
   # base of vcf-subset command to execute per sample id
-  base_command = 'vcf-subset --keep-uncalled -c %(sample)s %(file)s'
+  base_command = "vcf-subset --keep-uncalled -c %(sample)s %(file)s"
 
   # spawn two csv readers
   vcf_reader, vcf_reader_copy = itertools.tee(open(vcf_path, encoding='utf-8'))

@@ -10,10 +10,10 @@ from .core import compare_vcfs
 
 @click.command()
 @click.option('-p', '--plugins', type=str, default=None)
-@click.option(
-  '-s', '--samples', type=str, default=None, help='List of samples to check')
-@click.argument(
-  'vcfs', nargs=-1, type=click.File(encoding='utf-8'), required=True)
+@click.option('-s', '--samples', type=str, default=None,
+              help='List of samples to check')
+@click.argument('vcfs', nargs=-1, type=click.File(encoding='utf-8'),
+                required=True)
 def compare(plugins, samples, vcfs):
   """Compare genotypes in two VCF-files.
 

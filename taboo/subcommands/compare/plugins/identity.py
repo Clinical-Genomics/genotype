@@ -13,7 +13,8 @@ from ...._compat import text_type
 
 def site_id(site, delimiter='|'):
   """Build a unique ID for a specific variant position."""
-  return delimiter.join(map(str, [site.CHROM, site.POS, site.REF, site.ALT[0]]))
+  id_components = [site.CHROM, site.POS, site.REF, site.ALT[0]]
+  return delimiter.join(map(str, id_components))
 
 
 def get_variant_id(sample, delimiter='|'):

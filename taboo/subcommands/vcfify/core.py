@@ -10,6 +10,7 @@ from .utils import encode_genotype, rsnumber_converter, vcf_headers
 
 
 def pipeline(excel_path, base_vcf_stream):
+  """Convert MAF Excel sheet with genotypes to a VCF file."""
   # export last sheet
   (excel_sheet_copy,
    excel_sheet) = tee(export_excel_sheet(excel_path, sheet_id=-1))
