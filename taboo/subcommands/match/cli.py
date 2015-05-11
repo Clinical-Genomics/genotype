@@ -12,7 +12,7 @@ import taboo.match
 @click.pass_context
 def match(context, sample, origin, alt_origin):
     """Match a sample genotype fingerprint against all the rest."""
-    matches = taboo.match.match_sample(context.store, sample, origin, alt_origin)
+    matches = taboo.match.match_sample(context.parent.store, sample, origin, alt_origin)
     ranked_matches = taboo.match.sort_ratios(matches)
 
     for sample, ratio in ranked_matches[:10]:

@@ -14,4 +14,4 @@ from taboo.input import load_excel, load_vcf
 def load(context, input_type, origin, input_path):
     """Load database with new samples and genotypes."""
     loader_func = {'vcf': load_vcf, 'excel': load_excel}.get(input_type)
-    loader_func(context.store, input_path, origin=origin)
+    loader_func(context.parent.store, input_path, origin=origin)
