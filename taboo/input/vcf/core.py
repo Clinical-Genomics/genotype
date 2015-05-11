@@ -18,7 +18,8 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
     Args:
         origin (str): identifier for variant origin (maf, mip, etc.)
     """
-    parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True)
+    parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True,
+                                  skip_info_check=True)
 
     # build samples and add to session
     samples = [build_sample(origin, individual) for individual in parser.individuals]
@@ -86,7 +87,8 @@ def format_genotype(sample_dict, variant):
     """
     gt_mapper = {
         '0': variant['REF'],
-        '1': variant['ALT']
+        '1': variant['ALT'],
+        '.': 'N'
     }
 
     for sample_id, genotype in iteritems(variant['genotypes']):
