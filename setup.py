@@ -95,7 +95,7 @@ setup(
   # target platform.
   entry_points={
     'console_scripts': [
-      'taboo = taboo.__main__:cli',
+      'taboo = taboo.cli:cli',
     ],
     'taboo.subcommand': [
       'match = taboo.subcommands:match',
