@@ -9,9 +9,13 @@ from taboo.input import load_excel, load_vcf
 @click.command()
 @click.option('-t', '--input-type', type=click.Choice(['vcf', 'excel']))
 @click.option('-o', '--origin', type=click.Choice(['genotyping', 'sequencing']))
+@click.option('-r', '--rsnumber-path', type=click.Path(exists=True))
 @click.argument('input_path', type=click.Path(exists=True))
 @click.pass_context
-def load(context, input_type, origin, input_path):
+def load(context, input_type, origin, rsnumber_path, input_path):
     """Load database with new samples and genotypes."""
-    loader_func = {'vcf': load_vcf, 'excel': load_excel}.get(input_type)
-    loader_func(context.parent.store, input_path, origin=origin)
+    if input_type == 'vcf':
+        load_vcf(context.parent.store, input_path, rsnumber_path, origin=origin)
+
+    else:
+        load_excel(context.parent.store, input_path, origin=origin)

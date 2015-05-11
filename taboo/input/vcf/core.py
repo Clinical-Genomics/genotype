@@ -12,7 +12,7 @@ from taboo.store.utils import build_genotype, build_sample
 logger = logging.getLogger(__name__)
 
 
-def load_vcf(store, vcf_path, rsnumber_path, origin='sequencing'):
+def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
     """Load samples with genotypes from a VCF file.
 
     Args:
@@ -37,8 +37,7 @@ def load_vcf(store, vcf_path, rsnumber_path, origin='sequencing'):
     sample_dict = {sample.sample_id: sample.id for sample in samples}
 
     # start processing variants
-    with codecs.open(rsnumber_path, 'r') as handle:
-        rsnumbers = read_rsnumbers(handle)
+    rsnumbers = read_rsnumbers(rsnumber_stream)
     matched_variants = extract_rsnumbers(parser, rsnumbers)
     removed_nonref = (variant for variant in matched_variants
                       if variant['ALT'] != '<NON_REF>')
