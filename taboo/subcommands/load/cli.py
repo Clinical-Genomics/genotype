@@ -3,14 +3,17 @@ from __future__ import absolute_import, unicode_literals
 
 import click
 
-from .core import load_comparison
+import taboo.store
+from taboo.input.excel import load_excel
+from taboo.input.vcf import load_vcf
 
 
 @click.command()
-@click.argument('compare_output', type=click.File(encoding='utf-8'),
-                default='-', required=False)
-@click.option('-u', '--uri', default=':memory:')
-@click.option('-d', '--dialect', default='sqlite')
-def load(compare_output, uri, dialect):
-  """Extract the most interesting information from a VCF-file."""
-  load_comparison(compare_output, uri=uri, dialect=dialect)
+@click.option('-t', '--input-type', type=click.Choice(['vcf', 'excel']))
+@click.option('-o', '--origin', type=click.Choice(['genotyping', 'sequencing']))
+@click.argument('input_path', type=click.Path(exists=True))
+@click.pass_context
+def load(context, input_type, origin, input_path):
+    """Load database with new samples and genotypes."""
+    loader_func = {'vcf': load_vcf, 'excel': load_excel}.get(input_type)
+    loader_func(context.store, input_path, origin=origin)

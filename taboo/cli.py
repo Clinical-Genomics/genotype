@@ -10,14 +10,17 @@ from pkg_resources import iter_entry_points
 
 import click
 
-from . import __version__
+import taboo
+import taboo.store
 
 
 @click.group()
-@click.version_option(__version__)
-def cli():
+@click.version_option(taboo.__version__)
+@click.option('-d', '--db-path', type=click.Path(), default='./taboo.sqlite3')
+@click.pass_context
+def cli(context, db_path):
   """Provide entry point for VCF genotype comparison utilities."""
-  pass
+  context.store = taboo.store.Database(db_path)
 
 
 # add subcommands dynamically to the CLI

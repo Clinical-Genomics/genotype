@@ -46,7 +46,7 @@ setup(
   # Versions should comply with PEP440. For a discussion on
   # single-sourcing the version across setup.py and the project code,
   # see http://packaging.python.org/en/latest/tutorial.html#version
-  version='0.0.1',
+  version='0.1.0',
 
   description=("Taboo provides an automated pipipeline for comparing"
                "genotypes from different assays."),
@@ -97,21 +97,9 @@ setup(
       'taboo = taboo.__main__:cli',
     ],
     'taboo.subcommand': [
-      'compare = taboo.subcommands:compare',
-      'extract = taboo.subcommands:extract',
-      'filter = taboo.subcommands:filter_vcf',
-      'rename = taboo.subcommands:rename',
-      'vcfify = taboo.subcommands:vcfify',
-      'split = taboo.subcommands:split',
+      'match = taboo.subcommands:match',
       'load = taboo.subcommands:load'
     ],
-    'taboo.comparator': [
-      'concordance = taboo.subcommands:concordance',
-      'gt-type = taboo.subcommands:gt_type',
-      'identity = taboo.subcommands:identity',
-      'quality = taboo.subcommands:quality',
-      'samples = taboo.subcommands:samples',
-    ]
   },
 
   # See: http://pypi.python.org/pypi?%3Aaction=list_classifiers

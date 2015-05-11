@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 from .core import Base
-from .position import Position
+from .genotype import Genotype
 from .sample import Sample

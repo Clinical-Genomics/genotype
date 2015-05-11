@@ -7,9 +7,10 @@ from .core import Base
 
 
 class Sample(Base):
+    __tablename__ = 'sample'
+    __table_args__ = (UniqueConstraint('sample_id', 'origin', name='_sample_origin'),)
+
     id = Column(Integer, primary_key=True)
     sample_id = Column(String(32))
     origin = Column(String(10), nullable=False)
-    positions = relationship('Position', backref='sample')
-
-    UniqueConstraint('sample_id', 'origin', name='_sample_origin')
+    genotypes = relationship('Genotype', backref='sample')
