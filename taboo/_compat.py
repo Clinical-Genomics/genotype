@@ -9,8 +9,6 @@ from __future__ import absolute_import
 import operator
 import sys
 
-from toolz import curry
-
 is_py2 = sys.version_info[0] == 2
 
 if not is_py2:
@@ -44,12 +42,3 @@ else:
   iteritems = operator.methodcaller('iteritems')
   iterkeys = operator.methodcaller('iterkeys')
   itervalues = operator.methodcaller('itervalues')
-
-
-@curry
-def split(string, sep='\t'):
-  """Split string with specified separator.
-
-  Unifies useage of ``sep`` keyword for both Python 2 and 3.
-  """
-  return text_type.split(string, sep)

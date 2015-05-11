@@ -3,9 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import click
 
-import taboo.store
-from taboo.input.excel import load_excel
-from taboo.input.vcf import load_vcf
+from taboo.input import load_excel, load_vcf
 
 
 @click.command()

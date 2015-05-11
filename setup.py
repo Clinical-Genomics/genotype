@@ -77,9 +77,10 @@ setup(
     'click',
     'setuptools',
     'xlrd',
-    'toolz',
     'PyVCF',
-    'sqlalchemy'
+    'sqlalchemy',
+    'fuzzywuzzy',
+    'vcf_parser'
   ],
   tests_require=[
     'pytest',

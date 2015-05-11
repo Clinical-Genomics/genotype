@@ -12,9 +12,9 @@ or ``python -m taboo`` (no install required).
 from __future__ import absolute_import, unicode_literals
 import sys
 
-from .cli import cli
+import taboo.cli
 
 
 if __name__ == '__main__':
   # exit using whatever exit code the CLI returned
-  sys.exit(cli())
+  sys.exit(taboo.cli.cli())
