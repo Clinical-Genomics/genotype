@@ -37,7 +37,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
 
     # build mapper between samples and primary keys
     sample_dict = {sample.sample_id: sample.id for sample in samples}
-    rsnumbers = read_rsnumbers(rsnumber_stream)
+    rsnumbers = set(rsnumber.strip() for rsnumber in rsnumber_stream)
 
     # start processing variants
     # skip header lines
@@ -73,11 +73,6 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
         store.save()
 
         raise exception
-
-
-def read_rsnumbers(rsnumbers_stream):
-    # read in rsnumbers
-    return set([rsnumber.strip() for rsnumber in rsnumbers_stream])
 
 
 def format_genotype(sample_dict, variant_row):
