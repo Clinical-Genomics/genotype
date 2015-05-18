@@ -15,7 +15,7 @@ def match(context, sample, origin, alt_origin):
     matches = taboo.match.match_sample(context.parent.store, sample, origin, alt_origin)
     ranked_matches = taboo.match.sort_ratios(matches)
 
+    click.echo('#id\tsample_id\tratio')
     for sample, ratio in ranked_matches[:10]:
-        click.echo('#id\tsample_id\tratio')
         click.echo("{sample.id}\t{sample.sample_id}\t{ratio}"
                    .format(sample=sample, ratio=ratio))
