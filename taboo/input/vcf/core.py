@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import codecs
+from collections import OrderedDict
 import logging
 
 import vcf_parser
@@ -36,7 +37,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
         raise exception
 
     # build mapper between samples and primary keys
-    sample_dict = {sample.sample_id: sample.id for sample in samples}
+    sample_dict = OrderedDict((sample.sample_id, sample.id) for sample in samples)
     rsnumbers = set(rsnumber.strip() for rsnumber in rsnumber_stream)
 
     # start processing variants
@@ -87,7 +88,7 @@ def format_genotype(sample_dict, variant_row):
     # handle '<NON_REF>'
     alt_parts = alt_str.split(',')
     alt = alt_parts[0]
-    assert alt != '<NON_REF>', 'Invalid genotype position {}'.format(variant_row)
+    assert alt != '<NON_REF>', 'Invalid genotype position: {}'.format(variant_row)
 
     genotypes = variant_row[9:]
     gt_mapper = {'0': ref, '1': alt, '.': 'N'}
