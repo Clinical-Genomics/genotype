@@ -16,10 +16,8 @@ from taboo.input import load_excel, load_vcf
 def load(context, input_type, origin, rsnumber_path, input_path):
     """Load database with new samples and genotypes."""
     if input_type == 'vcf':
-        with codecs.open(input_path, 'r') as vcf_stream:
-            with codecs.open(rsnumber_path, 'r') as rsnumber_stream:
-                load_vcf(context.parent.store, vcf_stream, rsnumber_stream,
-                         origin=origin)
+        with codecs.open(rsnumber_path, 'r') as rsnumber_stream:
+            load_vcf(context.parent.store, input_path, rsnumber_stream, origin=origin)
 
     else:
         load_excel(context.parent.store, input_path, origin=origin)
