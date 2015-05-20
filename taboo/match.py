@@ -38,12 +38,12 @@ def match_sample(store, sample_id, origin='sequencing', compare_origin='maf'):
     alt_samples = query(Sample).filter_by(origin=compare_origin)
 
     genotypes = query(Genotype).filter_by(sample_id=sample.id).order_by('rsnumber')
-    fingerprint = stringify_genotypes(genotypes)
+    fingerprint = stringify_genotypes(query, genotypes)
 
     for alt_sample in alt_samples:
         alt_genotypes = query(Genotype).filter_by(sample_id=alt_sample.id)\
                                        .order_by('rsnumber')
-        alt_fingerprint = stringify_genotypes(alt_genotypes)
+        alt_fingerprint = stringify_genotypes(query, alt_genotypes)
 
         # compare the fingerprints
         ratio = fuzzywuzzy.fuzz.ratio(fingerprint, alt_fingerprint)

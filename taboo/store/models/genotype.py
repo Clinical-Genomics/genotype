@@ -18,4 +18,6 @@ class Genotype(Base):
 
     def __str__(self):
         """Stringify genotype call."""
-        return "{this.allele_1}{this.allele_2}".format(this=self)
+        # assume we aren't dealing with stranded data
+        genotypes = sorted([self.allele_1, self.allele_2])
+        return ''.join(genotypes)

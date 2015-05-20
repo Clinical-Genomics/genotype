@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
 
 from .core import Base
-from taboo.store.utils import unique_rsnumbers
 
 
 class Sample(Base):
