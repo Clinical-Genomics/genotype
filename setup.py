@@ -100,7 +100,8 @@ setup(
     'taboo.subcommand': [
       'match = taboo.subcommands:match',
       'load = taboo.subcommands:load',
-      'setup = taboo.store:setup'
+      'setup = taboo.store:setup',
+      'show = taboo.subcommand:show'
     ],
   },
 
