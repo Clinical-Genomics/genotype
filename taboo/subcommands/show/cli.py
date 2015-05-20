@@ -15,5 +15,5 @@ def show(context, samples):
 
     click.echo('#id\tsample_id\tgenotypes')
     for sample in db_samples:
-        click.echo("{sample.id}\t{sample.sample_id}\t{sample.stringify()}"
-                   .format(sample=sample))
+        click.echo("{sample.id}\t{sample.sample_id}\t{genotype_str}"
+                   .format(sample=sample, genotype_str=sample.stringify()))
