@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
 
 from .core import Base
+from taboo.store.utils import unique_rsnumbers
 
 
 class Sample(Base):
@@ -13,8 +14,4 @@ class Sample(Base):
     id = Column(Integer, primary_key=True)
     sample_id = Column(String(32))
     origin = Column(String(10), nullable=False)
-    genotypes = relationship('Genotype', backref='sample')
-
-    def stringify(self):
-        """Stringify genotypes in the simplest possible way."""
-        return '-'.join(str(genotype) for genotype in self.genotypes)
+    genotypes = relationship('Genotype', order_by='Genotype.rsnumber', backref='sample')

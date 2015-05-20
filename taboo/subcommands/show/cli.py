@@ -2,7 +2,8 @@
 from __future__ import absolute_import, unicode_literals
 import click
 
-from taboo.store.models import Sample, Genotype
+import taboo.match
+from taboo.store.models import Sample
 
 
 @click.command()
@@ -15,5 +16,6 @@ def show(context, samples):
 
     click.echo('#id\tsample_id\tgenotypes')
     for sample in db_samples:
+        genotype_str = taboo.match.stringify_genotypes(query, sample.genotypes)
         click.echo("{sample.id}\t{sample.sample_id}\t{genotype_str}"
-                   .format(sample=sample, genotype_str=sample.stringify()))
+                   .format(sample=sample, genotype_str=genotype_str))

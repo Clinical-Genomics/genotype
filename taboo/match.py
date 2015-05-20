@@ -5,9 +5,18 @@ import taboo.store
 from taboo.store.models import Sample, Genotype
 
 
-def stringify_genotypes(genotypes):
-    """Stringify a list of genotypes."""
-    return '-'.join(str(genotype) for genotype in genotypes)
+def stringify_genotypes(query, genotypes):
+    """Stringify a list of genotypes.
+
+    TODO: replace 'XX' with the correct reference base
+    """
+    rsnumbers = taboo.store.unique_rsnumbers(query)
+    genotype_dict = {genotype.rsnumber: str(genotype) for genotype in genotypes}
+
+    # prepare genotypes
+    genotype_strs = [genotype_dict.get(rsnumber, 'XX') for rsnumber in rsnumbers]
+
+    return '-'.join(genotype_strs)
 
 
 def sort_ratios(ratios):
