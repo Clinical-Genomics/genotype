@@ -14,3 +14,7 @@ class Sample(Base):
     sample_id = Column(String(32))
     origin = Column(String(10), nullable=False)
     genotypes = relationship('Genotype', order_by='Genotype.rsnumber', backref='sample')
+
+    def stringify(self):
+        """Stringify genotypes for the sample."""
+        return '-'.join(str(genotype) for genotype in self.genotypes)
