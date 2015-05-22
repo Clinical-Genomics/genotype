@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import collections
+
 import taboo._compat
 import taboo.store
 import taboo.rsnumbers
@@ -7,7 +9,7 @@ from taboo.store.models import Sample, Genotype
 
 def sort_scores(scores):
     """Sort matches based on comparison scores."""
-    return sorted(scores, key=lambda item: item[1])
+    return sorted(scores, key=lambda item: item[1]['match'])
 
 
 def fill_forward(all_rsnumbers, reference_dict, genotypes):
@@ -28,10 +30,22 @@ def compare_genotypes(original, alternative):
 
     Returns the number of mismatches based soley on identity.
     """
-    mismatches = [None for org_gt, alt_gt in taboo._compat.zip(original, alternative)
-                  if (str(org_gt) != str(alt_gt)) and (alt_gt.allele_1 != '0')]
+    for org_gt, alt_gt in taboo._compat.zip(original, alternative):
+        if alt_gt.allele_1 != '0':
+            # no comparison
+            yield 'unknown'
+        elif str(org_gt) != str(alt_gt):
+            # genotypes are *not* identical
+            yield 'mismatch'
+        else:
+            # genotypes are identical
+            yield 'match'
 
-    return len(mismatches)
+
+def count_results(comparisons):
+    """Tally the results from the comparison."""
+    counter = collections.Counter(comparisons)
+    return counter
 
 
 def match_sample(store, rsnumber_stream, sample_id, origin='sequencing',
@@ -52,6 +66,7 @@ def match_sample(store, rsnumber_stream, sample_id, origin='sequencing',
     # walk over all alternative samples and find best matches
     alt_samples = query(Sample).filter_by(origin=compare_origin)
     for alt_sample in alt_samples:
-        mismatches = compare_genotypes(original_genotypes, alt_sample.genotypes)
+        comparisons = compare_genotypes(original_genotypes, alt_sample.genotypes)
+        results = count_results(comparisons)
 
-        yield alt_sample, mismatches
+        yield alt_sample, results

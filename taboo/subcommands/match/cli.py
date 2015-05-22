@@ -18,6 +18,10 @@ def match(context, sample, references, origin, alt_origin):
     ranked_comparisons = taboo.match.sort_scores(comparisons)
 
     click.echo('#id\tsample_id\tmismatches')
-    for sample, mismatches in ranked_comparisons[:10]:
-        click.echo("{sample.id}\t{sample.sample_id}\t{mismatches}"
-                   .format(sample=sample, mismatches=mismatches))
+    for sample, results in ranked_comparisons[:10]:
+        mismatches = results['mismatch']
+        matches = results['match']
+        unknowns = results['unknown']
+        click.echo("{sample.id}\t{sample.sample_id}\t{match}\t{mismatch}\t{unknown}"
+                   .format(sample=sample, match=matches, mismatch=mismatches,
+                           unknown=unknowns))
