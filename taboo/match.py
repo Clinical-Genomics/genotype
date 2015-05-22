@@ -28,8 +28,6 @@ def compare_genotypes(original, alternative):
 
     Returns the number of mismatches based soley on identity.
     """
-    assert len(original) == len(alternative), 'Genotype lists not the same length'
-
     mismatches = [None for org_gt, alt_gt in taboo._compat.zip(original, alternative)
                   if str(org_gt) == str(alt_gt)]
 
