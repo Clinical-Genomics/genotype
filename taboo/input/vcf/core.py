@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from taboo._compat import zip, itervalues
 import taboo.store
+import taboo.rsnumbers
 from taboo.store.utils import build_genotype, build_sample
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,10 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
 
     # build mapper between samples and primary keys
     sample_dict = OrderedDict((sample.sample_id, sample.id) for sample in samples)
-    rsnumbers = set(rsnumber.strip() for rsnumber in rsnumber_stream)
+
+    # read in rsnumbers
+    rsnumbers = (row[0] for row in taboo.rsnumbers.read(rsnumber_stream))
+    rsnumber_matcher = taboo.rsnumbers.matcher(rsnumbers)
 
     # start processing variants
     # skip header lines
@@ -49,7 +53,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
         content_rows = (line.split('\t') for line in content_lines)
 
         # extract rsnumbers
-        relevant_rows = (row for row in content_rows if row[2] in rsnumbers)
+        relevant_rows = (row for row in content_rows if row[2] in rsnumber_matcher)
 
         variant_inputs = (format_genotype(sample_dict, variant_row)
                           for variant_row in relevant_rows)
