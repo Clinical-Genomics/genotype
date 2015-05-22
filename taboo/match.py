@@ -31,7 +31,7 @@ def compare_genotypes(original, alternative):
     Returns the number of mismatches based soley on identity.
     """
     for org_gt, alt_gt in taboo._compat.zip(original, alternative):
-        if alt_gt.allele_1 != '0':
+        if alt_gt.allele_1 == '0':
             # no comparison
             yield 'unknown'
         elif str(org_gt) != str(alt_gt):
