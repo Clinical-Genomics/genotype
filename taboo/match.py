@@ -9,7 +9,7 @@ from taboo.store.models import Sample, Genotype
 
 def sort_scores(scores):
     """Sort matches based on comparison scores."""
-    return sorted(scores, key=lambda item: item[1]['match'])
+    return sorted(scores, key=lambda item: item[1]['match'], reverse=True)
 
 
 def fill_forward(all_rsnumbers, reference_dict, genotypes):
