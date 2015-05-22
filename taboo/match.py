@@ -29,7 +29,7 @@ def compare_genotypes(original, alternative):
     Returns the number of mismatches based soley on identity.
     """
     mismatches = [None for org_gt, alt_gt in taboo._compat.zip(original, alternative)
-                  if str(org_gt) != str(alt_gt)]
+                  if (str(org_gt) != str(alt_gt)) and (alt_gt.allele_1 != '0')]
 
     return len(mismatches)
 
@@ -46,7 +46,8 @@ def match_sample(store, rsnumber_stream, sample_id, origin='sequencing',
     all_rsnumbers = taboo.store.unique_rsnumbers(query)
     rsnumber_references = taboo.rsnumbers.read(rsnumber_stream)
     reference_dict = taboo.rsnumbers.dictify(rsnumber_references)
-    original_genotypes = fill_forward(all_rsnumbers, reference_dict, sample.genotypes)
+    original_genotypes = list(fill_forward(all_rsnumbers, reference_dict,
+                                           sample.genotypes))
 
     # walk over all alternative samples and find best matches
     alt_samples = query(Sample).filter_by(origin=compare_origin)
