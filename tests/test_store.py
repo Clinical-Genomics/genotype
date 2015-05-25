@@ -3,9 +3,19 @@ import os
 import taboo.store
 
 
-def test_setup():
-    """Test setting up the database."""
+class TestStore:
     db_path = 'tests/test.sqlite3'
-    db = taboo.store.setup(db_path)
+    store = None
 
-    assert os.path.exists(db_path)
+    def setup(self):
+        """Setup database for testing."""
+        self.store = taboo.store.Database(self.db_path)
+        self.store.setup()
+
+    def teardown(self):
+        """Remve the database file."""
+        os.remove(self.db_path)
+
+    def test_setup(self):
+        """Test that the setup created a new database."""
+        assert os.path.exists(self.db_path)
