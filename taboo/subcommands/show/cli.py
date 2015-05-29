@@ -27,7 +27,8 @@ def show(context, samples, references):
         rsnumber_references = taboo.rsnumbers.read(references)
         reference_dict = taboo.rsnumbers.dictify(rsnumber_references)
 
-    click.echo('#id\tsample_id\tgenotypes')
+    rsnumber_columns = '\t'.join(all_rsnumbers)
+    click.echo("#id\tsample_id\tgenotypes\t{}".format(rsnumber_columns))
     for sample in db_samples:
         if references:
             genotypes = taboo.match.fill_forward(all_rsnumbers, reference_dict,
@@ -35,6 +36,6 @@ def show(context, samples, references):
         else:
             genotypes = sample.genotypes
 
-        genotype_str = stringify_genotypes(genotypes)
+        genotype_str = '\t'.join(str(genotype) for genotype in genotypes)
         click.echo("{sample.id}\t{sample.sample_id}\t{genotype_str}"
                    .format(sample=sample, genotype_str=genotype_str))
