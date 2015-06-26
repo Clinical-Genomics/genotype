@@ -2,8 +2,8 @@
 """
 taboo.cli
 ~~~~~~~~~
-
 Command line interface (console entry points). Based on Click.
+Loads subcommands dynamically using setuptools entry points.
 """
 from __future__ import absolute_import, unicode_literals
 from pkg_resources import iter_entry_points
@@ -19,7 +19,7 @@ import taboo.store
 @click.option('-d', '--db-path', type=click.Path(), default='./taboo.sqlite3')
 @click.pass_context
 def cli(context, db_path):
-  """Provide entry point for VCF genotype comparison utilities."""
+  """Genotype comparison tool."""
   context.store = taboo.store.Database(db_path)
 
 

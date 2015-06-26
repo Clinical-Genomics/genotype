@@ -2,14 +2,13 @@
 """
 taboo
 ~~~~~
-
-Taboo provides an automated pipipeline for comparing genotypes from
-different assays.
+Taboo is a tool for comparing genotypes from different assays.
 
 :copyright: (c) 2014 by Robin Andeer
 :licence: MIT, see LICENCE for more details
 """
 from __future__ import absolute_import, unicode_literals
+import logging
 
 __all__ = [
   '__title__', '__summary__', '__uri__', '__version__', '__author__',
@@ -25,14 +24,16 @@ __banner__ = r"""
 """
 
 __title__ = 'taboo'
-__summary__ = ("Taboo provides an automated pipipeline for comparing"
-               "genotypes from different assays.")
-__uri__ = 'https://github.com/robinandeer/taboo'
+__summary__ = 'tool for comparing genotypes from different assays.'
+__uri__ = 'https://github.com/Clinical-Genomics/taboo'
 
-__version__ = '0.0.1'
+__version__ = '0.1.0'
 
 __author__ = 'Robin Andeer'
 __email__ = 'robin.andeer@scilifelab.se'
 
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2014 Robin Andeer'
+__copyright__ = 'Copyright 2015 Robin Andeer'
+
+# the user should dictate what happens when a logging event occurs
+logging.getLogger(__name__).addHandler(logging.NullHandler())

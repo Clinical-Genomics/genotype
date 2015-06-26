@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 taboo.__main__
-~~~~~~~~~~~~~~
-
+~~~~~~~~~~~~~~~~
 The main entry point for the command line interface.
 
 Invoke as ``taboo`` (if installed)

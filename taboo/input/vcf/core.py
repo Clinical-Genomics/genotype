@@ -14,26 +14,28 @@ from taboo.store.utils import build_genotype, build_sample
 logger = logging.getLogger(__name__)
 
 
-def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
+def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
+             source=None):
     """Load samples with genotypes from a VCF file.
 
     Args:
-        origin (str): identifier for variant origin (maf, mip, etc.)
+        experiment (str): identifier for variant experiment (maf, mip, etc.)
     """
     # parse some meta data
     parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True,
                                   skip_info_check=True)
 
     # build samples and add to session
-    samples = [build_sample(origin, individual) for individual in parser.individuals]
+    samples = [build_sample(experiment, individual, source=(source or vcf_path))
+               for individual in parser.individuals]
     store.add(*samples)
 
     try:
         # commit samples to get ids
         store.save()
     except IntegrityError as exception:
-        logger.error("Sample ({}, {}) already loaded loaded into database"
-                     .format(*exception.params))
+        logger.error("Sample (%s, %s) already loaded loaded into database",
+                     *exception.params)
         store.session.rollback()
         raise exception
 
@@ -69,7 +71,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, origin='sequencing'):
         store.save()
     except IntegrityError as exception:
         # we are not handling multiple alleles because we don't expect any
-        logger.error("Multiple alleles detected, aborting")
+        logger.error('Multiple alleles detected, aborting')
         store.session.rollback()
 
         # remove uploaded samples

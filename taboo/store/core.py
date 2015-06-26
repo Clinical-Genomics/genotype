@@ -52,10 +52,10 @@ class Database(object):
         # add all records to the session object
         self.session.add_all(records)
 
-    def sample(self, sample_id, origin):
+    def sample(self, sample_id, experiment):
         """Get a sample based on the unique id"""
         sample = (self.session.query(Sample)
-                  .filter(sample_id=sample_id, origin=origin)
+                  .filter(sample_id=sample_id, experiment=experiment)
                   .one())
 
         return sample

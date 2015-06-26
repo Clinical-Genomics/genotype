@@ -8,7 +8,14 @@ from taboo.store.models import Sample, Genotype
 
 
 def sort_scores(scores):
-    """Sort matches based on comparison scores."""
+    """Sort matches based on comparison scores.
+
+    Args:
+        scores (list): list of matches from comparison
+
+    Returns:
+        list: sorted matches based on 'match' score
+    """
     return sorted(scores, key=lambda item: item[1]['match'], reverse=True)
 
 
@@ -48,13 +55,14 @@ def count_results(comparisons):
     return counter
 
 
-def match_sample(store, rsnumber_stream, sample_id, origin='sequencing',
-                 compare_origin='maf'):
+def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
+                 alt_experiment='maf'):
     """Match a sample fingerprint against the database."""
     query = store.session.query
 
     # get genotypes for the original sample
-    sample = query(Sample).filter_by(sample_id=sample_id, origin=origin).one()
+    sample = query(Sample).filter_by(sample_id=sample_id,
+                                     experiment=experiment).one()
 
     # fill forward missing positions as "ref/ref"
     all_rsnumbers = taboo.store.unique_rsnumbers(query)
@@ -64,7 +72,7 @@ def match_sample(store, rsnumber_stream, sample_id, origin='sequencing',
                                            sample.genotypes))
 
     # walk over all alternative samples and find best matches
-    alt_samples = query(Sample).filter_by(origin=compare_origin)
+    alt_samples = query(Sample).filter_by(experiment=alt_experiment)
     for alt_sample in alt_samples:
         comparisons = compare_genotypes(original_genotypes, alt_sample.genotypes)
         results = count_results(comparisons)

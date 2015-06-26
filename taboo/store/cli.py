@@ -2,8 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 import click
 
-from .core import Database
-
 
 def setup_db(store, reset=False):
     """Configure a new database from scratch."""

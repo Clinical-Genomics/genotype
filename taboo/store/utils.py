@@ -8,9 +8,9 @@ def build_genotype(rsnumber, sample_id, allele_1, allele_2):
                     allele_2=allele_2)
 
 
-def build_sample(origin, sample_id):
+def build_sample(experiment, sample_id, source=None):
     """Build a sample record."""
-    return Sample(sample_id=sample_id, origin=origin)
+    return Sample(sample_id=sample_id, experiment=experiment, source=source)
 
 
 def unique_rsnumbers(query):

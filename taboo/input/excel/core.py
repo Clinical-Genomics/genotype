@@ -42,7 +42,7 @@ def rsnumber_start(header_row):
     return next(snp_columns)
 
 
-def load_excel(store, excel_path, origin='genotyping'):
+def load_excel(store, excel_path, experiment='genotyping', source=None):
     """Convert MAF Excel sheet with genotypes to a VCF file."""
     # export last sheet
     excel_sheet = export_excel_sheet(excel_path, sheet_id=-1)
@@ -56,7 +56,8 @@ def load_excel(store, excel_path, origin='genotyping'):
         sample_id = sample_row[1].split('-')[-1]  # remove leading 'IDX-'
         genotype_columns = sample_row[snp_start:]
 
-        sample = Sample(sample_id=sample_id, origin=origin)
+        sample = Sample(sample_id=sample_id, experiment=experiment,
+                        source=(source or excel_path))
 
         rsnumber_genotypes = taboo._compat.zip(rsnumber_columns, genotype_columns)
         genotypes = [build_genotype(rsnumber, sample, *genotype_str.split())
