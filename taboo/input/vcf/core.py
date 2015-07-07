@@ -81,6 +81,8 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
 
         raise exception
 
+    return samples
+
 
 def format_genotype(sample_dict, variant_row):
     """Format variant dict for database input.
