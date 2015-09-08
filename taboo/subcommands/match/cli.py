@@ -22,6 +22,7 @@ def match(context, sample, references, experiment, alt_experiment):
         mismatches = results['mismatch']
         matches = results['match']
         unknowns = results['unknown']
-        click.echo("{sample.id}\t{sample.sample_id}\t{match}\t{mismatch}\t{unknown}"
-                   .format(sample=sample, match=matches, mismatch=mismatches,
-                           unknown=unknowns))
+        template = ("{sample.id}\t{sample.sample_id}\t{match}\t{mismatch}"
+                    "\t{unknown}")
+        click.echo(template.format(sample=sample, match=matches,
+                                   mismatch=mismatches, unknown=unknowns))

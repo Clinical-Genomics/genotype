@@ -19,10 +19,10 @@ import taboo.store
 @click.option('-d', '--db-path', type=click.Path(), default='./taboo.sqlite3')
 @click.pass_context
 def cli(context, db_path):
-  """Genotype comparison tool."""
-  context.store = taboo.store.Database(db_path)
+    """Genotype comparison tool."""
+    context.store = taboo.store.Database(db_path)
 
 
 # add subcommands dynamically to the CLI
 for entry_point in iter_entry_points('taboo.subcommand'):
-  cli.add_command(entry_point.load())
+    cli.add_command(entry_point.load())

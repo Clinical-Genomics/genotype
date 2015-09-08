@@ -29,7 +29,8 @@ def fill_forward(all_rsnumbers, reference_dict, genotypes):
 
         else:
             reference = reference_dict[rsnumber]
-            yield Genotype(rsnumber=rsnumber, allele_1=reference, allele_2=reference)
+            yield Genotype(rsnumber=rsnumber, allele_1=reference,
+                           allele_2=reference)
 
 
 def compare_genotypes(original, alternative):
@@ -74,7 +75,8 @@ def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
     # walk over all alternative samples and find best matches
     alt_samples = query(Sample).filter_by(experiment=alt_experiment)
     for alt_sample in alt_samples:
-        comparisons = compare_genotypes(original_genotypes, alt_sample.genotypes)
+        comparisons = compare_genotypes(original_genotypes,
+                                        alt_sample.genotypes)
         results = count_results(comparisons)
 
         yield alt_sample, results

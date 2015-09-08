@@ -8,29 +8,28 @@ from taboo.store.models import Sample, Genotype
 
 
 def export_excel_sheet(book_path, sheet_id=0):
-  """Export data from a sheet in an Excel book.
+    """Export data from a sheet in an Excel book.
 
-  Args:
-    book_path (str): path to Excel book file
-    sheet_id (int or str): index or name of sheet to export
+    Args:
+        book_path (str): path to Excel book file
+        sheet_id (int or str): index or name of sheet to export
 
-  Yields:
-    list: values from row in Excel sheet
-  """
-  # import excel (book) file
-  excel_book = xlrd.open_workbook(book_path)
+    Yields:
+        list: values from row in Excel sheet
+    """
+    # import excel (book) file
+    excel_book = xlrd.open_workbook(book_path)
 
-  # extract sheet by index or name
-  if isinstance(sheet_id, int):
-    sheet = excel_book.sheet_by_index(sheet_id)
+    # extract sheet by index or name
+    if isinstance(sheet_id, int):
+        sheet = excel_book.sheet_by_index(sheet_id)
+    elif isinstance(sheet_id, str):
+        sheet = excel_book.sheet_by_name(sheet_id)
 
-  elif isinstance(sheet_id, str):
-    sheet = excel_book.sheet_by_name(sheet_id)
-
-  # yield each row, loop over all row indices
-  for rowx in range(sheet.nrows):
-    # access row by its row index
-    yield sheet.row_values(rowx)
+    # yield each row, loop over all row indices
+    for rowx in range(sheet.nrows):
+        # access row by its row index
+        yield sheet.row_values(rowx)
 
 
 def rsnumber_start(header_row):
@@ -76,5 +75,4 @@ def build_genotype(rsnumber, sample, allele_1, allele_2):
     """Build Genotype object without commiting parent Sample."""
     genotype = Genotype(rsnumber=rsnumber, allele_1=allele_1, allele_2=allele_2)
     genotype.sample = sample
-
     return genotype

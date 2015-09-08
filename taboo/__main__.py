@@ -15,5 +15,5 @@ import taboo.cli
 
 
 if __name__ == '__main__':
-  # exit using whatever exit code the CLI returned
-  sys.exit(taboo.cli.cli())
+    # exit using whatever exit code the CLI returned
+    sys.exit(taboo.cli.cli())

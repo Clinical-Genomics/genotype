@@ -3,6 +3,7 @@
 Provide an interface and helper functions to deal with the rsnumbers file.
 """
 
+
 def read(stream, separator='\t'):
     """Read in a file with rsnumbers."""
     lines = (line.strip() for line in stream)
@@ -12,7 +13,7 @@ def read(stream, separator='\t'):
 
 def dictify(rows, id_idx=0, ref_idx=1):
     """Make a dict matching rsnumbers with corresponding ancestral allele."""
-    mapper = {row[id_idx]:row[ref_idx] for row in rows}
+    mapper = {row[id_idx]: row[ref_idx] for row in rows}
     return mapper
 
 

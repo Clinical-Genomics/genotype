@@ -26,7 +26,8 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
                                   skip_info_check=True)
 
     # build samples and add to session
-    samples = [build_sample(experiment, individual, source=(source or vcf_path))
+    samples = [build_sample(experiment, individual,
+                            source=(source or vcf_path))
                for individual in parser.individuals]
     store.add(*samples)
 
@@ -40,7 +41,8 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
         raise exception
 
     # build mapper between samples and primary keys
-    sample_dict = OrderedDict((sample.sample_id, sample.id) for sample in samples)
+    sample_dict = OrderedDict((sample.sample_id, sample.id)
+                              for sample in samples)
 
     # read in rsnumbers
     rsnumbers = (row[0] for row in taboo.rsnumbers.read(rsnumber_stream))
@@ -55,14 +57,17 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
         content_rows = (line.split('\t') for line in content_lines)
 
         # extract rsnumbers
-        relevant_rows = (row for row in content_rows if row[2] in rsnumber_matcher)
+        relevant_rows = (row for row in content_rows if row[2] in
+                         rsnumber_matcher)
 
         variant_inputs = (format_genotype(sample_dict, variant_row)
                           for variant_row in relevant_rows)
-        variant_inputs_flat = (item for sublist in variant_inputs for item in sublist)
+        variant_inputs_flat = (item for sublist in variant_inputs
+                               for item in sublist)
 
         # build genotypes and add to session
-        genotypes = [build_genotype(**variant) for variant in variant_inputs_flat]
+        genotypes = [build_genotype(**variant) for variant in
+                     variant_inputs_flat]
 
     store.add(*genotypes)
 
@@ -96,7 +101,8 @@ def format_genotype(sample_dict, variant_row):
     # handle '<NON_REF>'
     alt_parts = alt_str.split(',')
     alt = alt_parts[0]
-    assert alt != '<NON_REF>', 'Invalid genotype position: {}'.format(variant_row)
+    assert alt != '<NON_REF>', ("Invalid genotype position: {}"
+                                .format(variant_row))
 
     genotypes = variant_row[9:]
     gt_mapper = {'0': ref, '1': alt, '.': 'N'}
