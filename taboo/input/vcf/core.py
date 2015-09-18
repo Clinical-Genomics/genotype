@@ -22,8 +22,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
         experiment (str): identifier for variant experiment (maf, mip, etc.)
     """
     # parse some meta data
-    parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True,
-                                  skip_info_check=True)
+    parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True)
 
     # build samples and add to session
     samples = [build_sample(experiment, individual,
