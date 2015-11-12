@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
+
 import click
+
+logger = logging.getLogger(__name__)
 
 
 def setup_db(store, reset=False):
@@ -15,5 +19,5 @@ def setup_db(store, reset=False):
 @click.pass_context
 def setup(context, reset):
     """Configure a new database from scratch."""
-    click.echo('Configuring new database...')
+    logger.info('Configuring new database...')
     setup_db(context.parent.store, reset=reset)

@@ -2,7 +2,6 @@
 root = true
 
 [*]
-indent_style = space
 end_of_line = lf
 charset = utf-8
 insert_final_newline = true
@@ -10,6 +9,7 @@ indent_size = 4
 
 [*.{py,ini,yaml,yml}]
 trim_trailing_whitespace = true
+indent_style = space
 
 [*.md]
 trim_trailing_whitespace = false
