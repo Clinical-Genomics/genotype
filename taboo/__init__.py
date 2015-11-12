@@ -7,7 +7,6 @@ Taboo is a tool for comparing genotypes from different assays.
 :copyright: (c) 2014 by Robin Andeer
 :licence: MIT, see LICENCE for more details
 """
-from __future__ import absolute_import, unicode_literals
 import logging
 
 __all__ = [

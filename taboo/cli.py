@@ -5,7 +5,6 @@ taboo.cli
 Command line interface (console entry points). Based on Click.
 Loads subcommands dynamically using setuptools entry points.
 """
-from __future__ import absolute_import, unicode_literals
 from pkg_resources import iter_entry_points
 
 import click

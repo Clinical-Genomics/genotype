@@ -4,7 +4,6 @@ taboo._compat
 ~~~~~~~~~~~~~
 Python 2.7.x, 3.2+ compatability module.
 """
-from __future__ import absolute_import
 import operator
 import sys
 
