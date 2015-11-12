@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import codecs
-from collections import OrderedDict
 import logging
+import os
 
 import vcf_parser
 from sqlalchemy.exc import IntegrityError
 
-from taboo._compat import zip, itervalues
 import taboo.store
+from taboo.store.models import Sample, Genotype
 import taboo.rsnumbers
-from taboo.store.utils import build_genotype, build_sample
 
 logger = logging.getLogger(__name__)
 
@@ -21,27 +20,16 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
     Args:
         experiment (str): identifier for variant experiment (maf, mip, etc.)
     """
+    source_id = source or os.path.basename(vcf_path)
+
     # parse some meta data
     parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True)
 
     # build samples and add to session
-    samples = [build_sample(experiment, individual,
-                            source=(source or vcf_path))
+    samples = [{'sample': Sample(sample_id=individual, experiment=experiment,
+                                 source=source_id),
+                'inputs': []}
                for individual in parser.individuals]
-    store.add(*samples)
-
-    try:
-        # commit samples to get ids
-        store.save()
-    except IntegrityError as exception:
-        logger.error("Sample (%s, %s) already loaded loaded into database",
-                     *exception.params)
-        store.session.rollback()
-        raise exception
-
-    # build mapper between samples and primary keys
-    sample_dict = OrderedDict((sample.sample_id, sample.id)
-                              for sample in samples)
 
     # read in rsnumbers
     rsnumbers = (row[0] for row in taboo.rsnumbers.read(rsnumber_stream))
@@ -59,36 +47,30 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
         relevant_rows = (row for row in content_rows if row[2] in
                          rsnumber_matcher)
 
-        variant_inputs = (format_genotype(sample_dict, variant_row)
-                          for variant_row in relevant_rows)
-        variant_inputs_flat = (item for sublist in variant_inputs
-                               for item in sublist)
+        variant_inputs = (format_genotype(variant_row) for variant_row
+                          in relevant_rows)
 
-        # build genotypes and add to session
-        genotypes = [build_genotype(**variant) for variant in
-                     variant_inputs_flat]
+        for positions in variant_inputs:
+            for index, position in enumerate(positions):
+                samples[index]['inputs'].append(position)
 
-    store.add(*genotypes)
+    for entity in samples:
+        sample = entity['sample']
+        genotypes = [Genotype(sample=sample, **genotype)
+                     for genotype in entity['inputs']]
 
-    try:
-        # commit the genotypes
-        store.save()
-    except IntegrityError as exception:
-        # we are not handling multiple alleles because we don't expect any
-        logger.error('Multiple alleles detected, aborting')
-        store.session.rollback()
-
-        # remove uploaded samples
-        for sample in samples:
-            store.session.delete(sample)
-        store.save()
-
-        raise exception
-
-    return samples
+        try:
+            store.add(sample, *genotypes)
+            # commit the genotypes
+            store.save()
+            logger.info("added sample: %s", sample.sample_id)
+            yield sample
+        except IntegrityError as exception:
+            logger.warn("sample already added: %s", sample.sample_id)
+            store.session.rollback()
 
 
-def format_genotype(sample_dict, variant_row):
+def format_genotype(variant_row):
     """Format variant dict for database input.
 
     Will accept any number of individuals with genotypes.
@@ -106,13 +88,13 @@ def format_genotype(sample_dict, variant_row):
     genotypes = variant_row[9:]
     gt_mapper = {'0': ref, '1': alt, '.': 'N'}
 
-    for sample_id, genotype_str in zip(itervalues(sample_dict), genotypes):
+    for genotype_str in genotypes:
         # convert to base in genotype call
         genotype_parts = genotype_str.split(':')
         genotype = genotype_parts[0].split('/')
         allele_1 = gt_mapper[genotype[0]]
         allele_2 = gt_mapper[genotype[1]]
 
-        variant_dict = {'rsnumber': rsnumber, 'sample_id': sample_id,
-                        'allele_1': allele_1, 'allele_2': allele_2}
+        variant_dict = {'rsnumber': rsnumber, 'allele_1': allele_1,
+                        'allele_2': allele_2}
         yield variant_dict
