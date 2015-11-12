@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import logging
 
 from sqlalchemy.exc import IntegrityError
@@ -42,16 +43,16 @@ def find_sheet(book, sheet_id=0):
         return book.sheet_by_name(sheet_id)
 
 
-def rsnumber_start(header_row):
-    """Figure out from which column the SNP information starts."""
+def find_column(header_row, pattern='rs'):
+    """Find the first column in a row that matches a pattern."""
     snp_columns = (index for index, column in enumerate(header_row)
-                   if column.startswith('rs'))
+                   if column.startswith(pattern))
 
     # return the first index
     return next(snp_columns)
 
 
-def extract(row, snp_start):
+def extract(row, snp_start, sex_start):
     """Extract relevant data from Excel rows.
 
     Args:
@@ -63,10 +64,45 @@ def extract(row, snp_start):
     # remove leading 'IDX-'
     sample_id = row[1].split('-')[-1]
     genotype_columns = row[snp_start:]
+    sex_columns = row[sex_start:sex_start+3]
     return {
         'sample_id': sample_id,
-        'genotypes': genotype_columns
+        'genotypes': genotype_columns,
+        'sex': sex_columns
     }
+
+
+def parse_sex(markers):
+    """Parse the sex prediction from a sample row."""
+    predictions = set()
+
+    # first marker
+    if markers[0] == 'T C':
+        predictions.add('male')
+    elif markers[0] == 'C C':
+        predictions.add('female')
+
+    # second marker
+    if markers[1] == 'T C':
+        predictions.add('male')
+    elif markers[1] == 'C C':
+        predictions.add('female')
+
+    # third marker
+    if markers[2] == 'C T':
+        predictions.add('male')
+    elif markers[2] == 'T T':
+        predictions.add('female')
+
+    if len(predictions) == 1:
+        return predictions.pop()
+    elif len(predictions) == 0:
+        # all assays failed
+        return 'unknown'
+    elif len(predictions) == 2:
+        # assays returned conflicting results
+        logger.warn("conflicting sex predictions: %s", markers)
+        return 'conflict'
 
 
 def build_genotype(rsnumber, sample, allele_1, allele_2):
@@ -76,17 +112,16 @@ def build_genotype(rsnumber, sample, allele_1, allele_2):
     return genotype
 
 
-def objectify(sample_id, experiment, source, genotypes):
+def objectify(sample_id, experiment, source, genotypes, sex_columns):
     """Create ORM objects from parsed data."""
+    sex = parse_sex(sex_columns)
     new_sample = Sample(sample_id=sample_id, experiment=experiment,
-                        source=source)
-    new_genotypes = [build_genotype(rsnumber, sample, *genotype_str.split())
-                     for rsnumber, genotype_str in rsnumber_genotypes]
+                        source=source, sex=sex)
+    new_genotypes = [build_genotype(rsnumber, new_sample, *genotype_str.split())
+                     for rsnumber, genotype_str in genotypes]
     return {
         'sample': new_sample,
-        'genotypes': new_genotypes
-
-
+        'genotypes': new_genotypes,
     }
 
 
@@ -116,18 +151,24 @@ def load_excel(store, book_path, experiment='genotyping', source=None):
 
     # figure our where SNP columns begin
     header_row = next(rows)
-    snp_start = rsnumber_start(header_row)
+    snp_start = find_column(header_row, pattern='rs')
     rsnumber_columns = header_row[snp_start:]
 
-    data_rows = (extract(row, snp_start) for row in rows)
-    source_id = source or book_path
-    parsed_rows = ((row['sample_id'], zip(rsnumber_columns, row['genotypes']))
+    # find out the start of sex prediction columns
+    sex_start = find_column(header_row, pattern='ZF_')
+
+    data_rows = (extract(row, snp_start, sex_start) for row in rows)
+    source_id = source or os.path.basename(book_path)
+    parsed_rows = ((row['sample_id'],
+                    zip(rsnumber_columns, row['genotypes']),
+                    row['sex'])
                    for row in data_rows)
 
-    objects = (objectify(sample_id, experiment, source_id, genotypes)
-               for sample_id, genotypes in parsed_rows)
+    objects = (objectify(sample_id, experiment, source_id, genotypes, sex_cols)
+               for sample_id, genotypes, sex_cols in parsed_rows)
 
     for data in objects:
-        sample_obj = commit(data['sample'], data['genotypes'])
+        sample_obj = commit(store, data['sample'], data['genotypes'])
         if sample_obj:
+            logger.info("added sample: %s", sample_obj.sample_id)
             yield sample_obj

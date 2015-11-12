@@ -30,6 +30,8 @@ class Sample(Base):
     source = Column(String(128))
     genotypes = relationship('Genotype', order_by='Genotype.rsnumber',
                              backref='sample')
+    # intended choices: female, male, unknown, conflict
+    sex = Column(String(32))
 
     def stringify(self):
         """Stringify genotypes for the sample.

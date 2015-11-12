@@ -20,7 +20,8 @@ def load(context, input_type, experiment, source, rsnumber_path, input_path):
         with codecs.open(rsnumber_path, 'r') as rsnumber_stream:
             load_vcf(context.parent.store, input_path, rsnumber_stream,
                      experiment=experiment, source=source)
-
     else:
-        load_excel(context.parent.store, input_path, experiment=experiment,
-                   source=source)
+        samples = load_excel(context.parent.store, input_path,
+                             experiment=experiment, source=source)
+        for sample in samples:
+            pass
