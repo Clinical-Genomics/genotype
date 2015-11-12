@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
-             source=None):
+             source=None, force=False):
     """Load samples with genotypes from a VCF file.
 
     Args:
@@ -59,15 +59,24 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
         genotypes = [Genotype(sample=sample, **genotype)
                      for genotype in entity['inputs']]
 
-        try:
-            store.add(sample, *genotypes)
-            # commit the genotypes
-            store.save()
-            logger.info("added sample: %s", sample.sample_id)
-            yield sample
-        except IntegrityError as exception:
+        sample_exists = store.sample(sample.sample_id, experiment, check=True)
+        if sample_exists:
             logger.warn("sample already added: %s", sample.sample_id)
-            store.session.rollback()
+            if force:
+                logger.info('removing existing sample')
+                store.remove(sample.sample_id, experiment)
+
+        if (not sample_exists) or force:
+            try:
+                store.add(sample, *genotypes)
+                # commit the genotypes
+                store.save()
+                logger.info("added sample: %s", sample.sample_id)
+                yield sample
+            except IntegrityError as exception:
+                store.session.rollback()
+                logger.error('unknown exception, multiple alleles?')
+                raise exception
 
 
 def format_genotype(variant_row):

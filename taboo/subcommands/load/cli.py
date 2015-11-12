@@ -12,17 +12,20 @@ from taboo.input import load_excel, load_vcf
                                                        'sequencing']))
 @click.option('-s', '--source', type=str)
 @click.option('-r', '--rsnumber-path', type=click.Path(exists=True))
+@click.option('-f', '--force', is_flag=True, help='overwrite existing samples')
 @click.argument('input_path', type=click.Path(exists=True))
 @click.pass_context
-def load(context, input_type, experiment, source, rsnumber_path, input_path):
+def load(context, input_type, experiment, source, rsnumber_path, force,
+         input_path):
     """Load database with new samples and genotypes."""
     with codecs.open(rsnumber_path, 'r') as rsnumber_stream:
         if input_type == 'vcf':
             samples = load_vcf(context.parent.store, input_path,
                                rsnumber_stream, experiment=experiment,
-                               source=source)
+                               source=source, force=force)
         else:
             samples = load_excel(context.parent.store, input_path,
-                                 experiment=experiment, source=source)
+                                 experiment=experiment, source=source,
+                                 force=force)
         for sample in samples:
             pass

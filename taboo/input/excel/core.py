@@ -127,18 +127,19 @@ def objectify(sample_id, experiment, source, genotypes, sex_columns):
 
 def commit(store, sample, genotypes):
     """Commit everything belonging to a sample."""
+    # commit samples and variants to get ids
+    store.add(sample, *genotypes)
+
     try:
-        # commit samples and variants to get ids
-        store.add(sample, *genotypes)
         store.save()
-        return sample
     except IntegrityError as exception:
         store.session.rollback()
-        logger.warn("conflict, skipping %s", sample.sample_id)
-        return None
+        logger.error('unknown exception, multiple alleles?')
+        raise exception
 
 
-def load_excel(store, book_path, experiment='genotyping', source=None):
+def load_excel(store, book_path, experiment='genotyping', source=None,
+               force=False):
     """Load samples from a MAF Excel sheet with genotypes.
 
     Args:
@@ -168,7 +169,15 @@ def load_excel(store, book_path, experiment='genotyping', source=None):
                for sample_id, genotypes, sex_cols in parsed_rows)
 
     for data in objects:
-        sample_obj = commit(store, data['sample'], data['genotypes'])
-        if sample_obj:
-            logger.info("added sample: %s", sample_obj.sample_id)
-            yield sample_obj
+        sample_id = data['sample'].sample_id
+        sample_exists = store.sample(sample_id, experiment, check=True)
+        if sample_exists:
+            logger.warn("sample already added: %s", sample_id)
+            if force:
+                logger.info('removing existing sample')
+                store.remove(sample_id, experiment)
+
+        if (not sample_exists) or force:
+            commit(store, data['sample'], data['genotypes'])
+            logger.info("added sample: %s", sample_id)
+            yield data['sample']

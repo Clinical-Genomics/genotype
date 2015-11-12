@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from .models import Base, Sample
+from .models import Base, Sample, Genotype
 
 
 class Database(object):
@@ -52,10 +52,20 @@ class Database(object):
         # add all records to the session object
         self.session.add_all(records)
 
-    def sample(self, sample_id, experiment):
+    def sample(self, sample_id, experiment, check=False):
         """Get a sample based on the unique id"""
-        sample = (self.session.query(Sample)
-                  .filter(sample_id=sample_id, experiment=experiment)
-                  .one())
+        sample_q = (self.session.query(Sample)
+                        .filter_by(sample_id=sample_id, experiment=experiment))
+        if check:
+            return sample_q.first()
+        else:
+            return sample_q.one()
 
-        return sample
+    def remove(self, sample_id, experiment):
+        """Remove sample and genotypes from the database."""
+        sample_obj = (self.session.query(Sample)
+                          .filter_by(sample_id=sample_id, experiment=experiment)
+                          .one())
+        self.session.query(Genotype).filter_by(sample_id=sample_obj.id).delete()
+        self.session.delete(sample_obj)
+        self.session.flush()
