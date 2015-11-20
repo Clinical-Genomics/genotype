@@ -52,7 +52,7 @@ def find_column(header_row, pattern='rs'):
     return next(snp_columns)
 
 
-def extract(row, snp_start, sex_start):
+def extract(row, snp_start, sex_start, sample_prepend='ID-GC-'):
     """Extract relevant data from Excel rows.
 
     Args:
@@ -62,7 +62,7 @@ def extract(row, snp_start, sex_start):
         dict: with `sample_id` and `genotypes`
     """
     # remove leading 'IDX-'
-    sample_id = row[1].split('-')[-1]
+    sample_id = row[1].lstrip(sample_prepend)
     genotype_columns = row[snp_start:]
     sex_columns = row[sex_start:sex_start+3]
     return {
@@ -139,12 +139,15 @@ def commit(store, sample, genotypes):
 
 
 def load_excel(store, book_path, experiment='genotyping', source=None,
-               force=False):
+               force=False, include_key='CG-', sample_prepend=None):
     """Load samples from a MAF Excel sheet with genotypes.
 
     Args:
         book_path (path): path to Excel book file
     """
+    if sample_prepend is None:
+        sample_prepend = "ID-".format(include_key)
+
     # import excel (book) file
     book = xlrd.open_workbook(book_path)
     sheet = find_sheet(book, sheet_id=-1)
@@ -158,7 +161,10 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
     # find out the start of sex prediction columns
     sex_start = find_column(header_row, pattern='ZF_')
 
-    data_rows = (extract(row, snp_start, sex_start) for row in rows)
+    # parse rows that match the "include key"
+    data_rows = (extract(row, snp_start, sex_start,
+                         sample_prepend=sample_prepend)
+                 for row in rows if include_key and (include_key in row[1]))
     source_id = source or os.path.basename(book_path)
     parsed_rows = ((row['sample_id'],
                     zip(rsnumber_columns, row['genotypes']),

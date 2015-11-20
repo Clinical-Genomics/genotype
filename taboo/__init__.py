@@ -26,7 +26,7 @@ __title__ = 'taboo'
 __summary__ = 'tool for comparing genotypes from different assays.'
 __uri__ = 'https://github.com/Clinical-Genomics/taboo'
 
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 
 __author__ = 'Robin Andeer'
 __email__ = 'robin.andeer@scilifelab.se'
