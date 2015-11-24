@@ -145,9 +145,6 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
     Args:
         book_path (path): path to Excel book file
     """
-    if sample_prepend is None:
-        sample_prepend = "ID-".format(include_key or '')
-
     # import excel (book) file
     book = xlrd.open_workbook(book_path)
     sheet = find_sheet(book, sheet_id=-1)
@@ -162,9 +159,12 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
     sex_start = find_column(header_row, pattern='ZF_')
 
     # parse rows that match the "include key"
+    if include_key:
+        rows = (row for row in rows if include_key in row[1])
+
     data_rows = (extract(row, snp_start, sex_start,
                          sample_prepend=sample_prepend)
-                 for row in rows if include_key and (include_key in row[1]))
+                 for row in rows)
     source_id = source or os.path.basename(book_path)
     parsed_rows = ((row['sample_id'],
                     zip(rsnumber_columns, row['genotypes']),
