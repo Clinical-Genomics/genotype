@@ -139,14 +139,14 @@ def commit(store, sample, genotypes):
 
 
 def load_excel(store, book_path, experiment='genotyping', source=None,
-               force=False, include_key='CG-', sample_prepend=None):
+               force=False, include_key=None, sample_prepend=None):
     """Load samples from a MAF Excel sheet with genotypes.
 
     Args:
         book_path (path): path to Excel book file
     """
     if sample_prepend is None:
-        sample_prepend = "ID-".format(include_key)
+        sample_prepend = "ID-".format(include_key or '')
 
     # import excel (book) file
     book = xlrd.open_workbook(book_path)
