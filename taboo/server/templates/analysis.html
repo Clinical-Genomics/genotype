@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Taboo - Analysis results</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            {{ sample_id }}:
+            {% if is_success %}
+                SUCCESS
+            {% else %}
+                FAIL
+            {% endif %}
+        </h1>
+
+        <table class="table table-bordered table-striped">
+            <caption>Results</caption>
+            <thead>
+                <tr>
+                    <th>Sample</th>
+                    <th>Experiment</th>
+                    <th>Sex</th>
+                    <th>Matches</th>
+                    <th>Mismatches</th>
+                    <th>Unknowns</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample, results in comparisons %}
+                    <tr>
+                        <td>{{ sample.sample_id }}</td>
+                        <td>{{ sample.experiment }}</td>
+                        <td>{{ sample.sex }}</td>
+                        <td>{{ results.match }}</td>
+                        <td>{{ results.mismatch }}</td>
+                        <td>{{ results.unknown }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</body>
+</html>

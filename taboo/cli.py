@@ -13,7 +13,7 @@ import yaml
 import taboo
 import taboo.store
 from taboo.subcommands import (delete_cmd, init_cmd, load_cmd, match_cmd,
-                               show_cmd)
+                               show_cmd, view_cmd)
 
 root_logger = logging.getLogger()
 
@@ -56,5 +56,6 @@ def cli(context, log_level, config, db_path):
 
 
 # add subcommands dynamically to the CLI
-for subcommand in [delete_cmd, init_cmd, load_cmd, match_cmd, show_cmd]:
+for subcommand in [delete_cmd, init_cmd, load_cmd, match_cmd, show_cmd,
+                   view_cmd]:
     cli.add_command(subcommand)
