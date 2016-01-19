@@ -78,7 +78,8 @@ setup(
         'setuptools',
         'xlrd',
         'sqlalchemy',
-        'vcf_parser'
+        'vcf_parser',
+        'pyyaml'
     ],
     tests_require=[
         'pytest',
@@ -94,13 +95,7 @@ setup(
     entry_points={
         'console_scripts': [
             'taboo = taboo.cli:cli',
-        ],
-        'taboo.subcommand': [
-            'match = taboo.subcommands:match',
-            'load = taboo.subcommands:load',
-            'setup = taboo.store:setup',
-            'show = taboo.subcommands:show'
-        ],
+        ]
     },
 
     # See: http://pypi.python.org/pypi?%3Aaction=list_classifiers

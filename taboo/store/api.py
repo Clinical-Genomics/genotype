@@ -2,14 +2,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from .models import Base, Sample, Genotype
+from .models import Base, Genotype, Sample
 
 
 class Database(object):
+
     """Interface to genotype database."""
+
     def __init__(self, db_path, connect=True):
         super(Database, self).__init__()
         self.db_path = db_path
+        self.engine = None
+        self.session = None
 
         if connect:
             self.connect()
@@ -18,17 +22,20 @@ class Database(object):
         """Connect to a SQLite database."""
         adaptor_path = "sqlite:///{}".format(self.db_path)
 
-        engine = create_engine(adaptor_path)
+        self.engine = create_engine(adaptor_path)
         # connect the engine to the ORM models
-        Base.metadata.bind = engine
+        Base.metadata.bind = self.engine
 
         # start a sesion
-        self.session = scoped_session(sessionmaker(bind=engine))
+        self.session = scoped_session(sessionmaker(bind=self.engine))
 
         return self.session
 
-    def setup(self):
+    def setup(self, reset=False):
         """Setup a new database."""
+        if reset:
+            self.tear_down()
+
         # create all the tables
         Base.metadata.create_all(self.session.bind)
 
@@ -60,6 +67,17 @@ class Database(object):
             return sample_q.first()
         else:
             return sample_q.one()
+
+    def samples(self, sample_ids=None, source=None, experiment=None):
+        """Fetch samples from database."""
+        samples = self.session.query(Sample)
+        if sample_ids:
+            samples = samples.filter(Sample.sample_id.in_(sample_ids))
+        if source:
+            samples = samples.filter_by(source=source)
+        if experiment:
+            samples = samples.filter_by(experiment=experiment)
+        return samples
 
     def remove(self, sample_id, experiment):
         """Remove sample and genotypes from the database."""

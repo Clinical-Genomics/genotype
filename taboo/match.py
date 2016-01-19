@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import collections
+import logging
 
-import taboo._compat
+import taboo.compat
 import taboo.store
 import taboo.rsnumbers
 from taboo.store.models import Sample, Genotype
+from taboo.utils import unique_rsnumbers
+
+logger = logging.getLogger(__name__)
 
 
 def sort_scores(scores):
@@ -38,7 +42,7 @@ def compare_genotypes(original, alternative):
 
     Returns the number of mismatches based soley on identity.
     """
-    for org_gt, alt_gt in taboo._compat.zip(original, alternative):
+    for org_gt, alt_gt in taboo.compat.zip(original, alternative):
         if alt_gt.allele_1 == '0':
             # no comparison
             yield 'unknown'
@@ -57,7 +61,7 @@ def count_results(comparisons):
 
 
 def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
-                 alt_experiment='maf'):
+                 alt_experiment='genotyping'):
     """Match a sample fingerprint against the database."""
     query = store.session.query
 
@@ -66,9 +70,8 @@ def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
                                      experiment=experiment).one()
 
     # fill forward missing positions as "ref/ref"
-    all_rsnumbers = taboo.store.unique_rsnumbers(query)
-    rsnumber_references = taboo.rsnumbers.read(rsnumber_stream)
-    reference_dict = taboo.rsnumbers.dictify(rsnumber_references)
+    all_rsnumbers = unique_rsnumbers(query)
+    reference_dict = taboo.rsnumbers.parse(rsnumber_stream)
     original_genotypes = list(fill_forward(all_rsnumbers, reference_dict,
                                            sample.genotypes))
 
@@ -80,3 +83,26 @@ def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
         results = count_results(comparisons)
 
         yield alt_sample, results
+
+
+def compare_sample(comparisons, sample_id, allowed_mismatches=3):
+    """Compare genotyping for a sample and update the status."""
+    top_sample, top_result = comparisons[0]
+    acceptable_mismatches = top_result['mismatches'] <= allowed_mismatches
+    same_sample = top_sample.sample_id == sample_id
+    if same_sample and acceptable_mismatches:
+        logger.info('genotypes match the same sample')
+        is_success = True
+    else:
+        is_success = False
+        if same_sample and not acceptable_mismatches:
+            logger.warn('genotyping has failed on acceptable mismatches (%s)',
+                        allowed_mismatches)
+        else:
+            if acceptable_mismatches:
+                logger.error("genotypes match a different sample: %s",
+                             top_sample.sample_id)
+            else:
+                logger.error("genotypes don't match any sample, top: %s",
+                             top_sample.sample_id)
+    return is_success

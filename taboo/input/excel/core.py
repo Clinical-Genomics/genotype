@@ -5,7 +5,7 @@ import logging
 from sqlalchemy.exc import IntegrityError
 import xlrd
 
-from taboo._compat import zip
+from taboo.compat import zip
 from taboo.store.models import Sample, Genotype
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def find_column(header_row, pattern='rs'):
     return next(snp_columns)
 
 
-def extract(row, snp_start, sex_start, sample_prepend='ID-GC-'):
+def extract(row, snp_start, sex_start):
     """Extract relevant data from Excel rows.
 
     Args:
@@ -61,8 +61,8 @@ def extract(row, snp_start, sex_start, sample_prepend='ID-GC-'):
     Returns:
         dict: with `sample_id` and `genotypes`
     """
-    # remove leading 'IDX-'
-    sample_id = row[1].lstrip(sample_prepend)
+    # remove leading 'IDX-CG-'
+    sample_id = row[1].split('-')[-1]
     genotype_columns = row[snp_start:]
     sex_columns = row[sex_start:sex_start+3]
     return {
@@ -139,7 +139,7 @@ def commit(store, sample, genotypes):
 
 
 def load_excel(store, book_path, experiment='genotyping', source=None,
-               force=False, include_key=None, sample_prepend=None):
+               force=False, include_key=None):
     """Load samples from a MAF Excel sheet with genotypes.
 
     Args:
@@ -162,10 +162,8 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
     if include_key:
         rows = (row for row in rows if include_key in row[1])
 
-    data_rows = (extract(row, snp_start, sex_start,
-                         sample_prepend=sample_prepend)
-                 for row in rows)
-    source_id = source or os.path.basename(book_path)
+    data_rows = (extract(row, snp_start, sex_start) for row in rows)
+    source_id = source or os.path.abspath(book_path)
     parsed_rows = ((row['sample_id'],
                     zip(rsnumber_columns, row['genotypes']),
                     row['sex'])
@@ -185,5 +183,4 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
 
         if (not sample_exists) or force:
             commit(store, data['sample'], data['genotypes'])
-            logger.info("added sample: %s", sample_id)
             yield data['sample']

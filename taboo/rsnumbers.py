@@ -4,19 +4,8 @@ Provide an interface and helper functions to deal with the rsnumbers file.
 """
 
 
-def read(stream, separator='\t'):
-    """Read in a file with rsnumbers."""
-    lines = (line.strip() for line in stream)
-    rows = (line.split(separator) for line in lines)
-    return rows
-
-
-def dictify(rows, id_idx=0, ref_idx=1):
-    """Make a dict matching rsnumbers with corresponding ancestral allele."""
-    mapper = {row[id_idx]: row[ref_idx] for row in rows}
-    return mapper
-
-
-def matcher(rsnumbers):
-    """Match efficiently against a list of rsnumbers."""
-    return set(rsnumbers)
+def parse(rs_handle):
+    """Read RS numbers into a dict."""
+    rows = (line.strip().split('\t') for line in rs_handle)
+    rs_map = {row[0]: row[1] for row in rows}
+    return rs_map

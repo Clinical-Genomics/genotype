@@ -20,7 +20,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
     Args:
         experiment (str): identifier for variant experiment (maf, mip, etc.)
     """
-    source_id = source or os.path.basename(vcf_path)
+    source_id = source or os.path.abspath(vcf_path)
 
     # parse some meta data
     parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True)
@@ -32,8 +32,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
                for individual in parser.individuals]
 
     # read in rsnumbers
-    rsnumbers = (row[0] for row in taboo.rsnumbers.read(rsnumber_stream))
-    rsnumber_matcher = taboo.rsnumbers.matcher(rsnumbers)
+    rsnumber_matcher = (row[0] for row in taboo.rsnumbers.parse(rsnumber_stream))
 
     # start processing variants
     # skip header lines

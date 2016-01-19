@@ -6,36 +6,31 @@ Command line interface (console entry points). Based on Click.
 Loads subcommands dynamically using setuptools entry points.
 """
 import logging
-from pkg_resources import iter_entry_points
 
 import click
+import yaml
 
 import taboo
 import taboo.store
+from taboo.subcommands import (delete_cmd, init_cmd, load_cmd, match_cmd,
+                               show_cmd)
 
 root_logger = logging.getLogger()
 
 
-LEVELS = {
-    0: 'WARNING',
-    1: 'INFO',
-    2: 'DEBUG',
-}
-
-
-def init_log(loglevel=None):
+def init_log(log_level=None):
     """Initialize the log file in the proper format.
 
     Arguments:
-        loglevel (str): determine level of the log output
+        log_level (str): determine level of the log output
     """
     root_logger = logging.getLogger()
 
     template = "[%(asctime)s] %(levelname)-8s: %(name)-25s: %(message)s"
     formatter = logging.Formatter(template)
 
-    if loglevel:
-        root_logger.setLevel(getattr(logging, loglevel))
+    if log_level:
+        root_logger.setLevel(getattr(logging, log_level))
 
     # We will always print warnings and higher to stderr
     console = logging.StreamHandler()
@@ -45,17 +40,21 @@ def init_log(loglevel=None):
 
 @click.group()
 @click.version_option(taboo.__version__)
-@click.option('-v', '--verbose', count=True, default=1,
-              help="Increase output verbosity. eg. -vv")
-@click.option('-d', '--db-path', type=click.Path(), default='./taboo.sqlite3')
+@click.option('-l', '--log-level', default='INFO')
+@click.option('-c', '--config', type=click.Path(exists=True))
+@click.option('-d', '--db-path', type=click.Path())
 @click.pass_context
-def cli(context, verbose, db_path):
+def cli(context, log_level, config, db_path):
     """Genotype comparison tool."""
-    loglevel = LEVELS.get(min(verbose, 2), 'WARNING')
-    init_log(loglevel)
-    context.store = taboo.store.Database(db_path)
+    with open(config) as handle:
+        options = yaml.load(handle)
+        context.obj = options
+
+    db_path = db_path or options.get('db_path') or './taboo.sqlite3'
+    init_log(log_level)
+    context.obj['store'] = taboo.store.Database(db_path)
 
 
 # add subcommands dynamically to the CLI
-for entry_point in iter_entry_points('taboo.subcommand'):
-    cli.add_command(entry_point.load())
+for subcommand in [delete_cmd, init_cmd, load_cmd, match_cmd, show_cmd]:
+    cli.add_command(subcommand)

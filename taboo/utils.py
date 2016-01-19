@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .models import Genotype
+from taboo.store import Genotype
 
 
 def build_genotype(rsnumber, sample_id, allele_1, allele_2):
