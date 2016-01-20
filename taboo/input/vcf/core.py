@@ -7,7 +7,7 @@ import vcf_parser
 from sqlalchemy.exc import IntegrityError
 
 import taboo.store
-from taboo.store.models import Sample, Genotype
+from taboo.store.models import Genotype
 import taboo.rsnumbers
 
 logger = logging.getLogger(__name__)
@@ -24,58 +24,60 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
 
     # parse some meta data
     parser = vcf_parser.VCFParser(infile=vcf_path, split_variants=True)
-
-    # build samples and add to session
-    samples = [{'sample': Sample(sample_id=individual, experiment=experiment,
-                                 source=source_id),
-                'inputs': []}
-               for individual in parser.individuals]
+    samples = {sample_id: store.get_or_create('sample', sample_id=sample_id)
+               for sample_id in parser.individuals}
 
     # read in rsnumbers
-    rsnumber_matcher = (row[0] for row in taboo.rsnumbers.parse(rsnumber_stream))
+    rsnumber_matcher = taboo.rsnumbers.parse(rsnumber_stream)
 
     # start processing variants
     # skip header lines
+    analyses = [{'sample_id': sample_id, 'genotypes': []}
+                for sample_id in samples.keys()]
     with codecs.open(vcf_path, 'r') as handle:
         content_lines = (line for line in handle if not line.startswith('#'))
 
         # split columns
-        content_rows = (line.split('\t') for line in content_lines)
+        content_rows = [line.split('\t') for line in content_lines]
 
         # extract rsnumbers
-        relevant_rows = (row for row in content_rows if row[2] in
-                         rsnumber_matcher)
+        relevant_rows = [row for row in content_rows if row[2] in
+                         rsnumber_matcher]
 
-        variant_inputs = (format_genotype(variant_row) for variant_row
-                          in relevant_rows)
+        variant_inputs = [format_genotype(variant_row) for variant_row
+                          in relevant_rows]
 
         for positions in variant_inputs:
             for index, position in enumerate(positions):
-                samples[index]['inputs'].append(position)
+                analyses[index]['genotypes'].append(position)
 
-    for entity in samples:
-        sample = entity['sample']
-        genotypes = [Genotype(sample=sample, **genotype)
-                     for genotype in entity['inputs']]
+    for analysis in analyses:
+        sample_obj = samples[analysis['sample_id']]
+        sample_id = sample_obj.sample_id
+        analysis_exists = store.analysis(sample_id, experiment, check=True)
 
-        sample_exists = store.sample(sample.sample_id, experiment, check=True)
-        if sample_exists:
-            logger.warn("sample already added: %s", sample.sample_id)
+        if analysis_exists:
+            logger.warn("analysis already added: %s", sample_id)
             if force:
-                logger.info('removing existing sample')
-                store.remove(sample.sample_id, experiment)
+                logger.info('removing existing analysis')
+                store.remove(sample_id, experiment)
 
-        if (not sample_exists) or force:
+        if (not analysis_exists) or force:
+            analysis_obj = store.add_analysis(sample_obj, experiment, source_id)
+            new_genotypes = [Genotype(**gt) for gt in analysis['genotypes']]
+            if len(new_genotypes) == 0:
+                logger.warn("no genotypes found, skipping: %s", sample_id)
+                continue
+            analysis_obj.genotypes = new_genotypes
+
+            store.add(analysis_obj)
             try:
-                store.add(sample, *genotypes)
-                # commit the genotypes
                 store.save()
-                logger.info("added sample: %s", sample.sample_id)
-                yield sample
             except IntegrityError as exception:
                 store.session.rollback()
                 logger.error('unknown exception, multiple alleles?')
                 raise exception
+            yield analysis_obj
 
 
 def format_genotype(variant_row):

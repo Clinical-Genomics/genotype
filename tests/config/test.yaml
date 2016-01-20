@@ -2,3 +2,4 @@
 log: tests/fixtures/logs
 db_path: tests/fixtures/data/taboo.sqlite3
 rsnumber_ref: tests/fixtures/references/rsnumbers.grch37.txt
+genotyping_dir: tests/fixtures/results/genotyping

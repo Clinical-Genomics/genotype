@@ -5,33 +5,83 @@
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
-        <table class="table table-bordered table-striped">
-            <caption>Loaded samples</caption>
+        <div class="page-header">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Upload genotyping results</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input type="file" name="excel_input" id="excelInput">
+                        </div>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Sample</th>
-                    <th>Experiment</th>
-                    <th>Sex</th>
-                    <th>Analysis</th>
+                    <th rowspan="2">Sample</th>
+                    <th colspan="2">Sex</th>
+                    <th rowspan="2">Comparison</th>
+                </tr>
+                <tr>
+                    <th>Sequencing</th>
+                    <th>Genotyping</th>
                 </tr>
             </thead>
             <tbody>
                 {% for sample in samples %}
-                    <tr>
+                    {% if sample.same_sex() == 'success' %}
+                        {% set sex_class = 'success' %}
+                    {% elif sample.same_sex() == 'fail' %}
+                        {% set sex_class = 'danger' %}
+                    {% elif sample.same_sex() == 'unknown' %}
+                        {% set sex_class = 'info' %}
+                    {% else %}
+                        {% set sex_class = 'nothing' %}
+                    {% endif %}
+
+                    {% set is_success = sample.is_success() %}
+
+                    <tr {% if is_success %}class="bg-success"{% endif %}>
                         <td>{{ sample.sample_id }}</td>
-                        <td>{{ sample.experiment }}</td>
-                        <td>{{ sample.sex }}</td>
-                        <td><a href="{{ url_for('analysis', sample_id=sample.sample_id, experiment=sample.experiment) }}">Submit</a></td>
+                        <td class="bg-{{ sex_class }}">
+                            {{ sample.sexes().sequencing }}
+                        </td>
+                        <td class="bg-{{ sex_class }}">
+                            {{ sample.sexes().genotyping }}
+                        </td>
+                        <td>
+                            {% if is_success %}
+                                Matches: {{ sample.matches()|join(', ') }}
+                            {% else %}
+                                {% set label_class = 'info' if sample.is_ready() else 'default' %}
+                                <a class="btn btn-{{ label_class }}" href="{{ url_for('analysis', sample_id=sample.sample_id, skip=skip, limit=limit) }}">Run</a>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <div class="row">
+            <div class="col-md-12">
+                <p class="text-center">
+                    {% if skip > 0 %}
+                    <a href="{{ url_for('index', skip=skip-limit) }}">Previous</a> |
+                    {% endif %}
+                    {{ skip }}-{{ skip + limit }} |
+                    <a href="{{ url_for('index', skip=skip+limit) }}">Next</a>
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- Latest compiled and minified JavaScript -->

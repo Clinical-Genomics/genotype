@@ -28,21 +28,21 @@ def show(context, samples, experiment, source, skip, reference):
     if reference is None:
         reference = context.obj['rsnumber_ref']
 
-    db_samples = store.samples(sample_ids=samples, experiment=experiment,
-                               source=source)
+    db_analyses = store.analyses(sample_ids=samples, experiment=experiment,
+                                 source=source)
 
     with codecs.open(reference, 'r') as ref_handle:
         reference_dict = taboo.rsnumbers.parse(ref_handle)
 
     all_rsnumbers = unique_rsnumbers(store.session.query)
     rsnumber_columns = '\t'.join(all_rsnumbers)
-    click.echo("#id\tsample_id\texperiment\tsource\t{}"
+    click.echo("#sample_id\texperiment\tsource\t{}"
                .format(rsnumber_columns))
 
-    template = ("{sample.id}\t{sample.sample_id}\t{sample.experiment}\t"
-                "{sample.source}\t{genotype_str}")
-    for sample in db_samples:
+    template = ("{analysis.sample.sample_id}\t{analysis.experiment}\t"
+                "{analysis.source}\t{genotype_str}")
+    for analysis in db_analyses:
         genotypes = taboo.match.fill_forward(all_rsnumbers, reference_dict,
-                                             sample.genotypes)
+                                             analysis.genotypes)
         genotype_str = '\t'.join(str(genotype) for genotype in genotypes)
-        click.echo(template.format(sample=sample, genotype_str=genotype_str))
+        click.echo(template.format(analysis=analysis, genotype_str=genotype_str))

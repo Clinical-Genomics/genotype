@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from .models import Base, Genotype, Sample
+from .models import Analysis, Base, Genotype, Sample
 
 
 class Database(object):
@@ -59,31 +59,86 @@ class Database(object):
         # add all records to the session object
         self.session.add_all(records)
 
-    def sample(self, sample_id, experiment, check=False):
+    def sample(self, sample_id, check=False):
         """Get a sample based on the unique id"""
-        sample_q = (self.session.query(Sample)
-                        .filter_by(sample_id=sample_id, experiment=experiment))
-        if check:
-            return sample_q.first()
-        else:
-            return sample_q.one()
+        sample_q = self.session.query(Sample).filter_by(sample_id=sample_id)
+        return sample_q.first() if check else sample_q.one()
 
-    def samples(self, sample_ids=None, source=None, experiment=None):
-        """Fetch samples from database."""
-        samples = self.session.query(Sample)
+    def analysis(self, sample_id, experiment, check=False):
+        """Get an analysis (SNP calling) from the databse."""
+        analysis_q = (self.session.query(Analysis)
+                                  .join(Analysis.sample)
+                                  .filter(Analysis.experiment == experiment,
+                                          Sample.sample_id == sample_id))
+        return analysis_q.first() if check else analysis_q.one()
+
+    def get_or_create(self, model, **fields):
+        """Fecth an original or create a new record."""
+        if model == 'sample':
+            sample_id = fields['sample_id']
+            model_obj = (self.session.query(Sample)
+                             .filter_by(sample_id=sample_id).first())
+
+        if model_obj is None:
+            model_obj = Sample(**fields)
+            self.add(model_obj)
+            self.save()
+
+        return model_obj
+
+    def add_analysis(self, sample_obj, experiment, source, sex=None):
+        """Add a new analysis to the database."""
+        analysis_obj = Analysis(sample=sample_obj, experiment=experiment,
+                                source=source, sex=sex)
+        # self.add(analysis_obj)
+        # self.save()
+        return analysis_obj
+
+    def analyses(self, sample_ids=None, source=None, experiment=None):
+        """Fetch analyses from database."""
+        objects = self.session.query(Analysis)
         if sample_ids:
-            samples = samples.filter(Sample.sample_id.in_(sample_ids))
+            objects = (objects.join(Analysis.sample)
+                              .filter(Sample.sample_id.in_(sample_ids)))
         if source:
-            samples = samples.filter_by(source=source)
+            objects = objects.filter_by(source=source)
         if experiment:
-            samples = samples.filter_by(experiment=experiment)
-        return samples
+            objects = objects.filter_by(experiment=experiment)
+        return objects
+
+    def samples(self, sample_ids=None):
+        """Fetch samples."""
+        objects = self.session.query(Sample)
+        if sample_ids:
+            objects = objects.filter(Sample.sample_id.in_(sample_ids))
+        return objects
+
+    def remove_sample(self, sample_id):
+        """Remove a sample including loaded analyses."""
+        sample_obj = self.sample(sample_id)
+
+        for analysis in sample_obj.analyses:
+            self.remove(sample_id, analysis.experiment)
+
+        self.session.delete(sample_obj)
+        self.save()
 
     def remove(self, sample_id, experiment):
         """Remove sample and genotypes from the database."""
-        sample_obj = (self.session.query(Sample)
-                          .filter_by(sample_id=sample_id, experiment=experiment)
-                          .one())
-        self.session.query(Genotype).filter_by(sample_id=sample_obj.id).delete()
-        self.session.delete(sample_obj)
-        self.session.flush()
+        analysis_obj = self.analysis(sample_id, experiment)
+        self.session.query(Genotype).filter_by(analysis_id=analysis_obj.id).delete()
+        self.session.delete(analysis_obj)
+        self.save()
+
+    def add_sex(self, sample_id, expected_sex, seq_sex=None):
+        """Add excepted and sequencing sex result."""
+        sample_obj = self.sample(sample_id)
+        sample_obj.expected_sex = expected_sex
+
+        if seq_sex:
+            analyses = sample_obj.analysis_dict
+            if 'sequencing' not in analyses:
+                raise ValueError('need to load sequencing results')
+            analyses['sequencing'].sex = seq_sex
+
+        self.save()

@@ -5,7 +5,7 @@ import logging
 import taboo.compat
 import taboo.store
 import taboo.rsnumbers
-from taboo.store.models import Sample, Genotype
+from taboo.store.models import Genotype, Result
 from taboo.utils import unique_rsnumbers
 
 logger = logging.getLogger(__name__)
@@ -65,44 +65,63 @@ def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
     """Match a sample fingerprint against the database."""
     query = store.session.query
 
-    # get genotypes for the original sample
-    sample = query(Sample).filter_by(sample_id=sample_id,
-                                     experiment=experiment).one()
+    # get genotypes for the original analysis
+    analysis = store.analysis(sample_id, experiment)
 
     # fill forward missing positions as "ref/ref"
     all_rsnumbers = unique_rsnumbers(query)
     reference_dict = taboo.rsnumbers.parse(rsnumber_stream)
     original_genotypes = list(fill_forward(all_rsnumbers, reference_dict,
-                                           sample.genotypes))
+                                           analysis.genotypes))
 
-    # walk over all alternative samples and find best matches
-    alt_samples = query(Sample).filter_by(experiment=alt_experiment)
-    for alt_sample in alt_samples:
+    # walk over all alternative analyses and find best matches
+    alt_analyses = store.analyses(experiment=alt_experiment)
+    for alt_analysis in alt_analyses:
         comparisons = compare_genotypes(original_genotypes,
-                                        alt_sample.genotypes)
+                                        alt_analysis.genotypes)
         results = count_results(comparisons)
 
-        yield alt_sample, results
+        yield alt_analysis, results
 
 
-def compare_sample(comparisons, sample_id, allowed_mismatches=3):
-    """Compare genotyping for a sample and update the status."""
-    top_sample, top_result = comparisons[0]
-    acceptable_mismatches = top_result['mismatches'] <= allowed_mismatches
-    same_sample = top_sample.sample_id == sample_id
+def is_success(expected_id, analysis, result, allowed_mismatches=3):
+    """Check if a comparison is successful."""
+    sample_id = analysis.sample.sample_id
+    acceptable_mismatches = result['mismatches'] <= allowed_mismatches
+    same_sample = sample_id == expected_id
     if same_sample and acceptable_mismatches:
-        logger.info('genotypes match the same sample')
-        is_success = True
+        logger.debug('genotypes match the same sample')
+        answer = True
     else:
-        is_success = False
+        answer = False
         if same_sample and not acceptable_mismatches:
-            logger.warn('genotyping has failed on acceptable mismatches (%s)',
-                        allowed_mismatches)
+            logger.debug('genotyping has failed on acceptable mismatches (%s)',
+                         allowed_mismatches)
         else:
             if acceptable_mismatches:
-                logger.error("genotypes match a different sample: %s",
-                             top_sample.sample_id)
+                logger.debug("genotypes match a different sample: %s", sample_id)
             else:
-                logger.error("genotypes don't match any sample, top: %s",
-                             top_sample.sample_id)
-    return is_success
+                logger.debug("genotypes don't match any sample, top: %s", sample_id)
+    return answer
+
+
+def run_comparison(store, rs_stream, sample_id, experiment='genotyping',
+                   alt_experiment='sequencing'):
+    comparisons = match_sample(store, rs_stream, sample_id,
+                               experiment, alt_experiment)
+    ranked_comparisons = sort_scores(comparisons)
+
+    successfuls = [Result(
+                       matches=comparison['match'],
+                       mismatches=comparison['mismatch'],
+                       unknowns=comparison['unknown'],
+                       analysis=analysis
+                   ) for analysis, comparison
+                   in ranked_comparisons
+                   if is_success(sample_id, analysis, comparison)]
+    sample_obj = store.sample(sample_id)
+
+    for result in sample_obj.results:
+        store.session.delete(result)
+    sample_obj.results = successfuls
+    store.save()

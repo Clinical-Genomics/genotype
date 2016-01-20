@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 import xlrd
 
 from taboo.compat import zip
-from taboo.store.models import Sample, Genotype
+from taboo.store.models import Genotype
 
 logger = logging.getLogger(__name__)
 
@@ -105,39 +105,6 @@ def parse_sex(markers):
         return 'conflict'
 
 
-def build_genotype(rsnumber, sample, allele_1, allele_2):
-    """Build Genotype object without commiting parent Sample."""
-    genotype = Genotype(rsnumber=rsnumber, allele_1=allele_1, allele_2=allele_2)
-    genotype.sample = sample
-    return genotype
-
-
-def objectify(sample_id, experiment, source, genotypes, sex_columns):
-    """Create ORM objects from parsed data."""
-    sex = parse_sex(sex_columns)
-    new_sample = Sample(sample_id=sample_id, experiment=experiment,
-                        source=source, sex=sex)
-    new_genotypes = [build_genotype(rsnumber, new_sample, *genotype_str.split())
-                     for rsnumber, genotype_str in genotypes]
-    return {
-        'sample': new_sample,
-        'genotypes': new_genotypes,
-    }
-
-
-def commit(store, sample, genotypes):
-    """Commit everything belonging to a sample."""
-    # commit samples and variants to get ids
-    store.add(sample, *genotypes)
-
-    try:
-        store.save()
-    except IntegrityError as exception:
-        store.session.rollback()
-        logger.error('unknown exception, multiple alleles?')
-        raise exception
-
-
 def load_excel(store, book_path, experiment='genotyping', source=None,
                force=False, include_key=None):
     """Load samples from a MAF Excel sheet with genotypes.
@@ -169,18 +136,45 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
                     row['sex'])
                    for row in data_rows)
 
-    objects = (objectify(sample_id, experiment, source_id, genotypes, sex_cols)
-               for sample_id, genotypes, sex_cols in parsed_rows)
+    sample_ids = []
+    analyses = []
+    for sample_id, genotypes, sex_columns in parsed_rows:
+        sample_ids.append(sample_id)
+        analyses.append({
+            'sex': parse_sex(sex_columns),
+            'sample_id': sample_id,
+            'genotypes': [{
+                'rsnumber': rsnumber,
+                'allele_1': genotype_str.split()[0],
+                'allele_2': genotype_str.split()[1]
+            } for rsnumber, genotype_str in genotypes]
+        })
 
-    for data in objects:
-        sample_id = data['sample'].sample_id
-        sample_exists = store.sample(sample_id, experiment, check=True)
-        if sample_exists:
-            logger.warn("sample already added: %s", sample_id)
+    samples = {sample_id: store.get_or_create('sample', sample_id=sample_id)
+               for sample_id in sample_ids}
+
+    for analysis in analyses:
+        sample_obj = samples[analysis['sample_id']]
+        sample_id = sample_obj.sample_id
+        analysis_exists = store.analysis(sample_id, experiment, check=True)
+
+        if analysis_exists:
+            logger.warn("analysis already added: %s", sample_id)
             if force:
-                logger.info('removing existing sample')
+                logger.info('removing existing analysis')
                 store.remove(sample_id, experiment)
 
-        if (not sample_exists) or force:
-            commit(store, data['sample'], data['genotypes'])
-            yield data['sample']
+        if (not analysis_exists) or force:
+            analysis_obj = store.add_analysis(sample_obj, experiment,
+                                              source_id, analysis['sex'])
+            new_genotypes = [Genotype(**gt) for gt in analysis['genotypes']]
+            analysis_obj.genotypes = new_genotypes
+
+            store.add(analysis_obj)
+            try:
+                store.save()
+            except IntegrityError as exception:
+                store.session.rollback()
+                logger.error('unknown exception, multiple alleles?')
+                raise exception
+            yield analysis_obj

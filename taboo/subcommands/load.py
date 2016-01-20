@@ -31,10 +31,10 @@ def load(context, input_type, force, include_key, input_file):
 
     with codecs.open(context.obj['rsnumber_ref']) as rs_stream:
         if input_type == 'vcf':
-            samples = load_vcf(db, input_file, rs_stream, force=force)
+            analyses = load_vcf(db, input_file, rs_stream, force=force)
         else:
-            samples = load_excel(db, input_file, include_key=include_key,
-                                 force=force)
+            analyses = load_excel(db, input_file, include_key=include_key,
+                                  force=force)
 
-        for sample in samples:
-            logger.info("added samples: %s", sample.sample_id)
+        for analysis in analyses:
+            logger.info("added analysis: %s", analysis.sample.sample_id)
