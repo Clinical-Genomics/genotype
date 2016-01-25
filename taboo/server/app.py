@@ -16,7 +16,7 @@ app = Flask(__name__)
 def index():
     """Display all samples."""
     skip = int(request.args.get('skip', 0))
-    limit = int(request.args.get('limit', 30))
+    limit = int(request.args.get('limit', 20))
     samples = (app.config['store'].samples().order_by(desc('created_at'))
                                             .offset(skip)
                                             .limit(limit))
