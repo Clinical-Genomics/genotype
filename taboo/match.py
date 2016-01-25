@@ -27,14 +27,14 @@ def fill_forward(all_rsnumbers, reference_dict, genotypes):
     """Fill forward missing rsnumbers as ref/ref."""
     genotype_dict = {genotype.rsnumber: genotype for genotype in genotypes}
 
-    for rsnumber in all_rsnumbers:
-        if rsnumber in genotype_dict:
-            yield genotype_dict[rsnumber]
+    for rsnumber_id in all_rsnumbers:
+        if rsnumber_id in genotype_dict:
+            yield genotype_dict[rsnumber_id]
 
         else:
-            reference = reference_dict[rsnumber]
-            yield Genotype(rsnumber=rsnumber, allele_1=reference,
-                           allele_2=reference)
+            rsnumber = reference_dict[rsnumber_id]
+            yield Genotype(rsnumber=rsnumber_id, allele_1=rsnumber.ref,
+                           allele_2=rsnumber.ref)
 
 
 def compare_genotypes(original, alternative):
