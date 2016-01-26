@@ -34,7 +34,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
     # start processing variants
     # skip header lines
     analyses = [{'sample_id': sample_id, 'genotypes': []}
-                for sample_id in samples.keys()]
+                for sample_id in parser.individuals]
     with codecs.open(vcf_path, 'r') as handle:
         content_lines = (line for line in handle if not line.startswith('#'))
 
