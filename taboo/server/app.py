@@ -5,8 +5,10 @@ import os
 from flask import Flask, render_template, redirect, request, url_for, abort
 from werkzeug import secure_filename
 
+from taboo import rsnumbers
 from taboo.input import load_excel
-from taboo.match import run_comparison
+from taboo.match import fill_forward, run_comparison
+from taboo.utils import unique_rsnumbers
 
 app = Flask(__name__)
 
@@ -29,6 +31,28 @@ def plate(plate_id):
     analyses = app.config['store'].analyses(source="/{}".format(plate_id))
     samples = (analysis.sample for analysis in analyses)
     return render_template('plate.html', samples=samples, plate_id=plate_id)
+
+
+@app.route('/samples/<sample_id>')
+def sample(sample_id):
+    """Display details for a sample."""
+    store = app.config['store']
+    sample_obj = store.sample(sample_id)
+
+    with codecs.open(app.config['rsnumber_ref'], 'r') as ref_handle:
+        reference_dict = rsnumbers.parse(ref_handle)
+
+    all_rsnumbers = unique_rsnumbers(store.session.query)
+    experiments = {
+        analysis.experiment: fill_forward(all_rsnumbers, reference_dict,
+                                          analysis.genotypes)
+        for analysis in sample_obj.analyses
+    }
+    genotype_pairs = zip(all_rsnumbers, *experiments.values())
+
+    return render_template('sample.html', sample=sample_obj,
+                           experiments=experiments, rsnumbers=all_rsnumbers,
+                           genotype_pairs=genotype_pairs)
 
 
 @app.route('/plates/analyze/<path:plate_id>')

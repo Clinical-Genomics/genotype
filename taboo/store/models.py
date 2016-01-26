@@ -45,6 +45,10 @@ class Genotype(Base):
         genotypes = sorted([self.allele_1, self.allele_2])
         return ''.join(genotypes)
 
+    def __eq__(self, other):
+        """Compare two Genotype records."""
+        return str(self) == str(other)
+
 
 class Sample(Base):
 

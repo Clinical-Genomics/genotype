@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="page-header">
+        <h3>Sample: {{ sample.sample_id }}</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>RS number</th>
+                    <th>Sequencing</th>
+                    <th>Genotyping</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rsnumber, genotype1, genotype2 in genotype_pairs %}
+                    {% set is_same = (genotype1 == genotype2) %}
+                    <tr class="{% if not is_same %}warning{% endif %}">
+                        <th>{{ rsnumber }}</th>
+                        <td>{{ genotype1 }}</td>
+                        <td>{{ genotype2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+{% endblock %}
