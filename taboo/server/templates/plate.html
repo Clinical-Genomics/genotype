@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Taboo - Samples</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h5><a href="{{ url_for('index') }}">Home</a></h5>
+            <h3>/{{ plate_id }}</h3>
+            <div>
+                <a class="btn btn-primary" href="{{ url_for('analyze_plate', plate_id=plate_id) }}">Analyze</a>
+            </div>
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="2">Sample</th>
+                    <th colspan="2">Sex</th>
+                    <th rowspan="2">Comparison</th>
+                </tr>
+                <tr>
+                    <th>Sequencing</th>
+                    <th>Genotyping</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in samples %}
+                    {% if sample.same_sex() == 'success' %}
+                        {% set sex_class = 'success' %}
+                    {% elif sample.same_sex() == 'fail' %}
+                        {% set sex_class = 'danger' %}
+                    {% elif sample.same_sex() == 'unknown' %}
+                        {% set sex_class = 'info' %}
+                    {% else %}
+                        {% set sex_class = 'nothing' %}
+                    {% endif %}
+
+                    {% set is_success = sample.is_success() %}
+
+                    <tr {% if is_success %}class="bg-success"{% endif %}>
+                        <td>{{ sample.sample_id }}</td>
+                        <td class="bg-{{ sex_class }}">
+                            {{ sample.sexes().sequencing }}
+                        </td>
+                        <td class="bg-{{ sex_class }}">
+                            {{ sample.sexes().genotyping }}
+                        </td>
+                        <td>
+                            {% if is_success %}
+                                Matches: {{ sample.matches()|join(', ') }}
+                            {% elif sample.results %}
+                                Top: {{ sample.top_samples()|join(', ') }}
+                            {% else %}
+                                {% set label_class = 'info' if sample.is_ready() else 'default' %}
+                                <a class="btn btn-{{ label_class }}" href="{{ url_for('analysis', sample_id=sample.sample_id) }}">Run</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</body>
+</html>

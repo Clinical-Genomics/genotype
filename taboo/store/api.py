@@ -123,6 +123,14 @@ class Database(object):
         self.session.delete(sample_obj)
         self.save()
 
+    def experiments(self, experiment='genotyping'):
+        """Return ids for all genotyping plates in the datbase."""
+        analysis_objs = (self.session.query(Analysis)
+                                     .filter_by(experiment=experiment)
+                                     .group_by(Analysis.source))
+        analysis_ids = [analysis.source for analysis in analysis_objs]
+        return analysis_ids
+
     def remove(self, sample_id, experiment):
         """Remove sample and genotypes from the database."""
         analysis_obj = self.analysis(sample_id, experiment)

@@ -60,13 +60,12 @@ def count_results(comparisons):
     return counter
 
 
-def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
-                 alt_experiment='genotyping'):
+def match_sample(store, rsnumber_stream, sample_id):
     """Match a sample fingerprint against the database."""
     query = store.session.query
 
     # get genotypes for the original analysis
-    analysis = store.analysis(sample_id, experiment)
+    analysis = store.analysis(sample_id, 'sequencing')
 
     # fill forward missing positions as "ref/ref"
     all_rsnumbers = unique_rsnumbers(query)
@@ -75,7 +74,7 @@ def match_sample(store, rsnumber_stream, sample_id, experiment='sequencing',
                                            analysis.genotypes))
 
     # walk over all alternative analyses and find best matches
-    alt_analyses = store.analyses(experiment=alt_experiment)
+    alt_analyses = store.analyses(experiment='genotyping')
     for alt_analysis in alt_analyses:
         comparisons = compare_genotypes(original_genotypes,
                                         alt_analysis.genotypes)
@@ -105,23 +104,20 @@ def is_success(expected_id, analysis, result, allowed_mismatches=3):
     return answer
 
 
-def run_comparison(store, rs_stream, sample_id, experiment='genotyping',
-                   alt_experiment='sequencing'):
-    comparisons = match_sample(store, rs_stream, sample_id,
-                               experiment, alt_experiment)
+def run_comparison(store, rs_stream, sample_id):
+    comparisons = match_sample(store, rs_stream, sample_id)
     ranked_comparisons = sort_scores(comparisons)
 
-    successfuls = [Result(
+    top_results = [Result(
                        matches=comparison['match'],
                        mismatches=comparison['mismatch'],
                        unknowns=comparison['unknown'],
                        analysis=analysis
                    ) for analysis, comparison
-                   in ranked_comparisons
-                   if is_success(sample_id, analysis, comparison)]
+                   in ranked_comparisons[:5]]
     sample_obj = store.sample(sample_id)
 
     for result in sample_obj.results:
         store.session.delete(result)
-    sample_obj.results = successfuls
+    sample_obj.results = top_results
     store.save()

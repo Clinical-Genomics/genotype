@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+import logging
 
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -8,6 +9,7 @@ from sqlalchemy.schema import UniqueConstraint
 
 # base for declaring a mapping
 Base = declarative_base()
+logger = logging.getLogger(__name__)
 
 
 class Genotype(Base):
@@ -102,14 +104,52 @@ class Sample(Base):
 
     def is_success(self):
         """Check if a comparison was made successfully."""
-        if not self.results:
-            return False
-        else:
+        success_results = self.successful_results()
+        if len(success_results) == 1:
             return True
+        else:
+            return False
+
+    def is_analyzed(self):
+        """Check if an analysis has been performed."""
+        analyses = self.analysis_dict
+        return 'genotyping' in analyses and analyses['genotyping'].results
+
+    def successful_results(self):
+        """Select all successful results."""
+        expected_id = self.sample_id
+        return [result for result in self.results
+                if result_success(expected_id, result)]
 
     def matches(self):
         """Return the matching sample ids."""
-        return [result.sample.sample_id for result in self.results]
+        return [result.analysis.sample.sample_id for result in
+                self.successful_results()]
+
+    def top_samples(self):
+        """Return sample ids for all results."""
+        return [result.analysis.sample.sample_id for result in self.results]
+
+
+def result_success(expected_id, result, allowed_mismatches=3):
+    """Check if a comparison is successful."""
+    sample_id = result.analysis.sample.sample_id
+    acceptable_mismatches = result.mismatches <= allowed_mismatches
+    same_sample = sample_id == expected_id
+    if same_sample and acceptable_mismatches:
+        logger.debug('genotypes match the same sample')
+        answer = True
+    else:
+        answer = False
+        if same_sample and not acceptable_mismatches:
+            logger.debug('genotyping has failed on acceptable mismatches (%s)',
+                         allowed_mismatches)
+        else:
+            if acceptable_mismatches:
+                logger.debug("genotypes match a different sample: %s", sample_id)
+            else:
+                logger.debug("genotypes don't match any sample, top: %s", sample_id)
+    return answer
 
 
 class Result(Base):
