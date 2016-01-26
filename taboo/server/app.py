@@ -19,10 +19,7 @@ def index():
     plates = [plate_id.lstrip('/') for plate_id
               in app.config['store'].experiments('genotyping')]
 
-    samples = (sample for sample in app.config['store'].samples()
-               if sample.is_analyzed() and not sample.is_success())
-
-    return render_template('index.html', plates=plates, samples=samples)
+    return render_template('index.html', plates=plates)
 
 
 @app.route('/plates/<path:plate_id>')
