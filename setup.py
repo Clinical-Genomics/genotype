@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Based on https://github.com/pypa/sampleproject/blob/master/setup.py."""
-from __future__ import unicode_literals
 # To use a consistent encoding
 from codecs import open
 import os
