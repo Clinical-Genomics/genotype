@@ -132,7 +132,8 @@ class Sample(Base):
 
     def top_samples(self):
         """Return sample ids for all results."""
-        return [result.analysis.sample.sample_id for result in self.results]
+        return [("{res.analysis.sample.sample_id} [{res.matches}]"
+                 .format(res=result)) for result in self.results]
 
 
 def result_success(expected_id, result, allowed_mismatches=3):
