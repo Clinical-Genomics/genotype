@@ -2,10 +2,10 @@
 
 {% block content %}
     <div class="page-header">
-        <h5><a href="{{ url_for('index') }}">Home</a></h5>
+        <h5><a href="{{ url_for('genotype.index') }}">Home</a></h5>
         <h3>/{{ plate_id }}</h3>
         <div>
-            <a class="btn btn-primary" href="{{ url_for('analyze_plate', plate_id=plate_id) }}">Analyze</a>
+            <a class="btn btn-primary" href="{{ url_for('genotype.analyze_plate', plate_id=plate_id) }}">Analyze</a>
         </div>
     </div>
 
@@ -37,7 +37,7 @@
 
                 <tr {% if is_success %}class="bg-success"{% endif %}>
                     <td>
-                        <a href="{{ url_for('sample', sample_id=sample.sample_id) }}">
+                        <a href="{{ url_for('genotype.sample', sample_id=sample.sample_id) }}">
                             {{ sample.sample_id }}
                         </a>
                     </td>
@@ -54,7 +54,7 @@
                             Top: {{ sample.top_samples()|join(', ') }}
                         {% else %}
                             {% set label_class = 'info' if sample.is_ready() else 'default' %}
-                            <a class="btn btn-{{ label_class }}" href="{{ url_for('analysis', sample_id=sample.sample_id) }}">Run</a>
+                            <a class="btn btn-{{ label_class }}" href="{{ url_for('genotype.analysis', sample_id=sample.sample_id) }}">Run</a>
                         {% endif %}
                     </td>
                 </tr>

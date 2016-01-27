@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from taboo.server import flask_app
+from taboo.server import create_app
 
 
 @click.command()
@@ -10,5 +10,5 @@ from taboo.server import flask_app
 @click.pass_context
 def view(context, debug, port):
     """View status of the database and samples."""
-    flask_app.config.update(context.obj)
-    flask_app.run(debug=debug, port=port)
+    app = create_app('taboo', config_obj=context.obj)
+    app.run(debug=debug, port=port)

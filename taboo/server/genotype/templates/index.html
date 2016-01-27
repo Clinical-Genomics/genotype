@@ -7,7 +7,7 @@
                 <h3 class="panel-title">Upload genotyping results</h3>
             </div>
             <div class="panel-body">
-                <form class="form-inline" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                <form class="form-inline" action="{{ url_for('genotype.upload') }}" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <input type="file" name="excel_input" id="excelInput">
                     </div>
@@ -26,7 +26,7 @@
         <tbody>
             {% for plate_id in plates %}
                 <tr>
-                    <td><a href="{{ url_for('plate', plate_id=plate_id) }}" title="{{ plate_id }}">{{ plate_id }}</a></td>
+                    <td><a href="{{ url_for('genotype.plate', plate_id=plate_id) }}" title="{{ plate_id }}">{{ plate_id }}</a></td>
                 </tr>
             {% endfor %}
         </tbody>
