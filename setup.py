@@ -83,7 +83,8 @@ setup(
         'xlrd',
         'sqlalchemy',
         'vcf_parser',
-        'pyyaml'
+        'pyyaml',
+        'pysam'
     ],
     tests_require=[
         'pytest',
