@@ -5,6 +5,7 @@ import os
 
 from flask import (Blueprint, current_app, render_template, redirect,
                    request, url_for, abort)
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug import secure_filename
 
 from taboo import rsnumbers
@@ -105,3 +106,17 @@ def upload():
         current_app.logger.info("added analysis: %s", analysis.sample.sample_id)
 
     return redirect(url_for('.index'))
+
+
+@genotype_bp.route('/search')
+def search_sample():
+    """Find a plate using a sample id."""
+    sample_id = request.args.get('sample_id')
+    try:
+        sample_obj = current_app.config['store'].sample(sample_id)
+    except NoResultFound:
+        return abort(404, "no sample found: {}".format(sample_id))
+    analysis_obj = sample_obj.analysis_dict.get('genotyping')
+    if analysis_obj is None:
+        return abort(404, "no genotyping results loaded: {}".format(sample_id))
+    return redirect(url_for('.plate', plate_id=analysis_obj.source.lstrip('/')))

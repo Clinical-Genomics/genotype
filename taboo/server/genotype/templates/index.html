@@ -17,6 +17,18 @@
         </div>
     </div>
 
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form action="{{ url_for('genotype.search_sample') }}" method="get" accept-charset="utf-8">
+                <div class="form-group">
+                    <label for="sampleId">Find plate by sample</label>
+                    <input type="text" class="form-control" id="sampleId" placeholder="sample id" name="sample_id">
+                </div>
+                <button type="submit" class="btn btn-default">Search</button>
+            </form>
+        </div>
+    </div>
+
     <table class="table table-bordered">
         <thead>
             <tr>
