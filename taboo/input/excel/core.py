@@ -63,12 +63,14 @@ def extract(row, snp_start, sex_start):
     """
     # remove leading 'IDX-CG-'
     sample_id = row[1].split('-')[-1]
+    sex = row[4]
     genotype_columns = row[snp_start:]
     sex_columns = row[sex_start:sex_start+3]
     return {
         'sample_id': sample_id,
+        'sex': sex,
         'genotypes': genotype_columns,
-        'sex': sex_columns
+        'sex_prediction': sex_columns
     }
 
 
@@ -132,16 +134,18 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
     data_rows = (extract(row, snp_start, sex_start) for row in rows)
     source_id = source or os.path.abspath(book_path)
     parsed_rows = ((row['sample_id'],
+                    row['sex'],
                     zip(rsnumber_columns, row['genotypes']),
-                    row['sex'])
+                    row['sex_prediction'])
                    for row in data_rows)
 
     sample_ids = []
     analyses = []
-    for sample_id, genotypes, sex_columns in parsed_rows:
+    for sample_id, sex, genotypes, sex_columns in parsed_rows:
         sample_ids.append(sample_id)
         analyses.append({
-            'sex': parse_sex(sex_columns),
+            'sex': sex,
+            'predicted_sex': parse_sex(sex_columns),
             'sample_id': sample_id,
             'genotypes': [{
                 'rsnumber': rsnumber,
@@ -162,19 +166,24 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
             logger.warn("analysis already added: %s", sample_id)
             if force:
                 logger.info('removing existing analysis')
-                store.remove(sample_id, experiment)
+                store.remove_analysis(source_id)
 
         if (not analysis_exists) or force:
-            analysis_obj = store.add_analysis(sample_obj, experiment,
-                                              source_id, analysis['sex'])
+            sample_obj.expected_sex = {1.0: 'male',
+                                       2.0: 'female'}.get(analysis['sex'])
+            store.save()
+
+            analysis_obj = store.add_analysis(sample_obj,
+                                              experiment,
+                                              source_id,
+                                              analysis['predicted_sex'])
             new_genotypes = [Genotype(**gt) for gt in analysis['genotypes']]
             analysis_obj.genotypes = new_genotypes
 
-            store.add(analysis_obj)
             try:
+                store.add(analysis_obj)
                 store.save()
             except IntegrityError as exception:
-                store.session.rollback()
                 logger.error('unknown exception, multiple alleles?')
                 raise exception
             yield analysis_obj

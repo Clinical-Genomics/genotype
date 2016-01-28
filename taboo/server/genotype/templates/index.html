@@ -19,7 +19,7 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            <form action="{{ url_for('genotype.search_sample') }}" method="get" accept-charset="utf-8">
+            <form action="{{ url_for('genotype.search_sample') }}" method="GET" accept-charset="utf-8">
                 <div class="form-group">
                     <label for="sampleId">Find plate by sample</label>
                     <input type="text" class="form-control" id="sampleId" placeholder="sample id" name="sample_id">
@@ -33,12 +33,19 @@
         <thead>
             <tr>
                 <th>Plates</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for plate_id in plates %}
                 <tr>
                     <td><a href="{{ url_for('genotype.plate', plate_id=plate_id) }}" title="{{ plate_id }}">{{ plate_id }}</a></td>
+                    <td>
+                        <form action="{{ url_for('genotype.delete_plate') }}" method="POST" accept-charset="utf-8">
+                            <input name="plate_id" value="{{ plate_id }}" hidden></input>
+                            <button class="btn btn-default btn-xs" type="submit">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

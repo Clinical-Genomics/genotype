@@ -13,10 +13,12 @@
         <thead>
             <tr>
                 <th rowspan="2">Sample</th>
-                <th colspan="2">Sex</th>
-                <th rowspan="2">Comparison</th>
+                <th colspan="3">Sex</th>
+                <th rowspan="2">Actions</th>
+                <th rowspan="2">Result</th>
             </tr>
             <tr>
+                <th>Expected</th>
                 <th>Sequencing</th>
                 <th>Genotyping</th>
             </tr>
@@ -27,10 +29,6 @@
                     {% set sex_class = 'success' %}
                 {% elif sample.same_sex() == 'fail' %}
                     {% set sex_class = 'danger' %}
-                {% elif sample.same_sex() == 'unknown' %}
-                    {% set sex_class = 'info' %}
-                {% else %}
-                    {% set sex_class = 'nothing' %}
                 {% endif %}
 
                 {% set is_success = sample.is_success() %}
@@ -42,19 +40,24 @@
                         </a>
                     </td>
                     <td class="bg-{{ sex_class }}">
-                        {{ sample.sexes().sequencing }}
+                        {{ sample.expected_sex or '' }}
                     </td>
                     <td class="bg-{{ sex_class }}">
-                        {{ sample.sexes().genotyping }}
+                        {{ sample.sexes().sequencing or '' }}
+                    </td>
+                    <td class="bg-{{ sex_class }}">
+                        {{ sample.sexes().genotyping or '' }}
+                    </td>
+                    <td>
+                        {% if sample.is_ready() %}
+                            <a class="btn btn-info btn-xs" href="{{ url_for('genotype.analysis', sample_id=sample.sample_id) }}">Compare</a>
+                        {% endif %}
                     </td>
                     <td>
                         {% if is_success %}
                             Matches: {{ sample.matches()|join(', ') }}
                         {% elif sample.results %}
                             Top: {{ sample.top_samples()|join(', ') }}
-                        {% else %}
-                            {% set label_class = 'info' if sample.is_ready() else 'default' %}
-                            <a class="btn btn-{{ label_class }}" href="{{ url_for('genotype.analysis', sample_id=sample.sample_id) }}">Run</a>
                         {% endif %}
                     </td>
                 </tr>

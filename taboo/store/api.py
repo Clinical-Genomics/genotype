@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from .models import Analysis, Base, Genotype, Sample
+from .models import Analysis, Base, Genotype, Sample, Result
+
+logger = logging.getLogger(__name__)
 
 
 class Database(object):
@@ -46,9 +50,13 @@ class Database(object):
 
     def save(self):
         """Manually persist changes made to various elements."""
-        # commit/persist dirty changes to the database
-        self.session.flush()
-        self.session.commit()
+        try:
+            # commit/persist dirty changes to the database
+            self.session.flush()
+            self.session.commit()
+        except Exception as error:
+            self.session.rollback()
+            raise error
 
     def add(self, *records):
         """Add new records to the current session transaction.
@@ -90,9 +98,27 @@ class Database(object):
         """Add a new analysis to the database."""
         analysis_obj = Analysis(sample=sample_obj, experiment=experiment,
                                 source=source, sex=sex)
-        # self.add(analysis_obj)
-        # self.save()
         return analysis_obj
+
+    def remove_analysis(self, source_id):
+        """Remove analysis objects from database and related results."""
+        logger.debug('remove related results')
+        results = (self.session.query(Result)
+                       .join(Result.analysis)
+                       .filter(Analysis.source == source_id))
+        for result in results:
+            self.session.delete(result)
+
+        logger.debug('remove genotypes')
+        genotypes = (self.session.query(Genotype)
+                         .join(Genotype.analysis)
+                         .filter(Analysis.source == source_id))
+        for genotype in genotypes:
+            self.session.delete(genotype)
+
+        logger.debug('remove analyses')
+        self.session.query(Analysis.id).filter_by(source=source_id).delete()
+        self.save()
 
     def analyses(self, sample_ids=None, source=None, experiment=None):
         """Fetch analyses from database."""
@@ -130,13 +156,6 @@ class Database(object):
                                      .group_by(Analysis.source))
         analysis_ids = [analysis.source for analysis in analysis_objs]
         return analysis_ids
-
-    def remove(self, sample_id, experiment):
-        """Remove sample and genotypes from the database."""
-        analysis_obj = self.analysis(sample_id, experiment)
-        self.session.query(Genotype).filter_by(analysis_id=analysis_obj.id).delete()
-        self.session.delete(analysis_obj)
-        self.save()
 
     def add_sex(self, sample_id, expected_sex, seq_sex=None):
         """Add excepted and sequencing sex result."""

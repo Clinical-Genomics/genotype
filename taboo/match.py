@@ -20,7 +20,7 @@ def sort_scores(scores):
     Returns:
         list: sorted matches based on 'match' score
     """
-    return sorted(scores, key=lambda item: item[1]['match'], reverse=True)
+    return sorted(scores, key=lambda item: item[1]['mismatch'])
 
 
 def fill_forward(all_rsnumbers, reference_dict, genotypes):
@@ -106,7 +106,9 @@ def is_success(expected_id, analysis, result, allowed_mismatches=3):
 
 def run_comparison(store, rs_stream, sample_id):
     comparisons = match_sample(store, rs_stream, sample_id)
-    ranked_comparisons = sort_scores(comparisons)
+    matching_comparisons = (comparison for comparison in comparisons
+                            if comparison[1]['match'] > 0)
+    ranked_comparisons = sort_scores(matching_comparisons)
 
     top_results = [Result(
                        matches=comparison['match'],

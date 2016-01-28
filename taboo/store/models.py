@@ -86,25 +86,25 @@ class Sample(Base):
 
     def sexes(self):
         """Return sex determinations from loaded analyses."""
-        sexes = {analysis.experiment: (analysis.sex or 'not set')
-                 for analysis in self.analyses}
+        sexes = {analysis.experiment: analysis.sex for analysis in self.analyses}
+        sexes['expected'] = self.expected_sex
         return sexes
 
     def same_sex(self):
         """Determine if the sex is the same for analyses."""
         sexes = self.sexes().values()
 
-        if 'not set' in sexes:
-            return 'unknown'
+        if len(set(filter(None, sexes))) != 1:
+            return 'fail'
 
-        elif len(sexes) != 2:
-            return 'N/A'
+        elif len(sexes) < 3 or None in sexes:
+            return 'unknown'
 
         elif len(set(sexes)) == 1:
             return 'success'
 
         else:
-            return 'fail'
+            raise ValueError('unknown error')
 
     def is_success(self):
         """Check if a comparison was made successfully."""
@@ -132,23 +132,27 @@ class Sample(Base):
 
     def top_samples(self):
         """Return sample ids for all results."""
-        return [("{res.analysis.sample.sample_id} [{res.matches}]"
-                 .format(res=result)) for result in self.results]
+        return [("{res.analysis.sample.sample_id} "
+                 "[{res.matches}/{res.mismatches}/{res.unknowns}/51]"
+                 .format(res=result)) for result in self.results[:2]]
 
 
-def result_success(expected_id, result, allowed_mismatches=3):
+def result_success(expected_id, result, min_matches=20, allowed_mismatches=3):
     """Check if a comparison is successful."""
     sample_id = result.analysis.sample.sample_id
     acceptable_mismatches = result.mismatches <= allowed_mismatches
     same_sample = sample_id == expected_id
-    if same_sample and acceptable_mismatches:
+    enough_matches = result.matches >= min_matches
+    if same_sample and acceptable_mismatches and enough_matches:
         logger.debug('genotypes match the same sample')
         answer = True
     else:
         answer = False
         if same_sample and not acceptable_mismatches:
-            logger.debug('genotyping has failed on acceptable mismatches (%s)',
+            logger.debug('genotyping failed on acceptable mismatches (%s)',
                          allowed_mismatches)
+        elif not enough_matches:
+            logger.debug('genotyping failed on not enough matches')
         else:
             if acceptable_mismatches:
                 logger.debug("genotypes match a different sample: %s", sample_id)

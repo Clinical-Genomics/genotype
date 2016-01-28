@@ -37,6 +37,14 @@ def plate(plate_id):
     return render_template('plate.html', samples=samples, plate_id=plate_id)
 
 
+@genotype_bp.route('/plates/delete', methods=['POST'])
+def delete_plate():
+    """Delete Analysis and Related result models."""
+    plate_id = "/{}".format(request.form['plate_id'])
+    current_app.config['store'].remove_analysis(plate_id)
+    return redirect(url_for('.index'))
+
+
 @genotype_bp.route('/samples/<sample_id>')
 def sample(sample_id):
     """Display details for a sample."""
