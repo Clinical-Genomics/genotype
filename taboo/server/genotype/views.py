@@ -56,10 +56,12 @@ def sample(sample_id):
 
     all_rsnumbers = unique_rsnumbers(store.session.query)
 
+    analyses = [sample_obj.analysis_dict['genotyping'],
+                sample_obj.analysis_dict['sequencing']]
     experiments = {
         analysis.experiment: fill_forward(all_rsnumbers, reference_dict,
                                           analysis.genotypes)
-        for analysis in sample_obj.analyses
+        for analysis in analyses
     }
     genotype_pairs = zip(all_rsnumbers, *experiments.values())
 
