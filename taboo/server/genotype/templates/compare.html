@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="page-header">
+        <h3>Samples: {{ sample1.sample_id }} vs. {{ sample2.sample_id }}</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>RS number</th>
+                    <th>Genotyping ({{ sample1.sample_id }})</th>
+                    <th>Sequencing ({{ sample2.sample_id }})</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rsnumber, genotype1, genotype2 in genotype_pairs %}
+                    {% if not genotype1.is_cool or not genotype1.is_cool %}
+                        {% set row_class = 'warning' %}
+                    {% elif genotype1 == genotype2 %}
+                        {% set row_class = 'success' %}
+                    {% else %}
+                        {% set row_class = 'danger' %}
+                    {% endif %}
+                    <tr class="{{ row_class }}">
+                        <th>{{ rsnumber }}</th>
+                        <td>{{ genotype1 }}</td>
+                        <td>{{ genotype2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+{% endblock %}

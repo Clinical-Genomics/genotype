@@ -23,7 +23,7 @@ genotype_bp = Blueprint('genotype', __name__, template_folder='templates',
 @genotype_bp.route('/')
 def index():
     """Display all samples."""
-    plates = [plate_id.lstrip('/') for plate_id
+    plates = [(os.path.basename(plate_id), plate_id.lstrip('/')) for plate_id
               in current_app.config['store'].experiments('genotyping')]
 
     return render_template('index.html', plates=plates)
@@ -55,6 +55,7 @@ def sample(sample_id):
         reference_dict = rsnumbers.parse(ref_handle)
 
     all_rsnumbers = unique_rsnumbers(store.session.query)
+
     experiments = {
         analysis.experiment: fill_forward(all_rsnumbers, reference_dict,
                                           analysis.genotypes)
@@ -63,7 +64,35 @@ def sample(sample_id):
     genotype_pairs = zip(all_rsnumbers, *experiments.values())
 
     return render_template('sample.html', sample=sample_obj,
-                           experiments=experiments, rsnumbers=all_rsnumbers,
+                           rsnumbers=all_rsnumbers,
+                           genotype_pairs=genotype_pairs)
+
+
+@genotype_bp.route('/samples/<sample1>/<sample2>')
+def compare_samples(sample1, sample2):
+    """Compare genotypes between samples.
+
+    Genotyping results will be used for 'sample1', and sequencing results
+    will be used for 'sample2'.
+    """
+    store = current_app.config['store']
+    sample_1 = store.sample(sample1)
+    sample_2 = store.sample(sample2)
+
+    genotyping = sample_1.analysis_dict['genotyping']
+    sequencing = sample_2.analysis_dict['sequencing']
+
+    with codecs.open(current_app.config['rsnumber_ref'], 'r') as ref_handle:
+        reference_dict = rsnumbers.parse(ref_handle)
+
+    all_rsnumbers = unique_rsnumbers(store.session.query)
+    experiments = [fill_forward(all_rsnumbers, reference_dict,
+                                analysis.genotypes)
+                   for analysis in [genotyping, sequencing]]
+    genotype_pairs = zip(all_rsnumbers, *experiments)
+
+    return render_template('compare.html', sample1=sample_1, sample2=sample_2,
+                           rsnumbers=all_rsnumbers,
                            genotype_pairs=genotype_pairs)
 
 

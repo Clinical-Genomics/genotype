@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 import logging
+import os
 
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -34,6 +35,11 @@ class Genotype(Base):
     analysis_id = Column(Integer, ForeignKey('analysis.id'))
     allele_1 = Column(String(1))
     allele_2 = Column(String(1))
+
+    @property
+    def is_cool(self):
+        """Check if the genotype looks good."""
+        return self.allele_1 != '0' or self.allele_2 != '0'
 
     def __str__(self):
         """Stringify genotype call.
@@ -195,6 +201,11 @@ class Analysis(Base):
     genotypes = relationship('Genotype', order_by='Genotype.rsnumber',
                              backref='analysis')
     results = relationship('Result', backref='analysis')
+
+    @property
+    def short_source(self):
+        """Basename of the source path."""
+        return os.path.basename(self.source)
 
     def stringify(self):
         """Stringify genotypes for the sample.

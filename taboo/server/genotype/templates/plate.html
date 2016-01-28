@@ -57,7 +57,10 @@
                         {% if is_success %}
                             Matches: {{ sample.matches()|join(', ') }}
                         {% elif sample.results %}
-                            Top: {{ sample.top_samples()|join(', ') }}
+                            {% for result in sample.results[:2] %}
+                                <a href="{{ url_for('genotype.compare_samples', sample1=sample.sample_id, sample2=result.sample.sample_id) }}">{{ result.sample.sample_id }}</a>
+                                [{{ result.matches }}/{{ result.mismatches }}/{{ result.unknowns }}/51] <br>
+                            {% endfor %}
                         {% endif %}
                     </td>
                 </tr>

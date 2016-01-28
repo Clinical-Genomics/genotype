@@ -37,12 +37,12 @@
             </tr>
         </thead>
         <tbody>
-            {% for plate_id in plates %}
+            {% for plate_id, plate_path in plates %}
                 <tr>
-                    <td><a href="{{ url_for('genotype.plate', plate_id=plate_id) }}" title="{{ plate_id }}">{{ plate_id }}</a></td>
+                    <td><a href="{{ url_for('genotype.plate', plate_id=plate_path) }}" title="{{ plate_id }}">{{ plate_id }}</a></td>
                     <td>
                         <form action="{{ url_for('genotype.delete_plate') }}" method="POST" accept-charset="utf-8">
-                            <input name="plate_id" value="{{ plate_id }}" hidden></input>
+                            <input name="plate_id" value="{{ plate_path }}" hidden></input>
                             <button class="btn btn-default btn-xs" type="submit">Delete</button>
                         </form>
                     </td>
