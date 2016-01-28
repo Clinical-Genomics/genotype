@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "utils.html" as utils %}
 
 {% block content %}
 
@@ -15,16 +16,7 @@
                     <th>Genotyping</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for rsnumber, genotype1, genotype2 in genotype_pairs %}
-                    {% set is_same = (genotype1 == genotype2) %}
-                    <tr class="{% if not is_same %}warning{% endif %}">
-                        <th>{{ rsnumber }}</th>
-                        <td>{{ genotype1 }}</td>
-                        <td>{{ genotype2 }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            {{ utils.compare_genotypes(genotype_pairs) }}
         </table>
     </div>
     

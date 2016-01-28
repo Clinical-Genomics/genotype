@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "utils.html" as utils %}
 
 {% block content %}
 
@@ -15,22 +16,7 @@
                     <th>Sequencing ({{ sample2.sample_id }})</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for rsnumber, genotype1, genotype2 in genotype_pairs %}
-                    {% if not genotype1.is_cool or not genotype1.is_cool %}
-                        {% set row_class = 'warning' %}
-                    {% elif genotype1 == genotype2 %}
-                        {% set row_class = 'success' %}
-                    {% else %}
-                        {% set row_class = 'danger' %}
-                    {% endif %}
-                    <tr class="{{ row_class }}">
-                        <th>{{ rsnumber }}</th>
-                        <td>{{ genotype1 }}</td>
-                        <td>{{ genotype2 }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+            {{ utils.compare_genotypes(genotype_pairs) }}
         </table>
     </div>
     

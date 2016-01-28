@@ -35,9 +35,13 @@
 
                 <tr {% if is_success %}class="bg-success"{% endif %}>
                     <td>
-                        <a href="{{ url_for('genotype.sample', sample_id=sample.sample_id) }}">
+                        {% if sample.is_ready() %}
+                            <a href="{{ url_for('genotype.sample', sample_id=sample.sample_id) }}">
+                                {{ sample.sample_id }}
+                            </a>
+                        {% else %}
                             {{ sample.sample_id }}
-                        </a>
+                        {% endif %}
                     </td>
                     <td class="bg-{{ sex_class }}">
                         {{ sample.expected_sex or '' }}
