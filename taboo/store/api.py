@@ -169,3 +169,16 @@ class Database(object):
             analyses['sequencing'].sex = seq_sex
 
         self.save()
+
+    def overview(self):
+        """Summarize all the results from comparisons."""
+        results = (self.session.query(Result).group_by(Result.sample_id)
+                                             .distinct(Result.sample_id))
+        samples = (result.sample for result in results)
+        summary = {'success': [], 'fail': []}
+        for sample in samples:
+            if sample.is_success():
+                summary['success'].append(sample)
+            else:
+                summary['fail'].append(sample)
+        return summary

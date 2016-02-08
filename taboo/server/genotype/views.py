@@ -26,7 +26,7 @@ def index():
     plates = [(os.path.basename(plate_id), plate_id.lstrip('/')) for plate_id
               in current_app.config['store'].experiments('genotyping')]
 
-    return render_template('index.html', plates=plates)
+    return render_template('genotype/index.html', plates=plates)
 
 
 @genotype_bp.route('/plates/<path:plate_id>')
@@ -34,7 +34,8 @@ def plate(plate_id):
     """Display all samples in a plate."""
     analyses = current_app.config['store'].analyses(source="/{}".format(plate_id))
     samples = (analysis.sample for analysis in analyses)
-    return render_template('plate.html', samples=samples, plate_id=plate_id)
+    return render_template('genotype/plate.html', samples=samples,
+                           plate_id=plate_id)
 
 
 @genotype_bp.route('/plates/delete', methods=['POST'])
@@ -59,11 +60,11 @@ def sample(sample_id):
     analyses = [sample_obj.analysis_dict['genotyping'],
                 sample_obj.analysis_dict['sequencing']]
     experiments = [fill_forward(all_rsnumbers, reference_dict,
-                                          analysis.genotypes)
+                                analysis.genotypes)
                    for analysis in analyses]
     genotype_pairs = zip(all_rsnumbers, *experiments)
 
-    return render_template('sample.html', sample=sample_obj,
+    return render_template('genotype/sample.html', sample=sample_obj,
                            rsnumbers=all_rsnumbers,
                            genotype_pairs=genotype_pairs)
 
@@ -91,8 +92,8 @@ def compare_samples(sample1, sample2):
                    for analysis in [genotyping, sequencing]]
     genotype_pairs = zip(all_rsnumbers, *experiments)
 
-    return render_template('compare.html', sample1=sample_1, sample2=sample_2,
-                           rsnumbers=all_rsnumbers,
+    return render_template('genotype/compare.html', sample1=sample_1,
+                           sample2=sample_2, rsnumbers=all_rsnumbers,
                            genotype_pairs=genotype_pairs)
 
 
