@@ -58,12 +58,10 @@ def sample(sample_id):
 
     analyses = [sample_obj.analysis_dict['genotyping'],
                 sample_obj.analysis_dict['sequencing']]
-    experiments = {
-        analysis.experiment: fill_forward(all_rsnumbers, reference_dict,
+    experiments = [fill_forward(all_rsnumbers, reference_dict,
                                           analysis.genotypes)
-        for analysis in analyses
-    }
-    genotype_pairs = zip(all_rsnumbers, *experiments.values())
+                   for analysis in analyses]
+    genotype_pairs = zip(all_rsnumbers, *experiments)
 
     return render_template('sample.html', sample=sample_obj,
                            rsnumbers=all_rsnumbers,
