@@ -45,7 +45,7 @@ setup(
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
     # see http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.5.0',
+    version='0.6.0',
 
     description=("Taboo provides an automated pipipeline for comparing"
                  "genotypes from different assays."),
@@ -66,7 +66,7 @@ setup(
     include_package_data=True,
     package_data={
         'taboo': [
-            'server/genotype/templates/*.html',
+            'server/genotype/templates/genotype/*.html',
         ]
     },
     zip_safe=False,

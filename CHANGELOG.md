@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.0] - 2016-02-08
+### Added
+- Add search form for sample -> plate
+- Save results base on few mismatches
+- Save expected sex from Excel
+- Add delete plate method + view
+- Add compare view between samples
+
+### Fixed
+- Order experiments correctly
+
 ## [0.5.0] - 2016-01-27
 ### Added
 - BCF input support
