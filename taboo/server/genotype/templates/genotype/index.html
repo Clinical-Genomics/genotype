@@ -9,8 +9,15 @@
             <div class="panel-body">
                 <form class="form-inline" action="{{ url_for('genotype.upload') }}" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
-                        <input type="file" name="excel_input" id="excelInput">
+                        <label for="excelInput">Excel file</label>
+                        <input class="form-control" id="excelInput" type="file" name="excel_input" id="excelInput">
                     </div>
+
+                    <div class="form-group">
+                        <label for="forceCheck">Force</label>
+                        <input type="checkbox" value="true" name="force" checked>
+                    </div>
+
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>
             </div>
@@ -19,9 +26,9 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            <form action="{{ url_for('genotype.search_sample') }}" method="GET" accept-charset="utf-8">
+            <form class="form-inline" action="{{ url_for('genotype.search_sample') }}" method="GET" accept-charset="utf-8">
                 <div class="form-group">
-                    <label for="sampleId">Find plate by sample</label>
+                    <label for="sampleId">Find plate</label>
                     <input type="text" class="form-control" id="sampleId" placeholder="sample id" name="sample_id">
                 </div>
                 <button type="submit" class="btn btn-default">Search</button>

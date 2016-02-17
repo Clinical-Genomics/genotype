@@ -130,6 +130,7 @@ def upload():
     db = current_app.config['store']
     include_key = '-CG-'
 
+    force = 'force' in request.form
     req_file = request.files['excel_input']
     filename = secure_filename(req_file.filename)
 
@@ -139,7 +140,7 @@ def upload():
     excel_path = os.path.join(current_app.config['genotyping_dir'], filename)
     req_file.save(excel_path)
 
-    analyses = load_excel(db, excel_path, include_key=include_key)
+    analyses = load_excel(db, excel_path, include_key=include_key, force=force)
     for analysis in analyses:
         current_app.logger.info("added analysis: %s", analysis.sample.sample_id)
 
