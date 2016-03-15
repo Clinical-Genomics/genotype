@@ -13,9 +13,9 @@ class Database(object):
 
     """Interface to genotype database."""
 
-    def __init__(self, db_path, connect=True):
+    def __init__(self, db_uri, connect=True):
         super(Database, self).__init__()
-        self.db_path = db_path
+        self.db_uri = db_uri
         self.engine = None
         self.session = None
 
@@ -23,10 +23,13 @@ class Database(object):
             self.connect()
 
     def connect(self):
-        """Connect to a SQLite database."""
-        adaptor_path = "sqlite:///{}".format(self.db_path)
+        """Connect to a SQL database."""
+        if '://' not in self.db_uri:
+            adaptor_str = "sqlite:///{}".format(self.db_uri)
+        else:
+            adaptor_str = self.db_uri
 
-        self.engine = create_engine(adaptor_path)
+        self.engine = create_engine(adaptor_str)
         # connect the engine to the ORM models
         Base.metadata.bind = self.engine
 
