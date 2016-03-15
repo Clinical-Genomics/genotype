@@ -42,17 +42,17 @@ def init_log(log_level=None):
 @click.version_option(taboo.__version__)
 @click.option('-l', '--log-level', default='INFO')
 @click.option('-c', '--config', type=click.Path(exists=True))
-@click.option('-d', '--db-path', type=click.Path())
+@click.option('-d', '--db-uri', type=click.Path())
 @click.pass_context
-def cli(context, log_level, config, db_path):
+def cli(context, log_level, config, db_uri):
     """Genotype comparison tool."""
     with open(config) as handle:
         options = yaml.load(handle)
         context.obj = options
 
-    db_path = db_path or options.get('db_path') or './taboo.sqlite3'
+    db_uri = db_uri or options.get('db_uri') or './taboo.sqlite3'
     init_log(log_level)
-    context.obj['store'] = taboo.store.Database(db_path)
+    context.obj['store'] = taboo.store.Database(db_uri)
 
 
 # add subcommands dynamically to the CLI
