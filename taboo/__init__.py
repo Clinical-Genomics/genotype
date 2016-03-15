@@ -8,6 +8,7 @@ Taboo is a tool for comparing genotypes from different assays.
 :licence: MIT, see LICENCE for more details
 """
 import logging
+from pkg_resources import get_distribution
 
 __all__ = [
   '__title__', '__summary__', '__uri__', '__version__', '__author__',
@@ -26,7 +27,7 @@ __title__ = 'taboo'
 __summary__ = 'tool for comparing genotypes from different assays.'
 __uri__ = 'https://github.com/Clinical-Genomics/taboo'
 
-__version__ = '0.4.0'
+__version__ = get_distribution(__title__).version
 
 __author__ = 'Robin Andeer'
 __email__ = 'robin.andeer@scilifelab.se'

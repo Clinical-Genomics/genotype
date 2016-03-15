@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.0] - 2016-03-15
+### Added
+- support for different SQL backends through connection string
+
 ## [0.6.0] - 2016-02-08
 ### Added
 - Add search form for sample -> plate
