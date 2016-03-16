@@ -3,7 +3,7 @@ from datetime import datetime
 import logging
 import os
 
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, ForeignKey, types
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -30,11 +30,11 @@ class Genotype(Base):
     __table_args__ = (UniqueConstraint('analysis_id', 'rsnumber',
                                        name='_sample_rsnumber'),)
 
-    id = Column(Integer, primary_key=True)
-    rsnumber = Column(String(10))
-    analysis_id = Column(Integer, ForeignKey('analysis.id'))
-    allele_1 = Column(String(1))
-    allele_2 = Column(String(1))
+    id = Column(types.Integer, primary_key=True)
+    rsnumber = Column(types.String(10))
+    analysis_id = Column(types.Integer, ForeignKey('analysis.id'))
+    allele_1 = Column(types.String(1))
+    allele_2 = Column(types.String(1))
 
     @property
     def is_cool(self):
@@ -72,10 +72,10 @@ class Sample(Base):
 
     __tablename__ = 'sample'
 
-    id = Column(Integer, primary_key=True)
-    sample_id = Column(String(32), unique=True)
-    expected_sex = Column(String(32))
-    created_at = Column(DateTime, default=datetime.now)
+    id = Column(types.Integer, primary_key=True)
+    sample_id = Column(types.String(32), unique=True)
+    expected_sex = Column(types.String(32))
+    created_at = Column(types.DateTime, default=datetime.now)
 
     analyses = relationship('Analysis', backref='sample')
     results = relationship('Result', backref='sample')
@@ -173,13 +173,13 @@ class Result(Base):
 
     __tablename__ = 'result'
 
-    id = Column(Integer, primary_key=True)
-    matches = Column(Integer)
-    mismatches = Column(Integer)
-    unknowns = Column(Integer)
+    id = Column(types.Integer, primary_key=True)
+    matches = Column(types.Integer)
+    mismatches = Column(types.Integer)
+    unknowns = Column(types.Integer)
 
-    analysis_id = Column(Integer, ForeignKey('analysis.id'))
-    sample_id = Column(Integer, ForeignKey('sample.id'))
+    analysis_id = Column(types.Integer, ForeignKey('analysis.id'))
+    sample_id = Column(types.Integer, ForeignKey('sample.id'))
 
 
 class Analysis(Base):
@@ -190,13 +190,13 @@ class Analysis(Base):
     __table_args__ = (UniqueConstraint('sample_id', 'experiment',
                                        name='_sample_exp'),)
 
-    id = Column(Integer, primary_key=True)
-    experiment = Column(String(32), nullable=False)
-    source = Column(String(128))
+    id = Column(types.Integer, primary_key=True)
+    experiment = Column(types.String(32), nullable=False)
+    source = Column(types.Text)
     # intended choices: female, male, unknown, conflict
-    sex = Column(String(32))
+    sex = Column(types.String(32))
 
-    sample_id = Column(Integer, ForeignKey('sample.id'))
+    sample_id = Column(types.Integer, ForeignKey('sample.id'))
 
     genotypes = relationship('Genotype', order_by='Genotype.rsnumber',
                              backref='analysis')
