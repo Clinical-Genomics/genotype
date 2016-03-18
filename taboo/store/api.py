@@ -157,7 +157,11 @@ class Database(object):
         analysis_objs = (self.session.query(Analysis)
                                      .filter_by(experiment=experiment)
                                      .group_by(Analysis.source))
-        analysis_ids = [analysis.source for analysis in analysis_objs]
+        try:
+            analysis_ids = [analysis.source for analysis in analysis_objs]
+        except Exception:
+            logger.exception("uncaught exception in 'experiments'")
+            self.session.rollback()
         return analysis_ids
 
     def add_sex(self, sample_id, expected_sex, seq_sex=None):

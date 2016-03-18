@@ -74,7 +74,7 @@ class Sample(Base):
 
     id = Column(types.Integer, primary_key=True)
     sample_id = Column(types.String(32), unique=True)
-    expected_sex = Column(types.String(32))
+    expected_sex = Column(types.Enum('male', 'female', 'unknown'))
     created_at = Column(types.DateTime, default=datetime.now)
 
     analyses = relationship('Analysis', backref='sample')
@@ -194,7 +194,7 @@ class Analysis(Base):
     experiment = Column(types.String(32), nullable=False)
     source = Column(types.Text)
     # intended choices: female, male, unknown, conflict
-    sex = Column(types.String(32))
+    sex = Column(types.Enum('male', 'female', 'unknown', 'conflict'))
 
     sample_id = Column(types.Integer, ForeignKey('sample.id'))
 
