@@ -9,7 +9,7 @@ RSNumber = namedtuple('RSNumber', ['id', 'ref', 'chrom', 'pos'])
 
 def parse(rs_handle):
     """Read RS numbers into a dict."""
-    rows = (line.strip().split('\t') for line in rs_handle)
+    rows = (line.strip().split('\t') for line in rs_handle if line)
     rs_map = {row[0]: RSNumber(id=row[0], ref=row[1],
                                chrom=row[2], pos=int(row[3]))
               for row in rows}

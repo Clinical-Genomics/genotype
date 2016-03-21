@@ -29,6 +29,8 @@
                     {% set sex_class = 'success' %}
                 {% elif sample.same_sex() == 'fail' %}
                     {% set sex_class = 'danger' %}
+                {% else %}
+                    {% set sex_class = 'default' %}
                 {% endif %}
 
                 {% set is_success = sample.is_success() %}
