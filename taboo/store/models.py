@@ -100,17 +100,14 @@ class Sample(Base):
         """Determine if the sex is the same for analyses."""
         sexes = self.sexes().values()
 
-        if len(set(filter(None, sexes))) != 1:
-            return 'fail'
-
-        elif len(sexes) < 3 or None in sexes:
+        if 'unknown' in sexes:
             return 'unknown'
 
-        elif len(set(sexes)) == 1:
+        elif len(set(filter(None, sexes))) == 1:
             return 'success'
 
         else:
-            raise ValueError('unknown error')
+            return 'fail'
 
     def is_success(self):
         """Check if a comparison was made successfully."""
