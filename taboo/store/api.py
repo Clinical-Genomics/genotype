@@ -103,7 +103,35 @@ class Database(object):
                                 source=source, sex=sex)
         return analysis_obj
 
-    def remove_analysis(self, source_id):
+    def remove_analysis(self, sample_id, experiment):
+        """Remove an analysis from the database along with related results."""
+        logger.debug('get sample')
+        samples_obj = self.sample(sample_id)
+
+        logger.debug('remove related results')
+        results = (self.session.query(Result)
+                       .join(Result.analysis)
+                       .filter(Analysis.sample_id == samples_obj.id,
+                               Analysis.experiment == experiment))
+        for result in results:
+            self.session.delete(result)
+
+        logger.debug('remove genotypes')
+        genotypes = (self.session.query(Genotype)
+                         .join(Genotype.analysis)
+                         .filter(Analysis.sample_id == samples_obj.id,
+                                 Analysis.experiment == experiment))
+        for genotype in genotypes:
+            self.session.delete(genotype)
+
+        logger.debug('remove analysis')
+        (self.session.query(Analysis.id)
+                     .filter_by(sample_id=samples_obj.id,
+                                experiment=experiment)
+                     .delete())
+        self.save()
+
+    def remove_source(self, source_id):
         """Remove analysis objects from database and related results."""
         logger.debug('remove related results')
         results = (self.session.query(Result)

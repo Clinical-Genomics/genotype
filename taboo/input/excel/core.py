@@ -166,7 +166,7 @@ def load_excel(store, book_path, experiment='genotyping', source=None,
             logger.warn("analysis already added: %s", sample_id)
             if force:
                 logger.info('removing existing analysis')
-                store.remove_analysis(source_id)
+                store.remove_analysis(sample_id, experiment)
 
         if (not analysis_exists) or force:
             sample_obj.expected_sex = {1.0: 'male',

@@ -61,7 +61,7 @@ def load_vcf(store, vcf_path, rsnumber_stream, experiment='sequencing',
             logger.warn("analysis already added: %s", sample_id)
             if force:
                 logger.info('removing existing analysis')
-                store.remove(sample_id, experiment)
+                store.remove_analysis(sample_id, experiment)
 
         if (not analysis_exists) or force:
             analysis_obj = store.add_analysis(sample_obj, experiment, source_id)
@@ -153,7 +153,7 @@ def load_bcf(store, bcf_file, rs_stream, experiment='sequencing', force=False):
             logger.warn("analysis already added: %s", sample_id)
             if force:
                 logger.info('removing existing analysis')
-                store.remove(sample_id, experiment)
+                store.remove_analysis(sample_id, experiment)
 
         if (not analysis_exists) or force:
             analysis_obj = store.add_analysis(sample_obj, experiment, source_id)
