@@ -128,10 +128,14 @@ def load_bcf(store, bcf_file, rs_stream, experiment='sequencing', force=False):
         if len(variants) == 1:
             variant = variants[0]
             for sample_id, sample in variant.samples.items():
+                allele_1 = ('0' if sample.allele_indices[0] is None else
+                            variant.alleles[sample.allele_indices[0]])
+                allele_2 = ('0' if sample.allele_indices[1] is None else
+                            variant.alleles[sample.allele_indices[1]])
                 analyses[sample_id].append({
                     'rsnumber': rsnumber.id,
-                    'allele_1': variant.alleles[sample.allele_indices[0]],
-                    'allele_2': variant.alleles[sample.allele_indices[1]]
+                    'allele_1': allele_1,
+                    'allele_2': allele_2
                 })
         elif len(variants) == 0:
             # ref/ref
