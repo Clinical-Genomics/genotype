@@ -12,11 +12,12 @@ log = logging.getLogger(__name__)
 @click.command()
 @click.option('--debug', is_flag=True)
 @click.option('--port', default=5000)
+@click.option('--host', default='localhost')
 @click.pass_context
-def serve(context, debug, port):
+def serve(context, debug, port, host):
     """Setup a new Taboo database."""
     flask_config = {"TABOO_{}".format(key.upper()): value for key, value
                     in iteritems(context.obj)}
 
     app = create_app('taboo', config_obj=flask_config)
-    app.run(debug=debug, port=port)
+    app.run(debug=debug, port=port, host=host)

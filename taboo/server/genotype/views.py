@@ -2,8 +2,8 @@
 import logging
 import os
 
-from flask import (abort, Blueprint, current_app, redirect, render_template,
-                   request, url_for)
+from flask import (abort, Blueprint, current_app, flash, redirect,
+                   render_template, request, url_for)
 from werkzeug import secure_filename
 
 from taboo.match.core import check_sample
@@ -50,7 +50,9 @@ def upload():
 
     analyses = load_excel(excel_path, include_key=include_key)
     for analysis in analyses:
-        db.add_analysis(analysis)
+        loaded_analysis = db.add_analysis(analysis, replace=True)
+        if loaded_analysis:
+            flash("added: {}".format(analysis.sample.id), 'info')
 
     return redirect(url_for('.index'))
 
