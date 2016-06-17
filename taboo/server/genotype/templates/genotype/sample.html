@@ -54,7 +54,7 @@
                                 </td>
                             {% endfor %}
                             <td>
-                                <textarea class="form-control" name="comment" cols="30" rows="10">{{ sample.comment }}</textarea>
+                                <textarea class="form-control" name="comment" cols="30" rows="10">{{ sample.comment if sample.comment }}</textarea>
                             </td>
                         </tr>
                     </tbody>
