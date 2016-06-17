@@ -32,6 +32,7 @@ pip-log.txt
 nosetests.xml
 htmlcov
 .cache/
+.coverage*
 
 # Translations
 *.mo
@@ -44,7 +45,7 @@ htmlcov
 TRASH*
 *.tar.gz
 .vagrant
-dev
+_DEVELOP/
 
 # SublimeText: workspace files are user-specific
 *.sublime-workspace
@@ -57,5 +58,6 @@ dev
 output/*.html
 output/*/index.html
 
-# Sphinx docs
+# Docs
 docs/_build
+_book/

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Based on https://github.com/pypa/sampleproject/blob/master/setup.py."""
 # To use a consistent encoding
-from codecs import open
+import codecs
 import os
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
@@ -13,6 +13,24 @@ import sys
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist bdist_wheel upload')
     sys.exit()
+
+
+def parse_reqs(req_path='./requirements.txt'):
+    """Recursively parse requirements from nested pip files."""
+    install_requires = []
+    with codecs.open(req_path, 'r') as handle:
+        # remove comments and empty lines
+        lines = (line.strip() for line in handle
+                 if line.strip() and not line.startswith('#'))
+        for line in lines:
+            # check for nested requirements files
+            if line.startswith('-r'):
+                # recursively call this function
+                install_requires += parse_reqs(req_path=line[3:])
+            else:
+                # add the line as a new requirement
+                install_requires.append(line)
+    return install_requires
 
 
 # This is a plug-in for setuptools that will invoke py.test
@@ -35,7 +53,7 @@ class PyTest(TestCommand):
 
 # Get the long description from the relevant file
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
@@ -77,15 +95,8 @@ setup(
     # '<sys.prefix>/my_data'
     # data_files=[('my_data', ['data/data_file'])],
 
-    install_requires=[
-        'click',
-        'setuptools',
-        'xlrd',
-        'sqlalchemy',
-        'vcf_parser',
-        'pyyaml',
-        'pysam'
-    ],
+    # Install requirements loaded from ``requirements.txt``
+    install_requires=parse_reqs(),
     tests_require=[
         'pytest',
     ],
@@ -99,7 +110,17 @@ setup(
     # target platform.
     entry_points={
         'console_scripts': [
-            'taboo = taboo.cli:cli',
+            'taboo = taboo.cli:root',
+        ],
+        'taboo.subcommands.2': [
+            'init = taboo.init.cli:init',
+            'load = taboo.load.cli:load',
+            'add-sex = taboo.store.cli:add_sex',
+            'view = taboo.store.cli:view',
+            'match = taboo.match.cli:match',
+            'check = taboo.match.cli:check',
+            'delete = taboo.load.cli:delete',
+            'serve = taboo.server.cli:serve',
         ]
     },
 

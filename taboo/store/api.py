@@ -1,219 +1,111 @@
 # -*- coding: utf-8 -*-
+import collections
 import logging
+import os
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from alchy import Manager
 
-from .models import Analysis, Base, Genotype, Sample, Result
+from taboo.load.mixins import LoadMixin
+from taboo.match.mixins import MatchMixin
+from .mixins import ModelsMixin
+from .models import Model
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
-class Database(object):
+class TabooDB(Manager, LoadMixin, ModelsMixin, MatchMixin):
 
-    """Interface to genotype database."""
+    """Manage Taboo database."""
 
-    def __init__(self, db_uri, connect=True):
-        super(Database, self).__init__()
-        self.db_uri = db_uri
-        self.engine = None
-        self.session = None
+    def __init__(self, uri=None, debug=False, Model=Model):
+        self.Model = Model
+        self.uri = uri
+        if uri:
+            self.connect(uri, debug=debug)
 
-        if connect:
-            self.connect()
+    def connect(self, db_uri, debug=False):
+        """Configure connection to a SQL database.
 
-    def connect(self):
-        """Connect to a SQL database."""
-        if '://' not in self.db_uri:
-            adaptor_str = "sqlite:///{}".format(self.db_uri)
-        else:
-            adaptor_str = self.db_uri
+        Args:
+            db_uri (str): path/URI to the database to connect to
+            debug (Optional[bool]): whether to output logging information
+        """
+        config = {'SQLALCHEMY_ECHO': debug}
+        if 'mysql' in db_uri:  # pragma: no cover
+            config['SQLALCHEMY_POOL_RECYCLE'] = 3600
+        elif '://' not in db_uri:
+            # expect only a path to a sqlite database
+            db_path = os.path.abspath(os.path.expanduser(db_uri))
+            db_uri = "sqlite:///{}".format(db_path)
+            self.uri = db_uri
 
-        self.engine = create_engine(adaptor_str)
-        # connect the engine to the ORM models
-        Base.metadata.bind = self.engine
+        config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
-        # start a sesion
-        self.session = scoped_session(sessionmaker(bind=self.engine))
+        # connect to the SQL database
+        super(TabooDB, self).__init__(config=config, Model=self.Model)
 
-        return self.session
+        # shortcut to query method
+        self.query = self.session.query
+        return self
 
-    def setup(self, reset=False):
-        """Setup a new database."""
-        if reset:
-            self.tear_down()
+    def set_up(self):
+        """Initialize a new database with the default tables and columns.
 
-        # create all the tables
-        Base.metadata.create_all(self.session.bind)
+        Returns:
+            TabooDB: self
+        """
+        # create the tables
+        self.create_all()
+        tables = self.Model.metadata.tables.keys()
+        log.info("created tables: %s", ', '.join(tables))
+        return self
 
     def tear_down(self):
-        """Tear down a database."""
-        # create all the tables
-        Base.metadata.drop_all(self.session.bind)
+        """Tear down a database (tables and columns).
+
+        Returns:
+            TabooDB: self
+        """
+        # drop/delete the tables
+        self.drop_all()
+        return self
 
     def save(self):
-        """Manually persist changes made to various elements."""
+        """Manually persist changes made to various elements. Chainable.
+
+        Returns:
+            TabooDB: `self` for chainability
+        """
         try:
             # commit/persist dirty changes to the database
             self.session.flush()
             self.session.commit()
         except Exception as error:
+            log.debug('rolling back failed transaction')
             self.session.rollback()
             raise error
+        return self
 
-    def add(self, *records):
-        """Add new records to the current session transaction.
+    def add(self, items):
+        """Add one or more new items and commit the changes. Chainable.
 
         Args:
-          records (list): new ORM objects instances
+            items (Model/List[Model]): new ORM object instance or list of
+
+        Returns:
+            TabooDB: `self` for chainability
         """
-        # add all records to the session object
-        self.session.add_all(records)
-
-    def sample(self, sample_id, check=False):
-        """Get a sample based on the unique id"""
-        sample_q = self.session.query(Sample).filter_by(sample_id=sample_id)
-        return sample_q.first() if check else sample_q.one()
-
-    def analysis(self, sample_id, experiment, check=False):
-        """Get an analysis (SNP calling) from the databse."""
-        analysis_q = (self.session.query(Analysis)
-                                  .join(Analysis.sample)
-                                  .filter(Analysis.experiment == experiment,
-                                          Sample.sample_id == sample_id))
-        return analysis_q.first() if check else analysis_q.one()
-
-    def get_or_create(self, model, **fields):
-        """Fecth an original or create a new record."""
-        if model == 'sample':
-            sample_id = fields['sample_id']
-            model_obj = (self.session.query(Sample)
-                             .filter_by(sample_id=sample_id).first())
-
-        if model_obj is None:
-            model_obj = Sample(**fields)
-            self.add(model_obj)
-            self.save()
-
-        return model_obj
-
-    def add_analysis(self, sample_obj, experiment, source, sex=None):
-        """Add a new analysis to the database."""
-        analysis_obj = Analysis(sample=sample_obj, experiment=experiment,
-                                source=source, sex=sex)
-        return analysis_obj
-
-    def remove_analysis(self, sample_id, experiment):
-        """Remove an analysis from the database along with related results."""
-        logger.debug('get sample')
-        samples_obj = self.sample(sample_id)
-
-        logger.debug('remove related results')
-        results = (self.session.query(Result)
-                       .join(Result.analysis)
-                       .filter(Analysis.sample_id == samples_obj.id,
-                               Analysis.experiment == experiment))
-        for result in results:
-            self.session.delete(result)
-
-        logger.debug('remove genotypes')
-        genotypes = (self.session.query(Genotype)
-                         .join(Genotype.analysis)
-                         .filter(Analysis.sample_id == samples_obj.id,
-                                 Analysis.experiment == experiment))
-        for genotype in genotypes:
-            self.session.delete(genotype)
-
-        logger.debug('remove analysis')
-        (self.session.query(Analysis.id)
-                     .filter_by(sample_id=samples_obj.id,
-                                experiment=experiment)
-                     .delete())
-        self.save()
-
-    def remove_source(self, source_id):
-        """Remove analysis objects from database and related results."""
-        logger.debug('remove related results')
-        results = (self.session.query(Result)
-                       .join(Result.analysis)
-                       .filter(Analysis.source == source_id))
-        for result in results:
-            self.session.delete(result)
-
-        logger.debug('remove genotypes')
-        genotypes = (self.session.query(Genotype)
-                         .join(Genotype.analysis)
-                         .filter(Analysis.source == source_id))
-        for genotype in genotypes:
-            self.session.delete(genotype)
-
-        logger.debug('remove analyses')
-        self.session.query(Analysis.id).filter_by(source=source_id).delete()
-        self.save()
-
-    def analyses(self, sample_ids=None, source=None, experiment=None):
-        """Fetch analyses from database."""
-        objects = self.session.query(Analysis)
-        if sample_ids:
-            objects = (objects.join(Analysis.sample)
-                              .filter(Sample.sample_id.in_(sample_ids)))
-        if source:
-            objects = objects.filter_by(source=source)
-        if experiment:
-            objects = objects.filter_by(experiment=experiment)
-        return objects
-
-    def samples(self, sample_ids=None):
-        """Fetch samples."""
-        objects = self.session.query(Sample)
-        if sample_ids:
-            objects = objects.filter(Sample.sample_id.in_(sample_ids))
-        return objects
-
-    def remove_sample(self, sample_id):
-        """Remove a sample including loaded analyses."""
-        sample_obj = self.sample(sample_id)
-
-        for analysis in sample_obj.analyses:
-            self.remove(sample_id, analysis.experiment)
-
-        self.session.delete(sample_obj)
-        self.save()
-
-    def experiments(self, experiment='genotyping'):
-        """Return ids for all genotyping plates in the datbase."""
-        analysis_objs = (self.session.query(Analysis)
-                                     .filter_by(experiment=experiment)
-                                     .group_by(Analysis.source))
-        try:
-            analysis_ids = [analysis.source for analysis in analysis_objs]
-        except Exception:
-            logger.exception("uncaught exception in 'experiments'")
-            self.session.rollback()
-        return analysis_ids
-
-    def add_sex(self, sample_id, expected_sex, seq_sex=None):
-        """Add excepted and sequencing sex result."""
-        sample_obj = self.sample(sample_id)
-        sample_obj.expected_sex = expected_sex
-
-        if seq_sex:
-            analyses = sample_obj.analysis_dict
-            if 'sequencing' not in analyses:
-                raise ValueError('need to load sequencing results')
-            analyses['sequencing'].sex = seq_sex
-
-        self.save()
-
-    def overview(self):
-        """Summarize all the results from comparisons."""
-        results = (self.session.query(Result).group_by(Result.sample_id)
-                                             .distinct(Result.sample_id))
-        samples = (result.sample for result in results)
-        summary = {'success': [], 'fail': []}
-        for sample in samples:
-            if sample.is_success():
-                summary['success'].append(sample)
-            else:
-                summary['fail'].append(sample)
-        return summary
+        if isinstance(items, self.Model):
+            # Add the record to the session object
+            self.session.add(items)
+        elif isinstance(items, list):
+            # Add all records to the session object
+            self.session.add_all(items)
+        elif (isinstance(items, collections.Iterable) and
+              not isinstance(items, dict)):
+            # Iterate over all items
+            for element in items:
+                self.session.add(element)
+        else:
+            raise ValueError("unknown object type for 'items'")
+        return self

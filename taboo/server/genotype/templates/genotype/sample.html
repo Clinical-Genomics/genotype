@@ -1,23 +1,125 @@
 {% extends "genotype/base.html" %}
-{% import "genotype/utils.html" as utils %}
+
+{% block navbar_items %}
+    <li class="active">
+        <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
+            {{ sample.id }}
+        </a>
+    </li>
+{% endblock %}
+
+{% block body_attribs %}
+    {% if sample.status == 'fail' %}
+        class="bg-danger"
+    {% elif sample.status == 'pass' %}
+        class="bg-success"
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 
-    <div class="page-header">
-        <h3>Sample: {{ sample.sample_id }}</h3>
-    </div>
+    <div class="container">
+        <form action="{{ url_for('genotype.update', sample_id=sample.id) }}" method="POST">
+            <div class="panel panel-default">
+                <div class="panel-heading">{{ sample.id }}</div>
+                
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sex</th>
+                            {% for analysis in sample.analyses %}
+                                <th>{{ analysis.type|capitalize }} sex</th>
+                            {% endfor %}
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select class="form-control" name="sample_sex">
+                                    <option></option>
+                                    {% for option in ['male', 'female', 'unknown'] %}
+                                        <option value="{{ option }}" {% if sample.sex == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            {% for analysis in sample.analyses %}
+                                <td>
+                                    <select class="form-control" name="{{ analysis.type }}_sex">
+                                        <option></option>
+                                        {% for option in ['male', 'female', 'unknown'] %}
+                                            <option value="{{ option }}" {% if analysis.sex == option %}selected{% endif %}>{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            {% endfor %}
+                            <td>
+                                <textarea class="form-control" name="comment" cols="30" rows="10">{{ sample.comment if sample.comment }}</textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>RS number</th>
-                    <th>Genotyping</th>
-                    <th>Sequencing</th>
-                </tr>
-            </thead>
-            {{ utils.compare_genotypes(genotype_pairs) }}
-        </table>
+                <div class="panel-body">
+                    <button class="btn btn-default form-control">Save</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Update status</div>
+
+            <div class="panel-body">
+                <form action="{{ url_for('genotype.update_status', sample_id=sample.id) }}" method="POST">
+                    <div class="row">
+                        <div class="col-xs-8">
+                            <textarea class="form-control" name="comment" cols="30" rows="5" required></textarea>
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" name="status">
+                                    <option></option>
+                                    {% for option in ['pass', 'fail', 'cancel'] %}
+                                        <option value="{{ option }}" {% if option == sample.status %}selected {% endif %}>
+                                            {{ option }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-default form-control">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form action="{{ url_for('genotype.check', sample_id=sample.id) }}" method="POST">
+                    <button class="form-control btn btn-primary">Run check!</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Genotypes</div>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        {% for analysis in sample.analyses %}
+                            <tr>
+                                <th>{{ analysis.type|capitalize }}</th>
+                                {% for genotype in analysis.genotypes %}
+                                    <td>{{ genotype.stringify() }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
 {% endblock %}
