@@ -9,7 +9,7 @@ import sys
 
 is_py2 = sys.version_info[0] == 2
 
-if not is_py2:
+if not is_py2:  # pragma: no cover
     # Python 3
     zip = zip
     range = range

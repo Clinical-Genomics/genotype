@@ -2,6 +2,7 @@
 import logging
 
 from flask import Flask
+from flask_bootstrap import Bootstrap
 
 from .genotype import genotype_bp
 
@@ -12,6 +13,7 @@ def create_app(app_name, config_obj):
 
     # configure app
     app.config.update(config_obj)
+    Bootstrap(app)
 
     # register blueprints
     app.register_blueprint(genotype_bp)

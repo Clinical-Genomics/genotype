@@ -1,61 +1,71 @@
 # -*- coding: utf-8 -*-
 """
 taboo.cli
-~~~~~~~~~
-Command line interface (console entry points). Based on Click.
-Loads subcommands dynamically using setuptools entry points.
+~~~~~~~~~~~
+Command line interface (console entry points). Based on Click_.
+
+.. _Click: http://click.pocoo.org/
 """
+import codecs
 import logging
+import os
+import pkg_resources
 
 import click
 import yaml
 
-import taboo
-import taboo.store
-from taboo.subcommands import (delete_cmd, init_cmd, load_cmd, match_cmd,
-                               show_cmd, view_cmd)
+from taboo import __title__, __version__
+from taboo.log import init_log
+from taboo.store.api import TabooDB
 
-root_logger = logging.getLogger()
-
-
-def init_log(log_level=None):
-    """Initialize the log file in the proper format.
-
-    Arguments:
-        log_level (str): determine level of the log output
-    """
-    root_logger = logging.getLogger()
-
-    template = "[%(asctime)s] %(levelname)-8s: %(name)-25s: %(message)s"
-    formatter = logging.Formatter(template)
-
-    if log_level:
-        root_logger.setLevel(getattr(logging, log_level))
-
-    # We will always print warnings and higher to stderr
-    console = logging.StreamHandler()
-    console.setFormatter(formatter)
-    root_logger.addHandler(console)
+log = logging.getLogger(__name__)
 
 
-@click.group()
-@click.version_option(taboo.__version__)
+class EntryPointsCLI(click.MultiCommand):
+
+    """Add subcommands dynamically to a CLI via entry points."""
+
+    def _iter_commands(self):
+        """Iterate over all subcommands as defined by the entry point."""
+        return {entry_point.name: entry_point for entry_point in
+                pkg_resources.iter_entry_points('taboo.subcommands.2')}
+
+    def list_commands(self, ctx):
+        """List the available commands."""
+        commands = self._iter_commands()
+        return commands.keys()
+
+    def get_command(self, ctx, name):
+        """Load one of the available commands."""
+        commands = self._iter_commands()
+        if name not in commands:
+            click.echo("no such command: {}".format(name))
+            ctx.abort()
+        return commands[name].load()
+
+
+@click.group(cls=EntryPointsCLI)
+@click.option('-c', '--config', default='~/.taboo.yaml',
+              type=click.Path(), help='path to config file')
+@click.option('-d', '--database', help='path/URI of the SQL database')
 @click.option('-l', '--log-level', default='INFO')
-@click.option('-c', '--config', type=click.Path(exists=True))
-@click.option('-d', '--db-uri', type=click.Path())
+@click.option('--log-file', type=click.Path())
+@click.version_option(__version__, prog_name=__title__)
 @click.pass_context
-def cli(context, log_level, config, db_uri):
-    """Genotype comparison tool."""
-    with open(config) as handle:
-        options = yaml.load(handle)
-        context.obj = options
+def root(context, config, database, log_level, log_file):
+    """Interact with Taboo genotype comparison tool."""
+    init_log(logging.getLogger(), loglevel=log_level, filename=log_file)
+    log.info("{}: version {}".format(__title__, __version__))
 
-    db_uri = db_uri or options.get('db_uri') or './taboo.sqlite3'
-    init_log(log_level)
-    context.obj['store'] = taboo.store.Database(db_uri)
+    # read in config file if it exists
+    if os.path.exists(config):
+        with codecs.open(config) as conf_handle:
+            context.obj = yaml.load(conf_handle)
+    else:
+        context.obj = {}
 
+    context.default_map = context.obj
 
-# add subcommands dynamically to the CLI
-for subcommand in [delete_cmd, init_cmd, load_cmd, match_cmd, show_cmd,
-                   view_cmd]:
-    cli.add_command(subcommand)
+    # setup database
+    uri = database or context.obj.get('database') or 'taboo.sqlite3'
+    context.obj['db'] = TabooDB(uri)

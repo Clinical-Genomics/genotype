@@ -10,11 +10,6 @@ Taboo is a tool for comparing genotypes from different assays.
 import logging
 from pkg_resources import get_distribution
 
-__all__ = [
-  '__title__', '__summary__', '__uri__', '__version__', '__author__',
-  '__email__', '__license__', '__copyright__', '__banner__'
-]
-
 # Generate your own AsciiArt at:
 # patorjk.com/software/taag/#f=Calvin%20S&t=Taboo ID Typing Pipeline
 __banner__ = r"""
