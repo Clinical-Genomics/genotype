@@ -9,7 +9,7 @@ python:
 
 install:
   # install dependencies
-  - pip install -r requirements/development.txt
+  - pip install -r requirements-dev.txt
 
   # install your own package + executables
   - pip install --editable .
