@@ -12,6 +12,7 @@ def create_app(app_name, config_obj):
     app = Flask(app_name)
 
     # configure app
+    app.config['SECRET_KEY'] = 'testing'
     app.config.update(config_obj)
     Bootstrap(app)
 

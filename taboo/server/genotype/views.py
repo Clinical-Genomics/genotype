@@ -102,6 +102,21 @@ def update_status(sample_id):
     return redirect(url_for('.sample', sample_id=sample_id))
 
 
+@genotype_bp.route('/samples/search')
+def search_samples():
+    """Search for a sample in the database."""
+    query_str = request.args.get('query')
+    query = Sample.query.filter(Sample.id.like("%{}%".format(query_str)))
+    # I'm feeling lucky
+    sample_obj = query.first()
+
+    if sample_obj:
+        return redirect(url_for('.sample', sample_id=sample_obj.id))
+    else:
+        flash("no samples matching the query: {}".format(query_str))
+        return redirect(url_for('.index'))
+
+
 def sample_or_404(sample_id):
     """Fetch sample or redirect user to 404 page."""
     sample_obj = Sample.query.get(sample_id)
