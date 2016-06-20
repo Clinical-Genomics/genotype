@@ -23,7 +23,7 @@ def index():
     pending = current_app.config['TABOO_DB'].pending()
     failing = current_app.config['TABOO_DB'].failing()
     return render_template('genotype/index.html', pending=pending,
-                           failing=failing)
+                           failing=failing, query=request.args.get('query'))
 
 
 @genotype_bp.route('/samples/<sample_id>')
@@ -107,14 +107,20 @@ def search_samples():
     """Search for a sample in the database."""
     query_str = request.args.get('query')
     query = Sample.query.filter(Sample.id.like("%{}%".format(query_str)))
-    # I'm feeling lucky
-    sample_obj = query.first()
+    no_samples = query.count()
 
-    if sample_obj:
+    if no_samples == 1:
+        # I'm feeling lucky
+        sample_obj = query.first()
         return redirect(url_for('.sample', sample_id=sample_obj.id))
-    else:
+
+    elif no_samples == 0:
         flash("no samples matching the query: {}".format(query_str))
-        return redirect(url_for('.index'))
+        return redirect(url_for('.index', query=query_str))
+
+    else:
+        return render_template('genotype/samples.html', samples=query,
+                               query=query_str)
 
 
 def sample_or_404(sample_id):

@@ -1,0 +1,34 @@
+{% extends "genotype/base.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">Samples</div>
+
+            <div class="panel-body">
+                <form action="{{ url_for('genotype.search_samples') }}" method="GET">
+                    <div class="row">
+                        <div class="col-xs-8">
+                            <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" required autofocus>
+                        </div>
+                        <div class="col-xs-4">
+                            <button type="submit" class="btn btn-default form-control">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <ul class="list-group">
+                {% for sample in samples %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
+                            {{ sample.id }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+{% endblock %}

@@ -49,7 +49,7 @@
                         <form action="{{ url_for('genotype.search_samples') }}" method="GET">
                             <div class="row">
                                 <div class="col-xs-8">
-                                    <input type="search" name="query" class="form-control" placeholder="sample id" required>
+                                    <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" required autofocus>
                                 </div>
                                 <div class="col-xs-4">
                                     <button type="submit" class="btn btn-default form-control">Search</button>
