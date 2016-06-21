@@ -4,12 +4,11 @@ import os
 
 from flask import (abort, Blueprint, current_app, flash, redirect,
                    render_template, request, url_for)
-from sqlalchemy import func
 from werkzeug import secure_filename
 
 from taboo.match.core import check_sample
 from taboo.load.excel import load_excel
-from taboo.store.models import Analysis, Sample
+from taboo.store.models import Sample
 
 
 logger = logging.getLogger(__name__)

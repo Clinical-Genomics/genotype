@@ -8,10 +8,9 @@ class MatchMixin:
 
     def pending(self):
         """Return samples to be matched."""
-        query = Sample.query.filter(Sample.status == None)
-        for sample in query:
-            if sample.sex and len(sample.analyses) == 2:
-                yield sample
+        query = self.complete().filter(Sample.status == None,
+                                       Sample.sex != None)
+        return query
 
     def passing(self):
         """Return all samples that have passed the checks."""
@@ -23,10 +22,17 @@ class MatchMixin:
         query = Sample.query.filter_by(status='fail')
         return query
 
+    def complete(self):
+        """Return samples that have been annotated completely."""
+        query = (Sample.query.join(Sample.analyses)
+                       .group_by(Analysis.sample_id)
+                       .having(func.count(Analysis.sample_id) == 2))
+        return query
+
     def incomplete(self, query=None):
         """Return samples that haven't been annotated completely."""
         query = query or Sample.query
-        query = (Sample.query.join(Sample.analyses)
-                       .group_by(Analysis.sample_id)
-                       .having(func.count(Analysis.sample_id) < 2))
+        query = (query.join(Sample.analyses)
+                      .group_by(Analysis.sample_id)
+                      .having(func.count(Analysis.sample_id) < 2))
         return query
