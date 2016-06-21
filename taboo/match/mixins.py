@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from taboo.store.models import Sample
+from sqlalchemy import func
+
+from taboo.store.models import Analysis, Sample
 
 
 class MatchMixin:
@@ -19,4 +21,12 @@ class MatchMixin:
     def failing(self):
         """Return all samples that have failed some check."""
         query = Sample.query.filter_by(status='fail')
+        return query
+
+    def incomplete(self, query=None):
+        """Return samples that haven't been annotated completely."""
+        query = query or Sample.query
+        query = (Sample.query.join(Sample.analyses)
+                       .group_by(Analysis.sample_id)
+                       .having(func.count(Analysis.sample_id) < 2))
         return query

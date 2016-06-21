@@ -10,10 +10,20 @@
                 <form action="{{ url_for('genotype.samples') }}" method="GET">
                     <div class="row">
                         <div class="col-xs-8">
-                            <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" required autofocus>
+                            <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" autofocus>
                         </div>
                         <div class="col-xs-4">
                             <button type="submit" class="btn btn-default form-control">Search</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="incomplete" {% if incomplete %}checked{% endif %}> Incomplete
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </form>
