@@ -1,6 +1,7 @@
 {% extends "genotype/base.html" %}
 
 {% block navbar_items %}
+    {{ super() }}
     <li class="active">
         <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
             {{ sample.id }}

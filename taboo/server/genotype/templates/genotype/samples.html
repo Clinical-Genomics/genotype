@@ -7,7 +7,7 @@
             <div class="panel-heading">Samples</div>
 
             <div class="panel-body">
-                <form action="{{ url_for('genotype.search_samples') }}" method="GET">
+                <form action="{{ url_for('genotype.samples') }}" method="GET">
                     <div class="row">
                         <div class="col-xs-8">
                             <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" required autofocus>
@@ -20,14 +20,40 @@
             </div>
 
             <ul class="list-group">
-                {% for sample in samples %}
+                {% for sample in samples.items %}
                     <li class="list-group-item">
                         <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
                             {{ sample.id }}
                         </a>
                     </li>
+                {% else %}
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <li class="list-group-item">{{ message }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                 {% endfor %}
             </ul>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-xs-4">
+                        {% if samples.has_prev %}
+                            <a href="{{ url_for('genotype.samples', page=samples.prev_num) }}">Prev</a>
+                        {% endif %}
+                    </div>
+                    <div class="col-xs-4 text-center">
+                        Page {{ samples.page }} <small class="text-muted">({{ samples.total }} cases)</small>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        {% if samples.has_next %}
+                            <a href="{{ url_for('genotype.samples', page=samples.next_num) }}">Next</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     

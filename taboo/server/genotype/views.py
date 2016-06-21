@@ -102,25 +102,29 @@ def update_status(sample_id):
     return redirect(url_for('.sample', sample_id=sample_id))
 
 
-@genotype_bp.route('/samples/search')
-def search_samples():
+@genotype_bp.route('/samples')
+def samples():
     """Search for a sample in the database."""
+    sample_q = Sample.query
+
+    # search samples
     query_str = request.args.get('query')
-    query = Sample.query.filter(Sample.id.like("%{}%".format(query_str)))
-    no_samples = query.count()
+    if query_str:
+        sample_q = sample_q.filter(Sample.id.like("%{}%".format(query_str)))
 
-    if no_samples == 1:
+    sample_count = sample_q.count()
+    if sample_count == 1:
         # I'm feeling lucky
-        sample_obj = query.first()
+        sample_obj = sample_q.first()
         return redirect(url_for('.sample', sample_id=sample_obj.id))
-
-    elif no_samples == 0:
+    elif sample_count == 0:
         flash("no samples matching the query: {}".format(query_str))
-        return redirect(url_for('.index', query=query_str))
 
-    else:
-        return render_template('genotype/samples.html', samples=query,
-                               query=query_str)
+    per_page = 20
+    page = int(request.args.get('page', 1))
+    page = sample_q.paginate(page, per_page=per_page)
+    return render_template('genotype/samples.html', samples=page,
+                           query=query_str)
 
 
 def sample_or_404(sample_id):

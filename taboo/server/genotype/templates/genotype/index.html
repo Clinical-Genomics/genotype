@@ -46,7 +46,7 @@
             <div class="panel panel-default">
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <form action="{{ url_for('genotype.search_samples') }}" method="GET">
+                        <form action="{{ url_for('genotype.samples') }}" method="GET">
                             <div class="row">
                                 <div class="col-xs-8">
                                     <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" required autofocus>

@@ -13,6 +13,7 @@ def create_app(app_name, config_obj):
 
     # configure app
     app.config['SECRET_KEY'] = 'testing'
+    app.config['BOOTSTRAP_SERVE_LOCAL'] = True
     app.config.update(config_obj)
     Bootstrap(app)
 
