@@ -106,7 +106,7 @@ def samples():
     """Search for a sample in the database."""
     sample_q = Sample.query
 
-    only_incomplete = request.args.get('incomplete') == 'on'
+    only_incomplete = 'incomplete' in request.args
     if only_incomplete:
         sample_q = api.incomplete(query=sample_q)
 
@@ -123,11 +123,14 @@ def samples():
     elif sample_count == 0:
         flash("no samples matching the query: {}".format(query_str))
 
+    req_args = request.args.to_dict()
+    if 'page' in req_args:
+        del req_args['page']
     per_page = 20
     page = int(request.args.get('page', 1))
     page = sample_q.paginate(page, per_page=per_page)
     return render_template('genotype/samples.html', samples=page,
-                           query=query_str, incomplete=only_incomplete)
+                           req_args=req_args)
 
 
 def sample_or_404(sample_id):

@@ -10,7 +10,7 @@
                 <form action="{{ url_for('genotype.samples') }}" method="GET">
                     <div class="row">
                         <div class="col-xs-8">
-                            <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" autofocus>
+                            <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ req_args.query if req_args.query }}" autofocus>
                         </div>
                         <div class="col-xs-4">
                             <button type="submit" class="btn btn-default form-control">Search</button>
@@ -21,7 +21,7 @@
                         <div class="col-xs-6">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="incomplete" {% if incomplete %}checked{% endif %}> Incomplete
+                                    <input type="checkbox" name="incomplete" {% if 'incomplete' in req_args %}checked{% endif %}> Incomplete
                                 </label>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                 <div class="row">
                     <div class="col-xs-4">
                         {% if samples.has_prev %}
-                            <a href="{{ url_for('genotype.samples', page=samples.prev_num) }}">Prev</a>
+                            <a href="{{ url_for('genotype.samples', page=samples.prev_num, **req_args) }}">Prev</a>
                         {% endif %}
                     </div>
                     <div class="col-xs-4 text-center">
@@ -59,7 +59,7 @@
                     </div>
                     <div class="col-xs-4 text-right">
                         {% if samples.has_next %}
-                            <a href="{{ url_for('genotype.samples', page=samples.next_num) }}">Next</a>
+                            <a href="{{ url_for('genotype.samples', page=samples.next_num, **req_args) }}">Next</a>
                         {% endif %}
                     </div>
                 </div>
