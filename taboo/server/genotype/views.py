@@ -8,7 +8,7 @@ from werkzeug import secure_filename
 
 from taboo.match.core import check_sample
 from taboo.load.excel import load_excel
-from taboo.store.models import Sample
+from taboo.store.models import Analysis, Sample
 from taboo.server.ext import api
 
 
@@ -110,6 +110,11 @@ def samples():
     if only_incomplete:
         sample_q = api.incomplete(query=sample_q)
 
+    source_id = request.args.get('plate')
+    if source_id:
+        sample_q = (sample_q.join(Sample.analyses)
+                            .filter(Analysis.source == source_id))
+
     # search samples
     query_str = request.args.get('query')
     if query_str:
@@ -130,7 +135,7 @@ def samples():
     page = int(request.args.get('page', 1))
     page = sample_q.paginate(page, per_page=per_page)
     return render_template('genotype/samples.html', samples=page,
-                           req_args=req_args)
+                           req_args=req_args, plates=api.plates())
 
 
 def sample_or_404(sample_id):
