@@ -8,4 +8,5 @@ xlrd
 # server
 Flask
 Flask-Bootstrap
+Flask-Alchy
 werkzeug

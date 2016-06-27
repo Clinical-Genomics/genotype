@@ -9,6 +9,7 @@ from werkzeug import secure_filename
 from taboo.match.core import check_sample
 from taboo.load.excel import load_excel
 from taboo.store.models import Sample
+from taboo.server.ext import api
 
 
 logger = logging.getLogger(__name__)
@@ -20,8 +21,7 @@ genotype_bp = Blueprint('genotype', __name__, template_folder='templates',
 @genotype_bp.route('/')
 def index():
     """Display all samples."""
-    pending = current_app.config['TABOO_DB'].pending()
-    failing = current_app.config['TABOO_DB'].failing()
+    pending, failing = api.pending(), api.failing()
     return render_template('genotype/index.html', pending=pending,
                            failing=failing, query=request.args.get('query'))
 
@@ -36,7 +36,6 @@ def sample(sample_id):
 @genotype_bp.route('/upload', methods=['POST'])
 def upload():
     """Upload an Excel report file from MAF."""
-    db = current_app.config['TABOO_DB']
     include_key = current_app.config['TABOO_INCLUDE_KEY']
 
     req_file = request.files['excel']
@@ -50,7 +49,7 @@ def upload():
 
     analyses = load_excel(excel_path, include_key=include_key)
     for analysis in analyses:
-        loaded_analysis = db.add_analysis(analysis, replace=True)
+        loaded_analysis = api.add_analysis(analysis, replace=True)
         if loaded_analysis:
             flash("added: {}".format(analysis.sample.id), 'info')
 
@@ -66,7 +65,7 @@ def check(sample_id=None):
         url = url_for('.sample', sample_id=sample_id)
     else:
         # fetch all pending samples
-        samples = current_app.config['TABOO_DB'].pending()
+        samples = api.pending()
         url = url_for('.index')
 
     for sample in samples:
@@ -75,7 +74,7 @@ def check(sample_id=None):
                        min_matches=current_app.config['TABOO_MIN_MATCHES'],)
         results = check_sample(sample, **cutoffs)
         sample.status = 'fail' if 'fail' in results.values() else 'pass'
-    current_app.config['TABOO_DB'].save()
+    api.save()
     return redirect(url)
 
 
@@ -87,7 +86,7 @@ def update(sample_id):
     sample_obj.comment = request.form['comment']
     for analysis in sample_obj.analyses:
         analysis.sex = request.form["{}_sex".format(analysis.type)] or None
-    current_app.config['TABOO_DB'].save()
+    api.save()
     return redirect(url_for('.sample', sample_id=sample_id))
 
 
@@ -98,19 +97,18 @@ def update_status(sample_id):
     new_status = request.form['status'] or None
     comment_update = request.form['comment']
     sample_obj.update_status(new_status, comment_update)
-    current_app.config['TABOO_DB'].save()
+    api.save()
     return redirect(url_for('.sample', sample_id=sample_id))
 
 
 @genotype_bp.route('/samples')
 def samples():
     """Search for a sample in the database."""
-    db = current_app.config['TABOO_DB']
     sample_q = Sample.query
 
     only_incomplete = request.args.get('incomplete') == 'on'
     if only_incomplete:
-        sample_q = db.incomplete(query=sample_q)
+        sample_q = api.incomplete(query=sample_q)
 
     # search samples
     query_str = request.args.get('query')
