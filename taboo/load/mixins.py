@@ -20,7 +20,7 @@ class LoadMixin:
 Source: {analysis.source}
 Type: {analysis.type}
 Sex: {analysis.sex}
-----------  AUTO: end replace  ----------""".format(analysis=old_analysis)
+----------  AUTO: end replace  ----------\n""".format(analysis=old_analysis)
         if old_analysis.sample.comment:
             old_analysis.sample.comment += log_msg
         else:
