@@ -24,7 +24,7 @@ def load(context, include_key, force, input_file):
         analyses = load_excel(input_file, include_key=include_key)
     elif input_file.endswith('.bcf'):
         log.info('loading analyses from BCF file: %s', input_file)
-        snps = context.obj['db'].snps()
+        snps = api.snps()
         analyses = load_bcf(input_file, snps)
 
     for analysis in analyses:
