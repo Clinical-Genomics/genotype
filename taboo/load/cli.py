@@ -19,17 +19,18 @@ log = logging.getLogger(__name__)
 @click.pass_context
 def load(context, include_key, force, input_file):
     """Load data from genotype resources."""
+    taboo_db = context.obj['db']
     if input_file.endswith('.xlsx'):
         log.info('loading analyses from Excel book: %s', input_file)
         analyses = load_excel(input_file, include_key=include_key)
     elif input_file.endswith('.bcf'):
         log.info('loading analyses from BCF file: %s', input_file)
-        snps = api.snps()
+        snps = api.snps(taboo_db)
         analyses = load_bcf(input_file, snps)
 
     for analysis in analyses:
         log.debug('loading analysis for sample: %s', analysis.sample_id)
-        is_saved = api.add_analysis(context.obj['db'], analysis, replace=force)
+        is_saved = api.add_analysis(taboo_db, analysis, replace=force)
         if is_saved:
             log.info('loaded analysis for sample: %s', analysis.sample_id)
         else:
@@ -45,7 +46,7 @@ def delete(context, analysis, sample_id):
     taboo_db = context.obj['db']
     if analysis:
         log.info("deleting analysis: %s, %s", sample_id, analysis)
-        old_analysis = api.analysis(sample_id, analysis).first()
+        old_analysis = api.analysis(taboo_db, sample_id, analysis).first()
         if old_analysis is None:
             log.error("analysis not loaded in database")
             context.abort()

@@ -19,6 +19,7 @@ def serve(context, debug, port, host):
     flask_config = {"TABOO_{}".format(key.upper()): value for key, value
                     in iteritems(context.obj)}
     flask_config['SQLALCHEMY_DATABASE_URI'] = context.obj['database']
+    flask_config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     app = create_app('taboo', config_obj=flask_config)
     app.run(debug=debug, port=port, host=host)
