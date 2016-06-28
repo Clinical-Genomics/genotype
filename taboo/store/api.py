@@ -44,8 +44,6 @@ class TabooDB(Manager, LoadMixin, ModelsMixin, MatchMixin):
         # connect to the SQL database
         super(TabooDB, self).__init__(config=config, Model=self.Model)
 
-        # shortcut to query method
-        self.query = self.session.query
         return self
 
     def set_up(self):

@@ -14,6 +14,8 @@
         class="bg-danger"
     {% elif sample.status == 'pass' %}
         class="bg-success"
+    {% elif sample.status == 'cancel' %}
+        class="bg-warning"
     {% endif %}
 {% endblock %}
 

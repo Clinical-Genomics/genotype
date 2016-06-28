@@ -26,6 +26,10 @@
                                     <label>
                                         <input type="checkbox" name="incomplete" {% if 'incomplete' in req_args %}checked{% endif %}> Incomplete
                                     </label>
+                                    <label>
+                                        <input type="checkbox" name="commented" {% if 'comment' in req_args %}checked{% endif %}>
+                                        Commented
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-xs-6">
@@ -45,10 +49,25 @@
 
             <ul class="list-group">
                 {% for sample in samples.items %}
-                    <li class="list-group-item">
+                    {% if sample.status == 'pass' %}
+                        {% set bg_class = 'list-group-item-success' %}
+                    {% elif sample.status == 'fail' %}
+                        {% set bg_class = 'list-group-item-danger' %}
+                    {% elif sample.status == 'cancel' %}
+                        {% set bg_class = 'list-group-item-warning' %}
+                    {% else %}
+                        {% set bg_class = None %}
+                    {% endif %}
+                    <li class="list-group-item {{ bg_class if bg_class }}">
                         <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
                             {{ sample.id }}
                         </a>
+                        
+                        {% if sample.comment %}
+                            <span class="badge">
+                                <span class="glyphicon glyphicon-comment"></span>
+                            </span>
+                        {% endif %}
                     </li>
                 {% else %}
                     {% with messages = get_flashed_messages() %}

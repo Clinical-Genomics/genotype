@@ -106,14 +106,15 @@ def samples():
     """Search for a sample in the database."""
     sample_q = Sample.query
 
-    only_incomplete = 'incomplete' in request.args
-    if only_incomplete:
-        sample_q = api.incomplete(query=sample_q)
-
     source_id = request.args.get('plate')
     if source_id:
         sample_q = (sample_q.join(Sample.analyses)
                             .filter(Analysis.source == source_id))
+
+    if 'incomplete' in request.args:
+        sample_q = api.incomplete(query=sample_q)
+    if 'commented' in request.args:
+        sample_q = sample_q.filter(Sample.comment != None)
 
     # search samples
     query_str = request.args.get('query')
