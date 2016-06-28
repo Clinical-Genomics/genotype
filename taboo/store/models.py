@@ -110,7 +110,7 @@ class Sample(Model):
 
     id = Column(types.String(32), primary_key=True)
     status = Column(types.Enum('pass', 'fail', 'cancel'))
-    comment = Column(types.Text)
+    comment = Column(types.Text(convert_unicode=True))
     sex = Column(types.Enum(*SEXES))
     created_at = Column(types.DateTime, default=datetime.now)
 
@@ -123,13 +123,13 @@ class Sample(Model):
 
     def update_status(self, new_status, comment_update):
         """Update the status with a required comment."""
-        comment_update = """MANUAL STATUS UPDATE: {old} -> {new}
+        comment_update = u"""MANUAL STATUS UPDATE: {old} -> {new}
 Date: {date}
 {comment}""".format(old=self.status, new=new_status, date=datetime.now(),
                     comment=comment_update)
         self.status = new_status
         if self.comment:
-            self.comment = "{}\n\n{}".format(self.comment, comment_update)
+            self.comment = u"{}\n\n{}".format(self.comment, comment_update)
         else:
             self.comment = comment_update
 

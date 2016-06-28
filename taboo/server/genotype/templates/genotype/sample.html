@@ -1,5 +1,10 @@
 {% extends "genotype/base.html" %}
 
+{% block title %}
+    {{ super() }}
+    - {{ sample.id }}
+{% endblock %}
+
 {% block navbar_items %}
     {{ super() }}
     <li class="active">
