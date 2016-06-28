@@ -1,109 +1,148 @@
 # -*- coding: utf-8 -*-
-import collections
 import logging
 import os
 
-from alchy import Manager
+from sqlalchemy import func
 
-from taboo.load.mixins import LoadMixin
-from taboo.match.mixins import MatchMixin
-from .mixins import ModelsMixin
-from .models import Model
+from taboo.store.models import Analysis, Sample, SNP
 
 log = logging.getLogger(__name__)
 
 
-class TabooDB(Manager, LoadMixin, ModelsMixin, MatchMixin):
+def complete():
+    """Return samples that have been annotated completely."""
+    query = (Sample.query.join(Sample.analyses)
+                   .group_by(Analysis.sample_id)
+                   .having(func.count(Analysis.sample_id) == 2))
+    return query
 
-    """Manage Taboo database."""
 
-    def __init__(self, uri=None, debug=False, Model=Model):
-        self.Model = Model
-        self.uri = uri
-        if uri:
-            self.connect(uri, debug=debug)
+def pending():
+    """Return samples to be matched."""
+    query = complete().filter(Sample.status == None, Sample.sex != None)
+    return query
 
-    def connect(self, db_uri, debug=False):
-        """Configure connection to a SQL database.
 
-        Args:
-            db_uri (str): path/URI to the database to connect to
-            debug (Optional[bool]): whether to output logging information
-        """
-        config = {'SQLALCHEMY_ECHO': debug}
-        if 'mysql' in db_uri:  # pragma: no cover
-            config['SQLALCHEMY_POOL_RECYCLE'] = 3600
-        elif '://' not in db_uri:
-            # expect only a path to a sqlite database
-            db_path = os.path.abspath(os.path.expanduser(db_uri))
-            db_uri = "sqlite:///{}".format(db_path)
-            self.uri = db_uri
+def failing():
+    """Return all samples that have failed some check."""
+    query = Sample.query.filter_by(status='fail')
+    return query
 
-        config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
-        # connect to the SQL database
-        super(TabooDB, self).__init__(config=config, Model=self.Model)
+def passing():
+    """Return all samples that have passed the checks."""
+    query = Sample.query.filter_by(status='pass')
+    return query
 
-        return self
 
-    def set_up(self):
-        """Initialize a new database with the default tables and columns.
+def incomplete(query=None):
+    """Return samples that haven't been annotated completely."""
+    query = query or Sample.query
+    query = (query.join(Sample.analyses)
+                  .group_by(Analysis.sample_id)
+                  .having(func.count(Analysis.sample_id) < 2))
+    return query
 
-        Returns:
-            TabooDB: self
-        """
-        # create the tables
-        self.create_all()
-        tables = self.Model.metadata.tables.keys()
-        log.info("created tables: %s", ', '.join(tables))
-        return self
 
-    def tear_down(self):
-        """Tear down a database (tables and columns).
+def snps():
+    """Return all the SNPs in order."""
+    query = SNP.query.order_by('id')
+    return query
 
-        Returns:
-            TabooDB: self
-        """
-        # drop/delete the tables
-        self.drop_all()
-        return self
 
-    def save(self):
-        """Manually persist changes made to various elements. Chainable.
+def sample(sample_id, notfound_cb=None):
+    """Get sample from database and abort context if not found."""
+    sample_obj = Sample.query.get(sample_id)
+    if sample_obj is None:
+        log.error("sample id not found in database: %s", sample_id)
+        if notfound_cb:
+            notfound_cb()
+    return sample_obj
 
-        Returns:
-            TabooDB: `self` for chainability
-        """
-        try:
-            # commit/persist dirty changes to the database
-            self.session.flush()
-            self.session.commit()
-        except Exception as error:
-            log.debug('rolling back failed transaction')
-            self.session.rollback()
-            raise error
-        return self
 
-    def add(self, items):
-        """Add one or more new items and commit the changes. Chainable.
+def plates():
+    """Return the plate ids loaded in the database."""
+    query = (Analysis.session().query(Analysis.source).distinct()
+                     .filter_by(type='genotype'))
+    all_plates = [(os.path.basename(analysis.source), analysis.source)
+                  for analysis in query]
+    return all_plates
 
-        Args:
-            items (Model/List[Model]): new ORM object instance or list of
 
-        Returns:
-            TabooDB: `self` for chainability
-        """
-        if isinstance(items, self.Model):
-            # Add the record to the session object
-            self.session.add(items)
-        elif isinstance(items, list):
-            # Add all records to the session object
-            self.session.add_all(items)
-        elif (isinstance(items, collections.Iterable) and
-              not isinstance(items, dict)):
-            # Iterate over all items
-            for element in items:
-                self.session.add(element)
+def delete_analysis(db, old_analysis, log=True):
+    """Delete an analysis with related genotypes.
+
+    Args:
+        old_analysis (Analysis): analysis record to be deleted
+        log (Optional[bool]): store log in sample record
+    """
+    # store away info about currently loaded analysis
+    log_msg = """----------AUTO: replace analysis----------
+Source: {analysis.source}
+Type: {analysis.type}
+Sex: {analysis.sex}
+----------  AUTO: end replace  ----------\n""".format(analysis=old_analysis)
+    if old_analysis.sample.comment:
+        old_analysis.sample.comment += log_msg
+    else:
+        old_analysis.sample.comment = log_msg
+
+    # remove old analysis data
+    old_analysis.delete()
+    db.commit()
+
+
+def add_analysis(db, new_analysis, replace=False):
+    """Add a new analysis to the database.
+
+    The analysis record should only have the `sample_id` field filled in.
+    A sample object will be fetched from the database or created.
+
+    Args:
+        new_analysis (Analysis): analysis record to be added
+        replace (Optional[bool]): replace existing record with new one
+
+    Returns:
+        Analysis/None: the analysis if successful, otherwise `None`
+    """
+    analysis_kwargs = dict(sample_id=new_analysis.sample_id,
+                           type=new_analysis.type)
+    old_analysis = analysis(**analysis_kwargs).first()
+    if old_analysis:
+        log.debug("found old analysis: %s-%s",
+                  new_analysis.sample_id, new_analysis.type)
+        if replace:
+            log.info("deleting and old analysis: %s-%s",
+                     new_analysis.sample_id, new_analysis.type)
+            delete_analysis(old_analysis)
         else:
-            raise ValueError("unknown object type for 'items'")
-        return self
+            return None
+
+    # check if sample already in database
+    sample_obj = Sample.query.get(new_analysis.sample_id)
+    if sample_obj:
+        log.debug('found sample in database')
+        new_analysis.sample = sample_obj
+    else:
+        sample_obj = Sample(id=new_analysis.sample_id)
+        new_analysis.sample = sample_obj
+
+    db.add_commit(new_analysis)
+    return new_analysis
+
+
+def analysis(sample_id, type):
+    """Ask the database for a single analysis record.
+
+    You can preferably call `.first()` on the returned value to get the
+    analysis record or `None` if not found in the database.
+
+    Args:
+        sample_id (str): unique sample id
+        type (str): choice of analysis type [genotype, sequence]
+
+    Returns:
+        query: SQLAlchemy query object
+    """
+    query = Analysis.query.filter_by(sample_id=sample_id, type=type)
+    return query

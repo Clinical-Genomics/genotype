@@ -5,6 +5,7 @@ import click
 
 from taboo.constants import TYPES
 from taboo.store.models import Sample
+from taboo.store import api
 from .bcf import load_bcf
 from .excel import load_excel
 
@@ -28,7 +29,7 @@ def load(context, include_key, force, input_file):
 
     for analysis in analyses:
         log.debug('loading analysis for sample: %s', analysis.sample_id)
-        is_saved = context.obj['db'].add_analysis(analysis, replace=force)
+        is_saved = api.add_analysis(context.obj['db'], analysis, replace=force)
         if is_saved:
             log.info('loaded analysis for sample: %s', analysis.sample_id)
         else:
@@ -44,11 +45,11 @@ def delete(context, analysis, sample_id):
     taboo_db = context.obj['db']
     if analysis:
         log.info("deleting analysis: %s, %s", sample_id, analysis)
-        old_analysis = taboo_db.analysis(sample_id, analysis).first()
+        old_analysis = api.analysis(sample_id, analysis).first()
         if old_analysis is None:
             log.error("analysis not loaded in database")
             context.abort()
-        taboo_db.delete_analysis(old_analysis)
+        api.delete_analysis(taboo_db, old_analysis)
     else:
         log.info("deleting sample: %s", sample_id)
         old_sample = Sample.query.get(sample_id)
@@ -56,4 +57,4 @@ def delete(context, analysis, sample_id):
             log.error("sample not loaded in database")
             context.abort()
         old_sample.delete()
-        taboo_db.save()
+        taboo_db.commit()

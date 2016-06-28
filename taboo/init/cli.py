@@ -17,12 +17,13 @@ log = logging.getLogger(__name__)
 def init(context, reset, snps):
     """Setup a new Taboo database."""
     if reset:
-        context.obj['db'].tear_down()
+        context.obj['db'].drop_all()
 
-    context.obj['db'].set_up()
+    context.obj['db'].create_all()
     snp_records = read_snps(snps)
     try:
-        context.obj['db'].add(snp_records).save()
+        context.obj['db'].add_all(snp_records)
+        context.obj['db'].commit()
     except IntegrityError:
         log.warn('database already setup with genotypes')
         context.abort()

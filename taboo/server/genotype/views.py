@@ -9,7 +9,8 @@ from werkzeug import secure_filename
 from taboo.match.core import check_sample
 from taboo.load.excel import load_excel
 from taboo.store.models import Analysis, Sample
-from taboo.server.ext import api
+from taboo.server.ext import db
+from taboo.store import api
 
 
 logger = logging.getLogger(__name__)
@@ -74,7 +75,7 @@ def check(sample_id=None):
                        min_matches=current_app.config['TABOO_MIN_MATCHES'],)
         results = check_sample(sample, **cutoffs)
         sample.status = 'fail' if 'fail' in results.values() else 'pass'
-    api.save()
+    db.commit()
     return redirect(url)
 
 
@@ -83,10 +84,10 @@ def update(sample_id):
     """Update information about a sample."""
     sample_obj = sample_or_404(sample_id)
     sample_obj.sex = request.form['sample_sex'] or None
-    sample_obj.comment = request.form['comment']
+    sample_obj.comment = request.form.get('comment')
     for analysis in sample_obj.analyses:
         analysis.sex = request.form["{}_sex".format(analysis.type)] or None
-    api.save()
+    db.commit()
     return redirect(url_for('.sample', sample_id=sample_id))
 
 
@@ -97,7 +98,7 @@ def update_status(sample_id):
     new_status = request.form['status'] or None
     comment_update = request.form['comment']
     sample_obj.update_status(new_status, comment_update)
-    api.save()
+    db.commit()
     return redirect(url_for('.sample', sample_id=sample_id))
 
 

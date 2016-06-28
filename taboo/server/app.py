@@ -4,7 +4,7 @@ import logging
 from flask import Flask
 from flask_bootstrap import Bootstrap
 
-from .ext import api
+from .ext import db
 from .genotype import genotype_bp
 
 
@@ -19,7 +19,7 @@ def create_app(app_name, config_obj):
 
     # configure extensions
     Bootstrap(app)
-    api.init_app(app)
+    db.init_app(app)
 
     # register blueprints
     app.register_blueprint(genotype_bp)

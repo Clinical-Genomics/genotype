@@ -11,12 +11,13 @@ import logging
 import os
 import pkg_resources
 
+from alchy import Manager
 import click
 import yaml
 
 from taboo import __title__, __version__
 from taboo.log import init_log
-from taboo.store.api import TabooDB
+from taboo.store.models import Model
 
 log = logging.getLogger(__name__)
 
@@ -68,4 +69,5 @@ def root(context, config, database, log_level, log_file):
 
     # setup database
     uri = database or context.obj.get('database') or 'taboo.sqlite3'
-    context.obj['db'] = TabooDB(uri)
+    config = dict(SQLALCHEMY_DATABASE_URI=uri)
+    context.obj['db'] = Manager(config=config, Model=Model)
