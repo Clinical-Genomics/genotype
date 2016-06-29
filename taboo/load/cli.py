@@ -25,7 +25,7 @@ def load(context, include_key, force, input_file):
         analyses = load_excel(input_file, include_key=include_key)
     elif input_file.endswith('.bcf'):
         log.info('loading analyses from BCF file: %s', input_file)
-        snps = api.snps(taboo_db)
+        snps = api.snps()
         analyses = load_bcf(input_file, snps)
 
     for analysis in analyses:
@@ -46,7 +46,7 @@ def delete(context, analysis, sample_id):
     taboo_db = context.obj['db']
     if analysis:
         log.info("deleting analysis: %s, %s", sample_id, analysis)
-        old_analysis = api.analysis(taboo_db, sample_id, analysis).first()
+        old_analysis = api.analysis(sample_id, analysis).first()
         if old_analysis is None:
             log.error("analysis not loaded in database")
             context.abort()

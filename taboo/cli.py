@@ -67,7 +67,8 @@ def root(context, config, database, log_level, log_file):
 
     context.default_map = context.obj
 
-    # setup database
-    uri = database or context.obj.get('database') or 'taboo.sqlite3'
-    config = dict(SQLALCHEMY_DATABASE_URI=uri)
-    context.obj['db'] = Manager(config=config, Model=Model)
+    if context.invoked_subcommand != 'serve':
+        # setup database
+        uri = database or context.obj.get('database') or 'sqlite://'
+        config = dict(SQLALCHEMY_DATABASE_URI=uri)
+        context.obj['db'] = Manager(config=config, Model=Model)

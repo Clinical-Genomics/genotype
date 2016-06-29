@@ -9,50 +9,50 @@ from taboo.store.models import Analysis, Sample, SNP
 log = logging.getLogger(__name__)
 
 
-def complete(db):
+def complete():
     """Return samples that have been annotated completely."""
-    query = (db.query(Sample).join(Sample.analyses)
-                             .group_by(Analysis.sample_id)
-                             .having(func.count(Analysis.sample_id) == 2))
+    query = (Sample.join(Sample.analyses)
+                   .group_by(Analysis.sample_id)
+                   .having(func.count(Analysis.sample_id) == 2))
     return query
 
 
-def pending(db):
+def pending():
     """Return samples to be matched."""
-    query = complete(db).filter(Sample.status == None, Sample.sex != None)
+    query = complete().filter(Sample.status == None, Sample.sex != None)
     return query
 
 
-def failing(db):
+def failing():
     """Return all samples that have failed some check."""
-    query = db.query(Sample).filter_by(status='fail')
+    query = Sample.query.filter_by(status='fail')
     return query
 
 
-def passing(db):
+def passing():
     """Return all samples that have passed the checks."""
-    query = db.query(Sample).filter_by(status='pass')
+    query = Sample.query.filter_by(status='pass')
     return query
 
 
-def incomplete(db, query=None):
+def incomplete(query=None):
     """Return samples that haven't been annotated completely."""
-    query = query or db.query(Sample)
+    query = query or Sample.query
     query = (query.join(Sample.analyses)
                   .group_by(Analysis.sample_id)
                   .having(func.count(Analysis.sample_id) < 2))
     return query
 
 
-def snps(db):
+def snps():
     """Return all the SNPs in order."""
-    query = db.query(SNP).order_by('id')
+    query = SNP.query.order_by('id')
     return query
 
 
-def sample(db, sample_id, notfound_cb=None):
+def sample(sample_id, notfound_cb=None):
     """Get sample from database and abort context if not found."""
-    sample_obj = db.query(Sample).get(sample_id)
+    sample_obj = Sample.query.get(sample_id)
     if sample_obj is None:
         log.error("sample id not found in database: %s", sample_id)
         if notfound_cb:
@@ -119,7 +119,7 @@ def add_analysis(db, new_analysis, replace=False):
             return None
 
     # check if sample already in database
-    sample_obj = db.query(Sample).get(new_analysis.sample_id)
+    sample_obj = Sample.query.get(new_analysis.sample_id)
     if sample_obj:
         log.debug('found sample in database')
         new_analysis.sample = sample_obj
@@ -131,7 +131,7 @@ def add_analysis(db, new_analysis, replace=False):
     return new_analysis
 
 
-def analysis(db, sample_id, type):
+def analysis(sample_id, type):
     """Ask the database for a single analysis record.
 
     You can preferably call `.first()` on the returned value to get the
@@ -144,5 +144,5 @@ def analysis(db, sample_id, type):
     Returns:
         query: SQLAlchemy query object
     """
-    query = db.query(Analysis).filter_by(sample_id=sample_id, type=type)
+    query = Analysis.query.filter_by(sample_id=sample_id, type=type)
     return query

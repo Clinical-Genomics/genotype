@@ -12,8 +12,8 @@ from .core import compare_analyses
 log = logging.getLogger(__name__)
 
 
-def log_result(taboo_db, sample_id, result):
-    total_snps = api.snps(taboo_db).count()
+def log_result(sample_id, result):
+    total_snps = api.snps().count()
     cutoff = math.floor(total_snps / 5)
     if result.get('mismatch') == 0 or result.get('mismatch') <= cutoff:
         log_func = log.info
@@ -33,8 +33,7 @@ def log_result(taboo_db, sample_id, result):
 @click.pass_context
 def match(context, sample_id, analysis):
     """Match genotypes for an analysis against all samples."""
-    taboo_db = context.obj['db']
-    sample_obj = api.sample(taboo_db, sample_id, notfound_cb=context.abort)
+    sample_obj = api.sample(sample_id, notfound_cb=context.abort)
     analysis_obj = sample_obj.analysis(analysis)
     other_analyses = Analysis.query.filter(Analysis.type != analysis)
     for other_analysis in other_analyses:
@@ -47,11 +46,10 @@ def match(context, sample_id, analysis):
 @click.pass_context
 def check(context, sample_id):
     """Check integrity of a sample."""
-    taboo_db = context.obj['db']
-    sample_obj = api.sample(taboo_db, sample_id, notfound_cb=context.abort)
+    sample_obj = api.sample(sample_id, notfound_cb=context.abort)
 
     # 1. check no calls from genotyping (could be sign of contamination)
-    total_snps = api.snps(taboo_db).count()
+    total_snps = api.snps().count()
     cutoff = math.floor(total_snps / 3)
     genotype_analysis = sample_obj.analysis('genotype')
     if genotype_analysis:

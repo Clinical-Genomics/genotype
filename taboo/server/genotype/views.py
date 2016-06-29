@@ -22,7 +22,7 @@ genotype_bp = Blueprint('genotype', __name__, template_folder='templates',
 @genotype_bp.route('/')
 def index():
     """Display all samples."""
-    pending, failing = api.pending(db), api.failing(db)
+    pending, failing = api.pending(), api.failing()
     return render_template('genotype/index.html', pending=pending,
                            failing=failing, query=request.args.get('query'))
 
@@ -66,7 +66,7 @@ def check(sample_id=None):
         url = url_for('.sample', sample_id=sample_id)
     else:
         # fetch all pending samples
-        samples = api.pending(db)
+        samples = api.pending()
         url = url_for('.index')
 
     for sample in samples:
@@ -105,14 +105,14 @@ def update_status(sample_id):
 @genotype_bp.route('/samples')
 def samples():
     """Search for a sample in the database."""
-    sample_q = db.query(Sample)
+    sample_q = Sample.query
     source_id = request.args.get('plate')
     if source_id:
         sample_q = (sample_q.join(Sample.analyses)
                             .filter(Analysis.source == source_id))
 
     if 'incomplete' in request.args:
-        sample_q = api.incomplete(db, query=sample_q)
+        sample_q = api.incomplete(query=sample_q)
     if 'commented' in request.args:
         sample_q = sample_q.filter(Sample.comment != None)
 
@@ -141,7 +141,7 @@ def samples():
 
 def sample_or_404(sample_id):
     """Fetch sample or redirect user to 404 page."""
-    sample_obj = api.sample(db, sample_id)
+    sample_obj = api.sample(sample_id)
     if sample_obj is None:
         return abort(404, "sample not found: {}".format(sample_id))
     return sample_obj
