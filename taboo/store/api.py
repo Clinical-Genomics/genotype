@@ -11,9 +11,9 @@ log = logging.getLogger(__name__)
 
 def complete():
     """Return samples that have been annotated completely."""
-    query = (Sample.join(Sample.analyses)
-                   .group_by(Analysis.sample_id)
-                   .having(func.count(Analysis.sample_id) == 2))
+    query = (Sample.query.join(Sample.analyses)
+                         .group_by(Analysis.sample_id)
+                         .having(func.count(Analysis.sample_id) == 2))
     return query
 
 
