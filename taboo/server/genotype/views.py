@@ -132,7 +132,7 @@ def samples():
     req_args = request.args.to_dict()
     if 'page' in req_args:
         del req_args['page']
-    per_page = 20
+    per_page = 100 if 'show_more' in request.args else 30
     page = int(request.args.get('page', 1))
     page = sample_q.paginate(page, per_page=per_page)
     return render_template('genotype/samples.html', samples=page,
