@@ -112,9 +112,9 @@ def add_analysis(db, new_analysis, replace=False):
         log.debug("found old analysis: %s-%s",
                   new_analysis.sample_id, new_analysis.type)
         if replace:
-            log.info("deleting and old analysis: %s-%s",
+            log.info("deleting old analysis: %s-%s",
                      new_analysis.sample_id, new_analysis.type)
-            delete_analysis(old_analysis)
+            delete_analysis(db, old_analysis)
         else:
             return None
 

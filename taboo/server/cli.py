@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 @click.option('--host', default='localhost')
 @click.pass_context
 def serve(context, debug, port, host):
-    """Setup a new Taboo database."""
+    """Start up the web interface."""
     flask_config = {"TABOO_{}".format(key.upper()): value for key, value
                     in iteritems(context.obj)}
     flask_config['SQLALCHEMY_DATABASE_URI'] = context.obj['database']
