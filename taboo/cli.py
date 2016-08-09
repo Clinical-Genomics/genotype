@@ -56,7 +56,7 @@ class EntryPointsCLI(click.MultiCommand):
 def root(context, config, database, log_level, log_file):
     """Interact with Taboo genotype comparison tool."""
     init_log(logging.getLogger(), loglevel=log_level, filename=log_file)
-    log.info("{}: version {}".format(__title__, __version__))
+    log.debug("{}: version {}".format(__title__, __version__))
 
     # read in config file if it exists
     if os.path.exists(config):
