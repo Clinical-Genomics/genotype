@@ -37,11 +37,11 @@ def passing():
 
 def incomplete(query=None):
     """Return samples that haven't been annotated completely."""
-    query = query or Sample.query
-    query = (query.join(Sample.analyses)
-                  .group_by(Analysis.sample_id)
-                  .having(func.count(Analysis.sample_id) < 2))
-    return query
+    base_query = query or Sample.query
+    base_query = (base_query.join(Sample.analyses)
+                            .group_by(Analysis.sample_id)
+                            .having(func.count(Analysis.sample_id) < 2))
+    return base_query
 
 
 def snps():

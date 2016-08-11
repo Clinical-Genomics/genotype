@@ -13,4 +13,4 @@ config = {
     'SQLALCHEMY_TRACK_MODIFICATIONS': False
 }
 
-app = create_app('taboo', config_obj=config)
+application = create_app('taboo', config_obj=config)

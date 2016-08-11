@@ -61,3 +61,8 @@ output/*/index.html
 # Docs
 docs/_build
 _book/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

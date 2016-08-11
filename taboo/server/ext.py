@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask.ext.alchy import Alchy
+from flask_alchy import Alchy
 
 from taboo.store.models import Model
 
