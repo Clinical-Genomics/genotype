@@ -46,12 +46,13 @@ def load_excel(excel_file, include_key=None):
     if include_key:
         rows = (row for row in rows if include_key in row[1])
 
-    for analysis, row in zip(analyses, rows):
+    for new_analysis, row in zip(analyses, rows):
         predicted_sex = parse_sex(row[sex_cols])
         new_genotypes = build_genotypes(rsnumber_columns, row[snp_start:])
-        analysis.genotypes = list(new_genotypes)
-        analysis.sex = predicted_sex
-        yield analysis
+        for genotype in new_genotypes:
+            new_analysis.genotypes.append(genotype)
+        new_analysis.sex = predicted_sex
+        yield new_analysis
 
 
 def parse_sampleids(sheet, include_key=None):
