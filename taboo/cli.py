@@ -66,9 +66,11 @@ def root(context, config, database, log_level, log_file):
         context.obj = {}
 
     context.default_map = context.obj
+    if context.obj.get('database') is None:
+        context.obj['database'] = database
 
     if context.invoked_subcommand != 'serve':
         # setup database
-        uri = database or context.obj.get('database') or 'sqlite://'
+        uri = context.obj['database'] or 'sqlite://'
         config = dict(SQLALCHEMY_DATABASE_URI=uri)
         context.obj['db'] = Manager(config=config, Model=Model)

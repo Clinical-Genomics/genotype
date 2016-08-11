@@ -55,8 +55,7 @@ def sample(sample_id, notfound_cb=None):
     sample_obj = Sample.query.get(sample_id)
     if sample_obj is None:
         log.error("sample id not found in database: %s", sample_id)
-        if notfound_cb:
-            notfound_cb()
+        return notfound_cb() if notfound_cb else notfound_cb
     return sample_obj
 
 
