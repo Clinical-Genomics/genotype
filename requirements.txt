@@ -4,6 +4,7 @@ Alchy
 SQLAlchemy
 pysam
 xlrd
+pymysql
 
 # server
 Flask
