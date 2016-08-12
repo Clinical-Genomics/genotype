@@ -15,18 +15,19 @@ log = logging.getLogger(__name__)
 @click.command()
 @click.option('-k', '--include-key', help='prefix for relevant samples')
 @click.option('-f', '--force', is_flag=True)
-@click.argument('input_file', type=click.Path(exists=True))
+@click.argument('input_file', type=click.File())
 @click.pass_context
 def load(context, include_key, force, input_file):
     """Load data from genotype resources."""
     taboo_db = context.obj['db']
-    if input_file.endswith('.xlsx'):
-        log.info('loading analyses from Excel book: %s', input_file)
-        analyses = load_excel(input_file, include_key=include_key)
+    if input_file.name.endswith('.xlsx'):
+        log.info('loading analyses from Excel book: %s', input_file.name)
+        analyses = load_excel(input_file.name, input_file.read(),
+                              include_key=include_key)
     elif input_file.endswith('.bcf'):
-        log.info('loading analyses from BCF file: %s', input_file)
+        log.info('loading analyses from BCF file: %s', input_file.name)
         snps = api.snps()
-        analyses = load_bcf(input_file, snps)
+        analyses = load_bcf(input_file.name, snps)
 
     for analysis in analyses:
         log.debug('loading analysis for sample: %s', analysis.sample_id)

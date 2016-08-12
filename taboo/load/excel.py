@@ -11,7 +11,7 @@ from taboo.store.models import Analysis, Genotype
 log = logging.getLogger(__name__)
 
 
-def load_excel(excel_file, include_key=None):
+def load_excel(file_path, file_contents, include_key=None):
     """Load genotypes from an Excel file.
 
     3. go over SNPs, build genotypes and link to analyses
@@ -24,12 +24,12 @@ def load_excel(excel_file, include_key=None):
         List[Analysis]: list of Analysis records
     """
     # import Excel (book) file
-    book = xlrd.open_workbook(excel_file)
+    book = xlrd.open_workbook(file_contents=file_contents)
     sheet = find_sheet(book, sheet_id=-1)
     # create new Sample records
     sample_ids = parse_sampleids(sheet, include_key=include_key)
     # create new Analyses records
-    source = os.path.abspath(excel_file)
+    source = os.path.abspath(file_path)
     analyses = [Analysis(type='genotype', source=source, sample_id=sample_id)
                 for sample_id in sample_ids]
 
