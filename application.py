@@ -5,7 +5,7 @@ from taboo.server import create_app
 
 config = {
     'TABOO_INCLUDE_KEY': '-CG-',
-    'TABOO_GENOTYPE_DIR': os.environ['TABOO_GENOTYPE_DIR'],
+    'TABOO_GENOTYPE_DIR': os.environ.get('TABOO_GENOTYPE_DIR'),
     'TABOO_MAX_NOCALLS': 15,
     'TABOO_MAX_MISMATCH': 3,
     'TABOO_MIN_MATCHES': 35,
