@@ -11,7 +11,7 @@ config = {
     'TABOO_MIN_MATCHES': 35,
     'SQLALCHEMY_DATABASE_URI': os.environ['SQLALCHEMY_DATABASE_URI'],
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-    'TABOO_NO_SAVE': os.environ['TABOO_NO_SAVE'],
+    'TABOO_NO_SAVE': os.environ.get('TABOO_NO_SAVE'),
 }
 
 application = create_app('taboo', config_obj=config)
