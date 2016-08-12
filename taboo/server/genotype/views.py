@@ -47,7 +47,7 @@ def upload():
                                   filename)
         req_file.save(excel_path)
 
-    analyses = load_excel(excel_path, req_file.stream.read(),
+    analyses = load_excel(filename, req_file.stream.read(),
                           include_key=include_key)
     for analysis in analyses:
         loaded_analysis = api.add_analysis(db, analysis, replace=True)
