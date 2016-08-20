@@ -14,6 +14,17 @@ $ conda install -c bioconda pysam pyyaml sqlalchemy flask
 $ pip install taboo==2.0.0-beta3
 ```
 
+## Deploy to Amazon Elastic Beanstalk
+
+This guide uses the command line utility for Elastic Beanstalk (EB): `eb`.
+
+1. Create a new application by running `eb init` in the root of the repository.
+2. Create a new environment by running `eb create taboo`
+3. Configure environment variables in the AWS console under "Configuration/Software Configuration/" for the new environment.
+    - `SQLALCHEMY_DATABASE_URI`: the connection URI for the database you are using
+    - `TABOO_NO_SAVE`: don't bother storing uploaded Excel books since EB doesn't provide persistent storage. Just set it to "yes".
+4. Install `taboo` locally and using the same connection URI run: `taboo --database [DB_URI] init <path to SNPs>`
+
 ## License
 MIT. See the [LICENSE](LICENSE) file for more details.
 
