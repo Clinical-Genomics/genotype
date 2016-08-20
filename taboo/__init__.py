@@ -8,7 +8,7 @@ Taboo is a tool for comparing genotypes from different assays.
 :licence: MIT, see LICENCE for more details
 """
 import logging
-from pkg_resources import get_distribution
+from pkg_resources import get_distribution, DistributionNotFound
 
 # Generate your own AsciiArt at:
 # patorjk.com/software/taag/#f=Calvin%20S&t=Taboo ID Typing Pipeline
@@ -22,7 +22,10 @@ __title__ = 'taboo'
 __summary__ = 'tool for comparing genotypes from different assays.'
 __uri__ = 'https://github.com/Clinical-Genomics/taboo'
 
-__version__ = get_distribution(__title__).version
+try:
+    __version__ = get_distribution(__title__).version
+except DistributionNotFound:
+    __version__ = None
 
 __author__ = 'Robin Andeer'
 __email__ = 'robin.andeer@scilifelab.se'
