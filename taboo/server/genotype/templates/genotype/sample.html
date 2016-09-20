@@ -106,7 +106,7 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <form action="{{ url_for('genotype.check', sample_id=sample.id) }}" method="POST">
-                    <button class="form-control btn btn-primary">Run check!</button>
+                    <button type="submit" class="form-control btn btn-primary">Run check!</button>
                 </form>
             </div>
         </div>
@@ -126,6 +126,14 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form action="{{ url_for('genotype.delete_sample', sample_id=sample.id) }}" method="POST">
+                    <button type="submit" class="form-control btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                </form>
             </div>
         </div>
     </div>
