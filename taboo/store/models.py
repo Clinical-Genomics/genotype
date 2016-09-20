@@ -145,6 +145,18 @@ Date: {date}
             raise InsufficientAnalysesError()
         return compare_analyses(*self.analyses)
 
+    def genotype_comparisons(self):
+        """Return compared genotypes."""
+        genotype_pairs = zip(self.analysis('genotype').genotypes,
+                             self.analysis('sequence').genotypes)
+        for gt1, gt2 in genotype_pairs:
+            if '0' in gt1.alleles or '0' in gt2.alleles:
+                yield gt1, gt2, 'unknown'
+            elif gt1.alleles == gt2.alleles:
+                yield gt1, gt2, 'match'
+            else:
+                yield gt1, gt2, 'mismatch'
+
     def check_sex(self):
         """Check that the sex determination is okey."""
         assert self.sex is not None, "need to set expected sex on sample"

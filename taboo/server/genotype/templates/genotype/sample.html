@@ -116,14 +116,29 @@
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <tbody>
-                        {% for analysis in sample.analyses %}
+                        {% if sample.analyses|length == 2 %}
                             <tr>
-                                <th>{{ analysis.type|capitalize }}</th>
-                                {% for genotype in analysis.genotypes %}
-                                    <td>{{ genotype.stringify() }}</td>
+                                {% for gt1, gt2, result in sample.genotype_comparisons() %}
+                                    {% if result == 'unknown' %}
+                                        {% set bg_class = 'default' %}
+                                    {% elif result == 'match' %}
+                                        {% set bg_class = 'success' %}
+                                    {% else %}
+                                        {% set bg_class = 'warning' %}
+                                    {% endif %}
+                                    <td class="bg-{{ bg_class }}">{{ gt1.stringify() }} | {{ gt2.stringify() }}</td>
                                 {% endfor %}
                             </tr>
-                        {% endfor %}
+                        {% else %}
+                            {% for analysis in sample.analyses %}
+                                <tr>
+                                    <th>{{ analysis.type|capitalize }}</th>
+                                    {% for genotype in analysis.genotypes %}
+                                        <td>{{ genotype.stringify() }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
