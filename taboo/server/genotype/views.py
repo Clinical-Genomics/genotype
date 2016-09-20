@@ -139,6 +139,16 @@ def samples():
                            req_args=req_args, plates=api.plates(db))
 
 
+@genotype_bp.route('/samples/<sample_id>/delete', methods=['POST'])
+def delete_sample(sample_id):
+    """Delete a whole sample from the database."""
+    sample_obj = sample_or_404(sample_id)
+    sample_obj.delete()
+    flash("delete sample: {}".format(sample_obj.id), 'info')
+    db.commit()
+    return redirect(url_for('.index'))
+
+
 def sample_or_404(sample_id):
     """Fetch sample or redirect user to 404 page."""
     sample_obj = api.sample(sample_id)
