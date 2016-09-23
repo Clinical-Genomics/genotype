@@ -63,7 +63,7 @@ def view(context, sample_id):
 
 
 @click.command()
-@click.option('--no-analysis', type=click.Choice(TYPES))
+@click.option('-a', '--no-analysis', type=click.Choice(TYPES))
 @click.option('-s', '--since', help='return analysis since date')
 @click.option('-l', '--limit', default=20)
 @click.option('-f', '--field', help='field to display')
