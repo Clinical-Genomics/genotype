@@ -24,7 +24,7 @@ def load(context, include_key, force, input_file):
         log.info('loading analyses from Excel book: %s', input_file.name)
         analyses = load_excel(input_file.name, input_file.read(),
                               include_key=include_key)
-    elif input_file.endswith('.bcf'):
+    elif input_file.name.endswith('.bcf'):
         log.info('loading analyses from BCF file: %s', input_file.name)
         snps = api.snps()
         analyses = load_bcf(input_file.name, snps)
