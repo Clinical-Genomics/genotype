@@ -93,7 +93,7 @@ setup(
     # may need to place data files outside of your packages.
     # In this case, 'data_file' will be installed into:
     # '<sys.prefix>/my_data'
-    # data_files=[('my_data', ['data/data_file'])],
+    # data_files=[('my_data',tr ['data/data_file'])],
 
     # Install requirements loaded from ``requirements.txt``
     install_requires=parse_reqs(),
@@ -122,6 +122,7 @@ setup(
             'check = taboo.match.cli:check',
             'delete = taboo.load.cli:delete',
             'serve = taboo.server.cli:serve',
+            'ls = taboo.store.cli:ls',
         ]
     },
 

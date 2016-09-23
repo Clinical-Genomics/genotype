@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
 from datetime import datetime
+import json
 
 from alchy import ModelBase, make_declarative_base
 from sqlalchemy import Column, ForeignKey, types
@@ -11,7 +12,24 @@ from taboo.constants import SEXES, TYPES
 from taboo.exc import UnknownAllelesError, InsufficientAnalysesError
 from taboo.match.core import compare_analyses
 
-Model = make_declarative_base(Base=ModelBase)
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+    if isinstance(obj, datetime):
+        serial = obj.isoformat()
+        return serial
+    raise TypeError('Type not serializable')
+
+
+class JsonModel(ModelBase):
+
+    def to_json(self, pretty=False):
+        """Serialize Model to JSON."""
+        kwargs = dict(indent=4, sort_keys=True) if pretty else dict()
+        return json.dumps(self.to_dict(), default=json_serial, **kwargs)
+
+
+Model = make_declarative_base(Base=JsonModel)
 
 
 class Genotype(Model):

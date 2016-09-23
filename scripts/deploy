@@ -1,0 +1,1 @@
+fab -f ./scripts/fabfile.py -H ec2-tb update

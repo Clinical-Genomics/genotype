@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import date as make_date
 import logging
 
 import click
@@ -59,3 +60,29 @@ def view(context, sample_id):
     click.echo(str(sample_obj))
     for analysis in sample_obj.analyses:
         click.echo(str(analysis))
+
+
+@click.command()
+@click.option('--no-analysis', type=click.Choice(TYPES))
+@click.option('-s', '--since', help='return analysis since date')
+@click.option('-l', '--limit', default=20)
+@click.option('-f', '--field', help='field to display')
+@click.pass_context
+def ls(context, no_analysis, since, limit, field):
+    """List samples from the database."""
+    date_obj = build_date(since) if since else None
+    sample_query = api.incomplete(analysis_type=no_analysis, since=date_obj)
+    if since is None:
+        sample_query = sample_query.limit(limit)
+
+    if field:
+        out_str = ' '.join(getattr(sample, field) for sample in sample_query)
+        click.echo(out_str, nl=False)
+    else:
+        for sample in sample_query:
+            click.echo(sample.to_json())
+
+
+def build_date(date_str):
+    """Parse date out of string."""
+    return make_date(*map(int, date_str.split('-')))
