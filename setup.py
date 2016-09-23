@@ -116,6 +116,7 @@ setup(
             'init = taboo.init.cli:init',
             'load = taboo.load.cli:load',
             'add-sex = taboo.store.cli:add_sex',
+            'mip-sex = taboo.store.cli:mip_sex',
             'view = taboo.store.cli:view',
             'match = taboo.match.cli:match',
             'check = taboo.match.cli:check',

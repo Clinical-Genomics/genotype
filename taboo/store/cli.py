@@ -36,7 +36,7 @@ def add_sex(context, sample, analysis, sample_id):
     taboo_db.commit()
 
 
-@click('mip-sex')
+@click.command('mip-sex')
 @click.option('-s', '--sample', help='limit to a single sample')
 @click.argument('qc_metrics', type=click.File('r'))
 def mip_sex(sample, qc_metrics):
