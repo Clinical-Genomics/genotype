@@ -2,9 +2,11 @@
 import logging
 
 import click
+import yaml
 
 from taboo.store import api
 from taboo.constants import SEXES, TYPES
+from .parsemip import parse_mipsex
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +34,20 @@ def add_sex(context, sample, analysis, sample_id):
         else:
             log.warn("analysis not found: %s-%s", sample_id, analysis_type)
     taboo_db.commit()
+
+
+@click('mip-sex')
+@click.option('-s', '--sample', help='limit to a single sample')
+@click.argument('qc_metrics', type=click.File('r'))
+def mip_sex(sample, qc_metrics):
+    """Parse out analysis determined sex of sample."""
+    qcm_data = yaml.load(qc_metrics)
+    samples_sex = parse_mipsex(qcm_data)
+    if sample:
+        click.echo(samples_sex[sample], nl=False)
+    else:
+        for sample_id, sex in samples_sex.items():
+            click.echo("{}: {}".format(sample_id, sex))
 
 
 @click.command()
