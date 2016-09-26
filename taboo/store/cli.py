@@ -64,14 +64,16 @@ def view(context, sample_id):
 
 @click.command()
 @click.option('-a', '--no-analysis', type=click.Choice(TYPES))
+@click.option('-x', '--no-sex', is_flag=True)
 @click.option('-s', '--since', help='return analysis since date')
 @click.option('-l', '--limit', default=20)
 @click.option('-f', '--field', help='field to display')
 @click.pass_context
-def ls(context, no_analysis, since, limit, field):
+def ls(context, no_analysis, no_sex, since, limit, field):
     """List samples from the database."""
     date_obj = build_date(since) if since else None
-    sample_query = api.incomplete(analysis_type=no_analysis, since=date_obj)
+    sample_query = api.incomplete(analysis_type=no_analysis, no_sex=no_sex,
+                                  since=date_obj)
     if since is None:
         sample_query = sample_query.limit(limit)
 

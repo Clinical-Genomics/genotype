@@ -2,7 +2,7 @@
 import logging
 import os
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from taboo.store.models import Analysis, Sample, SNP
 
@@ -35,17 +35,25 @@ def passing():
     return query
 
 
-def incomplete(query=None, analysis_type=None, since=None):
+def incomplete(query=None, analysis_type=None, no_sex=False, since=None):
     """Return samples that haven't been annotated completely."""
     base_query = query or Sample.query
-    base_query = base_query.join(Sample.analyses)
-    if analysis_type:
-        base_query = base_query.filter(Analysis.type == analysis_type)
+    base_query = (base_query.join(Sample.analyses)
+                            .order_by(Analysis.created_at.desc()))
+    if no_sex:
+        # filter on samples lacking sex but having all genotypes
+        nosex_filter = or_(Sample.sex == None, Analysis.sex == None)
+        base_query = (base_query.filter(nosex_filter)
+                                .group_by(Analysis.sample_id)
+                                .having(func.count(Analysis.sample_id) == 2)
+                                .order_by(Analysis.created_at.desc()))
+    else:
+        if analysis_type:
+            base_query = base_query.filter(Analysis.type == analysis_type)
+        base_query = (base_query.group_by(Analysis.sample_id)
+                                .having(func.count(Analysis.sample_id) < 2))
     if since:
         base_query = base_query.filter(Analysis.created_at > since)
-    base_query = (base_query.group_by(Analysis.sample_id)
-                            .having(func.count(Analysis.sample_id) < 2)
-                            .order_by(Analysis.created_at.desc()))
     return base_query
 
 
