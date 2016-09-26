@@ -72,21 +72,27 @@ def view(context, sample_id):
 def ls(context, no_analysis, no_sex, since, limit, field):
     """List samples from the database."""
     date_obj = build_date(since) if since else None
-    if no_analysis:
-        analysis_type = 'genotype' if no_analysis == 'sequence' else 'sequence'
-    else:
-        analysis_type = None
-    sample_query = api.incomplete(analysis_type=analysis_type, no_sex=no_sex,
-                                  since=date_obj)
+    sample_query = api.incomplete(no_sex=no_sex, since=date_obj)
     if since is None:
         sample_query = sample_query.limit(limit)
 
-    if field:
-        out_str = ' '.join(getattr(sample, field) for sample in sample_query)
-        click.echo(out_str, nl=False)
+    if no_analysis:
+        samples = (sample for sample in sample_query
+                   if sample.analyses[0].type != no_analysis)
     else:
-        for sample in sample_query:
-            click.echo(sample.to_json())
+        samples = sample_query
+
+    output = []
+    for index, sample in enumerate(samples):
+        if index > limit:
+            break
+        else:
+            if field:
+                output.append(getattr(sample, field))
+            else:
+                click.echo(sample.to_json())
+    if field:
+        click.echo(" ".join(output), nl=False)
 
 
 def build_date(date_str):

@@ -35,7 +35,7 @@ def passing():
     return query
 
 
-def incomplete(query=None, analysis_type=None, no_sex=False, since=None):
+def incomplete(query=None, no_sex=False, since=None):
     """Return samples that haven't been annotated completely."""
     base_query = query or Sample.query
     base_query = (base_query.join(Sample.analyses)
@@ -48,8 +48,6 @@ def incomplete(query=None, analysis_type=None, no_sex=False, since=None):
                                 .having(func.count(Analysis.sample_id) == 2)
                                 .order_by(Analysis.created_at.desc()))
     else:
-        if analysis_type:
-            base_query = base_query.filter(Analysis.type == analysis_type)
         base_query = (base_query.group_by(Analysis.sample_id)
                                 .having(func.count(Analysis.sample_id) < 2))
     if since:
