@@ -72,7 +72,11 @@ def view(context, sample_id):
 def ls(context, no_analysis, no_sex, since, limit, field):
     """List samples from the database."""
     date_obj = build_date(since) if since else None
-    sample_query = api.incomplete(analysis_type=no_analysis, no_sex=no_sex,
+    if no_analysis:
+        analysis_type = 'genotype' if no_analysis == 'sequence' else 'sequence'
+    else:
+        analysis_type = None
+    sample_query = api.incomplete(analysis_type=analysis_type, no_sex=no_sex,
                                   since=date_obj)
     if since is None:
         sample_query = sample_query.limit(limit)
