@@ -63,36 +63,25 @@ def view(context, sample_id):
 
 
 @click.command()
-@click.option('-a', '--no-analysis', type=click.Choice(TYPES))
-@click.option('-x', '--no-sex', is_flag=True)
 @click.option('-s', '--since', help='return analysis since date')
 @click.option('-l', '--limit', default=20)
-@click.option('-f', '--field', help='field to display')
+@click.option('-o', '--offset', default=0)
+@click.argument('missing', type=click.Choice(['sex', 'genotype', 'sequence']))
 @click.pass_context
-def ls(context, no_analysis, no_sex, since, limit, field):
+def ls(context, since, limit, offset, missing):
     """List samples from the database."""
     date_obj = build_date(since) if since else None
-    sample_query = api.incomplete(no_sex=no_sex, since=date_obj)
-    if since is None:
-        sample_query = sample_query.limit(limit)
-
-    if no_analysis:
-        samples = (sample for sample in sample_query
-                   if sample.analyses[0].type != no_analysis)
+    if missing == 'sex':
+        query = api.incomplete(no_sex=True, since=date_obj)
     else:
-        samples = sample_query
+        session = context.obj['db'].session
+        query = api.missing_genotypes(session, missing, since=date_obj)
 
-    output = []
-    for index, sample in enumerate(samples):
-        if index > limit:
-            break
-        else:
-            if field:
-                output.append(getattr(sample, field))
-            else:
-                click.echo(sample.to_json())
-    if field:
-        click.echo(" ".join(output), nl=False)
+    query = query.offset(offset).limit(limit) if since is None else query
+    # sex queries Sample table, genotypes queries Analysis table
+    id_key = 'id' if missing == 'sex' else 'sample_id'
+    sample_ids = (getattr(record, id_key) for record in query)
+    click.echo(" ".join(sample_ids), nl=False)
 
 
 def build_date(date_str):
