@@ -66,7 +66,7 @@ def view(context, sample_id):
 @click.option('-s', '--since', help='return analysis since date')
 @click.option('-l', '--limit', default=20)
 @click.option('-o', '--offset', default=0)
-@click.optoin('-m', '--missing', required=True,
+@click.option('-m', '--missing', required=True,
               type=click.Choice(['sex', 'genotype', 'sequence']))
 @click.pass_context
 def ls(context, since, limit, offset, missing):
