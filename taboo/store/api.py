@@ -35,22 +35,14 @@ def passing():
     return query
 
 
-def incomplete(query=None, no_sex=False, since=None):
+def incomplete(query=None, since=None):
     """Return samples that haven't been annotated completely."""
     base_query = query or Sample.query
     base_query = (base_query.join(Sample.analyses)
                             .order_by(Analysis.created_at.desc()))
-    if no_sex:
-        # filter on samples lacking sex but having all genotypes
-        nosex_filter = or_(Sample.sex == None, Analysis.sex == None)
-        base_query = (base_query.filter(nosex_filter)
-                                .group_by(Analysis.sample_id)
-                                .having(func.count(Analysis.sample_id) == 2)
-                                .order_by(Analysis.created_at.desc()))
-    else:
-        # filter analyses on which are lacking genotypes
-        base_query = (base_query.group_by(Analysis.sample_id)
-                                .having(func.count(Analysis.sample_id) < 2))
+    # filter analyses on which are lacking genotypes
+    base_query = (base_query.group_by(Analysis.sample_id)
+                            .having(func.count(Analysis.sample_id) < 2))
     if since:
         base_query = base_query.filter(Analysis.created_at > since)
     return base_query
@@ -64,6 +56,19 @@ def missing_genotypes(session, analysis_type, since=None):
                               .subquery())
     query = (session.query(subquery)
                     .filter(subquery.c.type != analysis_type))
+    if since:
+        query = query.filter(Analysis.created_at > since)
+    return query
+
+
+def missing_sex(since=None):
+    """Return Samples lacking sex but having all genotypes."""
+    nosex_filter = or_(Sample.sex == None, Analysis.sex == None)
+    query = (Sample.query.join(Sample.analyses)
+                         .order_by(Analysis.created_at.desc())
+                         .filter(nosex_filter)
+                         .group_by(Analysis.sample_id)
+                         .having(func.count(Analysis.sample_id) == 2))
     if since:
         query = query.filter(Analysis.created_at > since)
     return query

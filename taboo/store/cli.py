@@ -73,7 +73,7 @@ def ls(context, since, limit, offset, missing):
     """List samples from the database."""
     date_obj = build_date(since) if since else None
     if missing == 'sex':
-        query = api.incomplete(no_sex=True, since=date_obj)
+        query = api.missing_sex(since=date_obj)
     else:
         session = context.obj['db'].session
         query = api.missing_genotypes(session, missing, since=date_obj)
