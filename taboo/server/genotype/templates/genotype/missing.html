@@ -1,0 +1,79 @@
+{% extends "genotype/base.html" %}
+
+{% block title %}
+    {{ super() }}
+    - Missing - {{ missing }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified">
+            {% for data in ['sex', 'genotype', 'sequence'] %}
+                <li {% if data == missing %}class="active"{% endif %}>
+                    <a href="{{ url_for('genotype.missing', data=data) }}">
+                        Missing {{ data }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        
+        <br>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Samples</div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sample</th>
+                        <th>Sex</th>
+                        {% if missing == 'sex' %}
+                            <th>Genotype sex</th>
+                            <th>Sequence sex</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sample in samples.items %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
+                                    {{ sample.id if missing == 'sex' else sample.sample_id }}
+                                </a>
+                            </td>
+                            <td>{{ sample.sex or '-' }}</td>
+                            {% if missing == 'sex' %}
+                                <td>{{ sample.analysis('genotype').sex or '-' }}</td>
+                                <td>{{ sample.analysis('sequence').sex or '-' }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="panel-footer">
+                {{ page_navigation(samples) }}
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
+
+{% macro page_navigation(samples) %}
+    <div class="row">
+        <div class="col-xs-4">
+            {% if samples.has_prev %}
+                <a href="{{ url_for('genotype.missing', data=missing, page=samples.prev_num) }}">Prev</a>
+            {% endif %}
+        </div>
+        <div class="col-xs-4 text-center">
+            Page {{ samples.page }} <small class="text-muted">({{ samples.total }} samples)</small>
+        </div>
+        <div class="col-xs-4 text-right">
+            {% if samples.has_next %}
+                <a href="{{ url_for('genotype.missing', data=missing, page=samples.next_num) }}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

@@ -50,10 +50,12 @@ def incomplete(query=None, since=None):
 
 def missing_genotypes(session, analysis_type, since=None):
     """Return analyses where the complementing genotype info is missing."""
-    subquery = (Analysis.query.order_by(Analysis.created_at.desc())
-                              .group_by(Analysis.sample_id)
-                              .having(func.count(Analysis.sample_id) < 2)
-                              .subquery())
+    subquery = (session.query(Analysis, Sample.sex.label('sample_sex'))
+                       .join(Analysis.sample)
+                       .order_by(Analysis.created_at.desc())
+                       .group_by(Analysis.sample_id)
+                       .having(func.count(Analysis.sample_id) < 2)
+                       .subquery())
     query = (session.query(subquery)
                     .filter(subquery.c.type != analysis_type))
     if since:

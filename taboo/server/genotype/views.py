@@ -155,3 +155,15 @@ def sample_or_404(sample_id):
     if sample_obj is None:
         return abort(404, "sample not found: {}".format(sample_id))
     return sample_obj
+
+
+@genotype_bp.route('/samples/missing/<data>')
+def missing(data):
+    """Samples with missing information to be compared."""
+    query = (api.missing_sex() if data == 'sex' else
+             api.missing_genotypes(db.session, data))
+
+    per_page = 30
+    page_no = int(request.args.get('page', 1))
+    page = query.paginate(page_no, per_page=per_page)
+    return render_template('genotype/missing.html', samples=page, missing=data)
