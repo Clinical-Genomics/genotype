@@ -81,8 +81,9 @@ def ls(context, since, limit, offset, missing):
     query = query.offset(offset).limit(limit) if since is None else query
     # sex queries Sample table, genotypes queries Analysis table
     id_key = 'id' if missing == 'sex' else 'sample_id'
-    sample_ids = (getattr(record, id_key) for record in query)
-    click.echo(" ".join(sample_ids), nl=False)
+    for record in query:
+        sample_id = getattr(record, id_key)
+        click.echo(sample_id)
 
 
 def build_date(date_str):
