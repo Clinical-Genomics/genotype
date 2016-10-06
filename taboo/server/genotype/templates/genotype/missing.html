@@ -36,10 +36,11 @@
                 </thead>
                 <tbody>
                     {% for sample in samples.items %}
+                        {% set sample_id = sample.id if missing == 'sex' else sample.sample_id %}
                         <tr>
                             <td>
-                                <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
-                                    {{ sample.id if missing == 'sex' else sample.sample_id }}
+                                <a href="{{ url_for('genotype.sample', sample_id=sample_id) }}">
+                                    {{ sample_id }}
                                 </a>
                             </td>
                             <td>{{ sample.sex or '-' }}</td>
