@@ -11,13 +11,12 @@ import logging
 import os
 import pkg_resources
 
-from alchy import Manager
 import click
 import yaml
 
 from taboo import __title__, __version__
 from taboo.log import init_log
-from taboo.store.models import Model
+from taboo.store import api
 
 log = logging.getLogger(__name__)
 
@@ -72,5 +71,4 @@ def root(context, config, database, log_level, log_file):
     if context.invoked_subcommand != 'serve':
         # setup database
         uri = context.obj['database'] or 'sqlite://'
-        config = dict(SQLALCHEMY_DATABASE_URI=uri)
-        context.obj['db'] = Manager(config=config, Model=Model)
+        context.obj['db'] = api.connect(uri)

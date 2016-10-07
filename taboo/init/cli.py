@@ -22,8 +22,8 @@ def init(context, reset, snps):
     context.obj['db'].create_all()
     snp_records = read_snps(snps)
     try:
-        context.obj['db'].add_all(snp_records)
-        context.obj['db'].commit()
+        context.obj['db'].add_commit(*snp_records)
     except IntegrityError:
         log.warn('database already setup with genotypes')
+        context.obj['db'].session.rollback()
         context.abort()

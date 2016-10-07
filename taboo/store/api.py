@@ -2,11 +2,18 @@
 import logging
 import os
 
+from alchy import Manager
 from sqlalchemy import func, or_
 
-from taboo.store.models import Analysis, Sample, SNP
+from taboo.store.models import Analysis, Model, Sample, SNP
 
 log = logging.getLogger(__name__)
+
+
+def connect(uri):
+    log.debug('open connection to database: %s', uri)
+    manager = Manager(config=dict(SQLALCHEMY_DATABASE_URI=uri), Model=Model)
+    return manager
 
 
 def complete():

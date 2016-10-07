@@ -5,7 +5,7 @@ from taboo.store.models import Sample, SNP
 def test_init(invoke_cli, existing_db, snp_path, snp_sequence):
     # GIVEN an empty exising database
     snp_count = len(snp_sequence)
-    db_uri = existing_db.uri
+    db_uri = existing_db.engine.url
     assert Sample.query.count() == 0
     assert SNP.query.count() == 0
     # WHEN running 'init' subcommand in CLI

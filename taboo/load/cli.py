@@ -6,7 +6,7 @@ import click
 from taboo.constants import TYPES
 from taboo.store.models import Sample
 from taboo.store import api
-from .bcf import load_bcf
+from .vcf import load_vcf
 from .excel import load_excel
 
 log = logging.getLogger(__name__)
@@ -24,10 +24,10 @@ def load(context, include_key, force, input_file):
         log.info('loading analyses from Excel book: %s', input_file.name)
         analyses = load_excel(input_file.name, input_file.read(),
                               include_key=include_key)
-    elif input_file.name.endswith('.bcf'):
-        log.info('loading analyses from BCF file: %s', input_file.name)
+    elif input_file.name.endswith('.bcf') or input_file.name.endswith('.vcf.gz'):
+        log.info('loading analyses from VCF file: %s', input_file.name)
         snps = api.snps()
-        analyses = load_bcf(input_file.name, snps)
+        analyses = load_vcf(input_file.name, snps)
 
     for analysis in analyses:
         log.debug('loading analysis for sample: %s', analysis.sample_id)

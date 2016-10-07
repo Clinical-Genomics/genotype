@@ -4,10 +4,10 @@ from taboo.store.models import Analysis, Sample
 
 def test_add_sex(invoke_cli, setexist_db):
     # GIVEN an existing database with a loaded sample
-    db_uri = setexist_db.uri
+    db_uri = setexist_db.engine.url
     sample_id = 'ADM12'
     new_sample = Sample(id=sample_id)
-    setexist_db.add(new_sample).save()
+    setexist_db.add_commit(new_sample)
     # WHEN adding information about the sex of the sample
     sex = 'female'
     result = invoke_cli(['-d', db_uri, 'add-sex', sample_id, '-s', sex])
@@ -23,7 +23,7 @@ def test_add_sex(invoke_cli, setexist_db):
 
 def test_add_sex_analysis(invoke_cli, setexist_db):
     # GIVEN an existing database with sample + analysis
-    db_uri = setexist_db.uri
+    db_uri = setexist_db.engine.url
     sex = 'male'
     sample_id = Sample.query.first().id
     analysis = Analysis.query.first()

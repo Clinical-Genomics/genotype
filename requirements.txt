@@ -2,7 +2,7 @@ click
 PyYAML
 Alchy
 SQLAlchemy
-pysam
+cyvcf2
 xlrd
 pymysql
 

@@ -2,34 +2,33 @@
 import os
 from collections import namedtuple
 
-import pysam
+from cyvcf2 import VCF
 
-from taboo.compat import iteritems, itervalues
+from taboo.compat import itervalues
 from taboo.store.models import Analysis, Genotype
 
 Result = namedtuple('Result', ['sample', 'genotypes'])
 RawGenotype = namedtuple('RawGenotype', ['sample', 'allele_1', 'allele_2'])
 
 
-def load_bcf(bcf_file, snps):
-    """Load genotypes from a BCF file.
+def load_vcf(vcf_file, snps):
+    """Load genotypes from a BCF/VCF.gz file.
 
     Args:
-        bcf_file (path): path to to BCF file (indexed)
+        vcf_file (path): path to to BCF/VCF.gz file (indexed)
         snps (List[SNP]): list of SNPs to consider
 
     Returns:
         List[Analysis]: list of Analysis records
     """
-    bcf = pysam.VariantFile(bcf_file, 'rb')
-    sample_ids = parse_sampleids(bcf)
+    vcf = VCF(vcf_file)
     # generate Analysis records for each included sample
-    source = os.path.abspath(bcf_file)
+    source = os.path.abspath(vcf_file)
     analyses = {sample_id: Analysis(type='sequence', source=source,
                                     sample_id=sample_id)
-                for sample_id in sample_ids}
+                for sample_id in vcf.samples}
     for snp in snps:
-        variant = fetch_snp(bcf, snp)
+        variant = fetch_snp(vcf, snp)
         if variant is None:
             # assume REF/REF
             for analysis in itervalues(analyses):
@@ -37,7 +36,7 @@ def load_bcf(bcf_file, snps):
                                     allele_2=snp.ref)
                 analysis.genotypes.append(genotype)
         else:
-            raw_genotypes = variant_genotypes(variant)
+            raw_genotypes = variant_genotypes(vcf.samples, variant)
             for raw_gt in raw_genotypes:
                 genotype = Genotype(rsnumber=snp.id, allele_1=raw_gt.allele_1,
                                     allele_2=raw_gt.allele_2)
@@ -46,19 +45,17 @@ def load_bcf(bcf_file, snps):
     return itervalues(analyses)
 
 
-def variant_genotypes(variant):
+def variant_genotypes(sample_ids, variant):
     """Build Genotype objects from a BCF variant."""
-    for sample_id, sample in iteritems(variant.samples):
-        allele_1 = ('0' if sample.allele_indices[0] is None else
-                    variant.alleles[sample.allele_indices[0]])
-        allele_2 = ('0' if sample.allele_indices[1] is None else
-                    variant.alleles[sample.allele_indices[1]])
+    for sample_id, bases in zip(sample_ids, variant.gt_bases):
+        allele_1, allele_2 = bases.split('/')
         yield RawGenotype(sample_id, allele_1, allele_2)
 
 
-def fetch_snp(bcf, snp):
+def fetch_snp(vcf, snp):
     """Fetch an SNP from the BCF file by position."""
-    variants = list(bcf.fetch(snp.chrom, snp.pos - 1, snp.pos))
+    pos_str = "{chrom}:{pos}-{pos}".format(chrom=snp.chrom, pos=snp.pos)
+    variants = list(vcf(pos_str))
     if len(variants) == 1:
         # everything OK
         variant = variants[0]
@@ -68,9 +65,3 @@ def fetch_snp(bcf, snp):
     else:  # pragma: no cover
         # weird SNP position lookup, not even possible; right?
         raise ValueError('multiple variants found for SNP')
-
-
-def parse_sampleids(bcf):
-    """Build new Sample models from BCF file."""
-    sample_ids = bcf.next().samples.keys()
-    return sample_ids

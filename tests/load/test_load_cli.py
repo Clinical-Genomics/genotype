@@ -5,7 +5,7 @@ from taboo.store.models import Analysis, SNP, Sample
 def test_load_bcf(invoke_cli, bcf_path, setexist_db):
     # GIVEN a database with some SNPs loaded and one sample
     sample_id = '000139T'
-    db_uri = setexist_db.uri
+    db_uri = setexist_db.engine.url
     assert SNP.query.count() > 0
     assert Sample.query.count() == 1
     assert Analysis.query.count() == 1
@@ -29,7 +29,7 @@ def test_load_bcf(invoke_cli, bcf_path, setexist_db):
 
 def test_load_excel(invoke_cli, excel_path, setexist_db):
     # GIVEN a database with some SNPs loaded
-    db_uri = setexist_db.uri
+    db_uri = setexist_db.engine.url
     assert SNP.query.count() > 0
     # WHEN loading an Excel book from the command line (multi-sample)
     result = invoke_cli(['-d', db_uri, 'load', excel_path, '-k', 'ID-CG-'])
@@ -41,7 +41,7 @@ def test_load_excel(invoke_cli, excel_path, setexist_db):
 
 def test_delete(invoke_cli, setexist_db):
     # GIVEN a database with a sample loaded (one analysis)
-    db_uri = setexist_db.uri
+    db_uri = setexist_db.engine.url
     assert Sample.query.count() == 1
     assert Analysis.query.count() == 1
     sample_id = Sample.query.first().id

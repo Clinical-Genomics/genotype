@@ -3,12 +3,12 @@ import codecs
 from functools import partial
 
 from click.testing import CliRunner
-import pysam
+import cyvcf2
 import pytest
 
 from taboo.cli import root
 from taboo.init.utils import read_snps
-from taboo.store.api import TabooDB
+from taboo.store import api
 from taboo.store.models import SNP, Genotype, Sample, Analysis
 
 
@@ -45,45 +45,45 @@ def snps(sample_db):
 
 
 @pytest.fixture
-def bcf(bcf_path):
-    _bcf = pysam.VariantFile(bcf_path, 'rb')
-    return _bcf
+def vcf(bcf_path):
+    _vcf = cyvcf2.VCF(bcf_path)
+    return _vcf
 
 
 @pytest.yield_fixture(scope='function')
 def taboo_db():
-    _taboo_db = TabooDB('sqlite://')
-    _taboo_db.set_up()
+    _taboo_db = api.connect('sqlite://')
+    _taboo_db.create_all()
     yield _taboo_db
-    _taboo_db.tear_down()
+    _taboo_db.drop_all()
 
 
 @pytest.yield_fixture(scope='function')
 def existing_db(tmpdir):
-    db_path = tmpdir.join('coverage.sqlite3')
-    taboo_db = TabooDB(str(db_path))
-    taboo_db.set_up()
+    db_path = "sqlite:///{}".format(tmpdir.join('coverage.sqlite3'))
+    taboo_db = api.connect(db_path)
+    taboo_db.create_all()
     yield taboo_db
-    taboo_db.tear_down()
+    taboo_db.drop_all()
 
 
 @pytest.yield_fixture(scope='function')
 def setexist_db(existing_db, snp_sequence, sample):
     snp_records = read_snps(snp_sequence)
-    existing_db.add(snp_records).save()
-    existing_db.add(sample).save()
+    existing_db.add_commit(*snp_records)
+    existing_db.add_commit(sample)
     yield existing_db
-    existing_db.tear_down()
-    existing_db.set_up()
+    existing_db.drop_all()
+    existing_db.create_all()
 
 
 @pytest.yield_fixture(scope='function')
 def sample_db(taboo_db, snp_sequence):
     snp_records = read_snps(snp_sequence)
-    taboo_db.add(snp_records).save()
+    taboo_db.add_commit(*snp_records)
     yield taboo_db
-    taboo_db.tear_down()
-    taboo_db.set_up()
+    taboo_db.drop_all()
+    taboo_db.create_all()
 
 
 @pytest.fixture
