@@ -86,6 +86,17 @@ def ls(context, since, limit, offset, missing):
         click.echo(sample_id)
 
 
+@click.command()
+@click.argument('sample_id')
+@click.pass_context
+def sample(context, sample_id):
+    """Get a sample from the database."""
+    sample_obj = api.sample(sample_id, notfound_cb=context.abort)
+    click.echo(sample_obj.status)
+    if sample_obj.status != 'pass':
+        context.abort()
+
+
 def build_date(date_str):
     """Parse date out of string."""
     return make_date(*map(int, date_str.split('-')))

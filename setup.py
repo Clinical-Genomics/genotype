@@ -123,6 +123,7 @@ setup(
             'delete = taboo.load.cli:delete',
             'serve = taboo.server.cli:serve',
             'ls = taboo.store.cli:ls',
+            'sample = taboo.store.cli:sample',
         ]
     },
 
