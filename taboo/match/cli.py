@@ -12,13 +12,16 @@ from .core import compare_analyses
 log = logging.getLogger(__name__)
 
 
-def log_result(sample_id, result):
+def log_result(sample_id, result, hide_fail=False):
     total_snps = api.snps().count()
     cutoff = math.floor(total_snps / 5)
     if result.get('mismatch') == 0 or result.get('mismatch') <= cutoff:
         log_func = log.info
     else:
-        log_func = log.warn
+        if hide_fail:
+            log_func = log.debug
+        else:
+            log_func = log.warn
     template = ("{sample} | matches: {match}, mismatches: {mismatch}, "
                 "unknown: {unknown}")
     log_func(template.format(sample=sample_id,
@@ -38,7 +41,7 @@ def match(context, sample_id, analysis):
     other_analyses = Analysis.query.filter(Analysis.type != analysis)
     for other_analysis in other_analyses:
         result = compare_analyses(analysis_obj, other_analysis)
-        log_result(other_analysis.sample_id, result)
+        log_result(other_analysis.sample_id, result, hide_fail=True)
 
 
 @click.command()
