@@ -31,14 +31,25 @@ def log_result(sample_id, result, hide_fail=False):
 
 
 @click.command()
-@click.argument('sample_id')
 @click.option('-a', '--analysis', default='genotype', type=click.Choice(TYPES))
+@click.argument('sample_ids', nargs=-1)
 @click.pass_context
-def match(context, sample_id, analysis):
+def match(context, sample_ids, analysis):
     """Match genotypes for an analysis against all samples."""
+    if len(sample_ids) == 0:
+        click.echo("you must supply at least one sample id")
+        context.abort()
+
+    sample_id = sample_ids[0]
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
     analysis_obj = sample_obj.analysis(analysis)
+
+    # compare against all other samples
     other_analyses = Analysis.query.filter(Analysis.type != analysis)
+    if len(sample_ids) > 1:
+        # compare only with the specified samples
+        other_analyses = other_analyses.join(Analysis.sample_id.in_(sample_ids))
+
     for other_analysis in other_analyses:
         result = compare_analyses(analysis_obj, other_analysis)
         log_result(other_analysis.sample_id, result, hide_fail=True)
