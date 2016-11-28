@@ -48,7 +48,8 @@ def match(context, sample_ids, analysis):
     other_analyses = Analysis.query.filter(Analysis.type != analysis)
     if len(sample_ids) > 1:
         # compare only with the specified samples
-        other_analyses = other_analyses.join(Analysis.sample_id.in_(sample_ids))
+        sample_filter = Analysis.sample_id.in_(sample_ids)
+        other_analyses = other_analyses.filter(sample_filter)
 
     for other_analysis in other_analyses:
         result = compare_analyses(analysis_obj, other_analysis)
