@@ -72,7 +72,7 @@ def view(context, sample_id):
 @click.pass_context
 def ls(context, since, limit, offset, missing, plate):
     """List samples from the database."""
-    query = api.analyses(plate_id=plate)
+    query = api.samples(plate_id=plate)
 
     if missing:
         date_obj = build_date(since) if since else None
