@@ -10,10 +10,9 @@ from .ext import db, user
 from .genotype import genotype_bp
 
 
-def create_app(app_name, config_obj):
+def create_app(config_obj):
     """Flask app factory."""
-    app = Flask(app_name, template_folder='templates', static_folder='static',
-                static_url_path='/static')
+    app = Flask(__name__)
     app.wsgi_app = ProxyFix(app.wsgi_app)
 
     @app.route('/')

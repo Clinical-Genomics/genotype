@@ -19,4 +19,4 @@ config = {
     'USER_DATABASE_PATH': os.environ['USER_DATABASE_PATH'],
 }
 
-application = create_app('taboo', config_obj=config)
+application = create_app(config_obj=config)
