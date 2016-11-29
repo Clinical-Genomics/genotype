@@ -1,0 +1,88 @@
+{% extends "genotype/base.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="col-md-7">
+            {# Failing samples at the top #}
+            <div class="panel panel-default">
+                <div class="panel-heading">Failing samples</div>
+                <ul class="list-group">
+                    {% for sample in failing %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
+                                {{ sample.id }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item">Everything cleared up 🏅</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            {# Unmatched samples #}
+            <div class="panel panel-default">
+                <div class="panel-heading">Pending samples</div>
+                <ul class="list-group">
+                    {% for sample in pending %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
+                                {{ sample.id }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item">No pending samples</li>
+                    {% endfor %}
+                    <li class="list-group-item">
+                        <form action="{{ url_for('genotype.check') }}" method="POST">
+                            <button class="btn btn-primary form-control">Check samples</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="panel panel-default">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <form action="{{ url_for('genotype.samples') }}" method="GET">
+                            <div class="row">
+                                <div class="col-xs-8">
+                                    <input type="search" name="query" class="form-control" placeholder="sample id" value="{{ query if query }}" required autofocus>
+                                </div>
+                                <div class="col-xs-4">
+                                    <button type="submit" class="btn btn-default form-control">Search</button>
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+
+                    {# Upload Excel report #}
+                    <li class="list-group-item">
+                        <label for="excelInput">Upload Excel book</label>
+                        <form class="form" action="{{ url_for('genotype.upload') }}" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-xs-8">
+                                    <input class="form-control" id="excelInput" type="file" name="excel" required>
+                                </div>
+                                <div class="col-xs-4">
+                                    <button type="submit" class="btn btn-default form-control">Upload</button>
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <li class="list-group-item">{{ message }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

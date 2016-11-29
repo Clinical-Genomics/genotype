@@ -14,6 +14,24 @@
         <div class="navbar-header">
             <a class="navbar-brand" href="{{ url_for('genotype.index') }}">Taboo</a>
         </div>
+
+        {% if current_user.is_authenticated %}
+            <form class="navbar-form navbar-left" action="{{ url_for('logout') }}" method="get" accept-charset="utf-8">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default btn-sm navbar-btn">
+                        Logout {{ current_user.name }}
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <form class="navbar-form navbar-left" action="{{ url_for('google.login') }}" method="get" accept-charset="utf-8">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default btn-sm navbar-btn">
+                        Login
+                    </button>
+                </div>
+            </form>
+        {% endif %}
     
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">

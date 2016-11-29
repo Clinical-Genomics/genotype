@@ -11,3 +11,5 @@ Flask
 Flask-Bootstrap
 Flask-Alchy
 werkzeug
+Flask-Login
+Housekeeper

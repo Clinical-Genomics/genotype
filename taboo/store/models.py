@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 
 from alchy import ModelBase, make_declarative_base
+from housekeeper.server.admin import UserManagementMixin
 from sqlalchemy import Column, ForeignKey, types
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -208,3 +209,8 @@ class SNP(Model):
     ref = Column(types.String(1))
     chrom = Column(types.String(5))
     pos = Column(types.Integer)
+
+
+class User(Model, UserManagementMixin):
+
+    pass

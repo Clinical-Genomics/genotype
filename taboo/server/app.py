@@ -3,14 +3,16 @@ import logging
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
+from werkzeug.contrib.fixers import ProxyFix
 
-from .ext import db
+from .ext import db, user
 from .genotype import genotype_bp
 
 
 def create_app(app_name, config_obj):
     """Flask app factory."""
     app = Flask(app_name)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     # configure app
     app.config['SECRET_KEY'] = 'testing'
@@ -20,6 +22,7 @@ def create_app(app_name, config_obj):
     # configure extensions
     Bootstrap(app)
     db.init_app(app)
+    user.init_app(app)
 
     # register blueprints
     app.register_blueprint(genotype_bp)

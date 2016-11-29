@@ -4,6 +4,7 @@ import os
 
 from flask import (abort, Blueprint, current_app, flash, redirect,
                    render_template, request, url_for)
+from flask_login import current_user, login_required
 from werkzeug import secure_filename
 
 from taboo.match.core import check_sample
@@ -22,12 +23,16 @@ genotype_bp = Blueprint('genotype', __name__, template_folder='templates',
 @genotype_bp.route('/')
 def index():
     """Display all samples."""
+    if not current_user.is_authenticated:
+        return render_template('genotype/index.html')
+
     pending, failing = api.pending(), api.failing()
-    return render_template('genotype/index.html', pending=pending,
+    return render_template('genotype/dashboard.html', pending=pending,
                            failing=failing, query=request.args.get('query'))
 
 
 @genotype_bp.route('/samples/<sample_id>')
+@login_required
 def sample(sample_id):
     """Display information about a sample."""
     sample_obj = sample_or_404(sample_id)
@@ -35,6 +40,7 @@ def sample(sample_id):
 
 
 @genotype_bp.route('/upload', methods=['POST'])
+@login_required
 def upload():
     """Upload an Excel report file from MAF."""
     include_key = current_app.config['TABOO_INCLUDE_KEY']
@@ -59,6 +65,7 @@ def upload():
 
 @genotype_bp.route('/check', methods=['POST'])
 @genotype_bp.route('/check/<sample_id>', methods=['POST'])
+@login_required
 def check(sample_id=None):
     """Check samples."""
     if sample_id:
@@ -80,6 +87,7 @@ def check(sample_id=None):
 
 
 @genotype_bp.route('/update/<sample_id>', methods=['POST'])
+@login_required
 def update(sample_id):
     """Update information about a sample."""
     sample_obj = sample_or_404(sample_id)
@@ -92,6 +100,7 @@ def update(sample_id):
 
 
 @genotype_bp.route('/update-status/<sample_id>', methods=['POST'])
+@login_required
 def update_status(sample_id):
     """Update the status for a sample."""
     sample_obj = sample_or_404(sample_id)
@@ -103,6 +112,7 @@ def update_status(sample_id):
 
 
 @genotype_bp.route('/samples')
+@login_required
 def samples():
     """Search for a sample in the database."""
     sample_q = Sample.query
@@ -140,6 +150,7 @@ def samples():
 
 
 @genotype_bp.route('/samples/<sample_id>/delete', methods=['POST'])
+@login_required
 def delete_sample(sample_id):
     """Delete a whole sample from the database."""
     sample_obj = sample_or_404(sample_id)
@@ -158,6 +169,7 @@ def sample_or_404(sample_id):
 
 
 @genotype_bp.route('/samples/missing/<data>')
+@login_required
 def missing(data):
     """Samples with missing information to be compared."""
     query = (api.missing_sex() if data == 'sex' else
