@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from flask import Flask
+from flask import Flask, render_template, redirect, url_for
+from flask_login import current_user
 from flask_bootstrap import Bootstrap
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -13,6 +14,14 @@ def create_app(app_name, config_obj):
     """Flask app factory."""
     app = Flask(app_name)
     app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    @app.route('/')
+    def index():
+        """Login view."""
+        if not current_user.is_authenticated:
+            return render_template('index.html')
+        else:
+            return redirect(url_for('genotype.dashboard'))
 
     # configure app
     app.config['SECRET_KEY'] = 'testing'

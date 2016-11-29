@@ -20,12 +20,10 @@ genotype_bp = Blueprint('genotype', __name__, template_folder='templates',
                         static_url_path='/static/genotype')
 
 
-@genotype_bp.route('/')
-def index():
+@genotype_bp.route('/dashboard')
+@login_required
+def dashboard():
     """Display all samples."""
-    if not current_user.is_authenticated:
-        return render_template('genotype/index.html')
-
     pending, failing = api.pending(), api.failing()
     return render_template('genotype/dashboard.html', pending=pending,
                            failing=failing, query=request.args.get('query'))
@@ -60,7 +58,7 @@ def upload():
         if loaded_analysis:
             flash("added: {}".format(analysis.sample.id), 'info')
 
-    return redirect(url_for('.index'))
+    return redirect(url_for('.dashboard'))
 
 
 @genotype_bp.route('/check', methods=['POST'])
@@ -74,7 +72,7 @@ def check(sample_id=None):
     else:
         # fetch all pending samples
         samples = api.pending()
-        url = url_for('.index')
+        url = url_for('.dashboard')
 
     for sample in samples:
         cutoffs = dict(max_nocalls=current_app.config['TABOO_MAX_NOCALLS'],
@@ -157,7 +155,7 @@ def delete_sample(sample_id):
     sample_obj.delete()
     flash("delete sample: {}".format(sample_obj.id), 'info')
     db.commit()
-    return redirect(url_for('.index'))
+    return redirect(url_for('.dashboard'))
 
 
 def sample_or_404(sample_id):
