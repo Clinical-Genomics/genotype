@@ -69,7 +69,7 @@ def view(context, sample_id):
 @click.option('-m', '--missing',
               type=click.Choice(['sex', 'genotype', 'sequence']))
 @click.option('-p', '--plate', help='list all samples on a plate')
-@click.option('--no-status', help='only report samples without status')
+@click.option('--no-status', is_flag=True, help='list samples without status')
 @click.pass_context
 def ls(context, since, limit, offset, missing, plate, no_status):
     """List samples from the database."""
