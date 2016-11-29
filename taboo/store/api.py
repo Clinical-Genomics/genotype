@@ -98,6 +98,15 @@ def sample(sample_id, notfound_cb=None):
     return sample_obj
 
 
+def samples(plate_id=None):
+    """List samples in the database."""
+    query = Sample.query
+    if plate_id:
+        query = (query.join(Sample.analyses)
+                      .filter(Analysis.source.like("%{}\_%".format(plate_id))))
+    return query
+
+
 def plates(db):
     """Return the plate ids loaded in the database."""
     query = (db.query(Analysis.source).distinct()

@@ -66,19 +66,24 @@ def view(context, sample_id):
 @click.option('-s', '--since', help='return analysis since date')
 @click.option('-l', '--limit', default=20)
 @click.option('-o', '--offset', default=0)
-@click.option('-m', '--missing', required=True,
+@click.option('-m', '--missing',
               type=click.Choice(['sex', 'genotype', 'sequence']))
+@click.option('-p', '--plate', help='list all samples on a plate')
 @click.pass_context
-def ls(context, since, limit, offset, missing):
+def ls(context, since, limit, offset, missing, plate):
     """List samples from the database."""
-    date_obj = build_date(since) if since else None
-    if missing == 'sex':
-        query = api.missing_sex(since=date_obj)
-    else:
-        session = context.obj['db'].session
-        query = api.missing_genotypes(session, missing, since=date_obj)
+    query = api.samples(plate_id=plate)
 
-    query = query.offset(offset).limit(limit) if since is None else query
+    if missing:
+        date_obj = build_date(since) if since else None
+        if missing == 'sex':
+            query = api.missing_sex(since=date_obj)
+        else:
+            session = context.obj['db'].session
+            query = api.missing_genotypes(session, missing, since=date_obj)
+
+        query = query.offset(offset).limit(limit) if since is None else query
+
     # sex queries Sample table, genotypes queries Analysis table
     id_key = 'id' if missing == 'sex' else 'sample_id'
     for record in query:
