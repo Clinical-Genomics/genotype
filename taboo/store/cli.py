@@ -72,7 +72,7 @@ def view(context, sample_id):
 @click.pass_context
 def ls(context, since, limit, offset, missing, plate):
     """List samples from the database."""
-    query = api.samples(plate_id=plate)
+    query = api.analyses(plate_id=plate)
 
     if missing:
         date_obj = build_date(since) if since else None
@@ -85,7 +85,7 @@ def ls(context, since, limit, offset, missing, plate):
         query = query.offset(offset).limit(limit) if since is None else query
 
     # sex queries Sample table, genotypes queries Analysis table
-    id_key = 'id' if missing == 'sex' else 'sample_id'
+    id_key = 'id' if (plate or missing == 'sex') else 'sample_id'
     for record in query:
         sample_id = getattr(record, id_key)
         click.echo(sample_id)
