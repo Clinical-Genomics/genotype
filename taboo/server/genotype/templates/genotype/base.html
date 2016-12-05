@@ -36,6 +36,7 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 {% block navbar_items %}
+                    <li><a href="{{ url_for('genotype.plates') }}">Plates</a></li>
                     <li><a href="{{ url_for('genotype.samples') }}">Samples</a></li>
                     <li><a href="{{ url_for('genotype.missing', data='sequence') }}">Missing</a></li>
                 {% endblock %}

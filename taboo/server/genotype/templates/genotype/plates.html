@@ -1,0 +1,44 @@
+{% extends "genotype/base.html" %}
+
+{% block title %}
+    {{ super() }} - Plates
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">Plates</div>
+
+            <ul class="list-group">
+                {% for plate in plates %}
+                    {{ plate_item(plate) }}
+                {% else %}
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <li class="list-group-item">{{ message }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% macro plate_item(plate) %}
+    {% if plate.signed_by %}
+        {% set bg_class = 'list-group-item-success' %}
+    {% else %}
+        {% set bg_class = None %}
+    {% endif %}
+    <li class="list-group-item {{ bg_class if bg_class }}">
+        <a href="{{ url_for('genotype.plate', plate_id=plate.plate_id) }}">
+            {{ plate.plate_id }}
+        </a>
+
+        {% if plate.signed_by %}
+            <span class="badge">{{ plate.signed_by.first_name }}</span>
+        {% endif %}
+    </li>
+{% endmacro %}

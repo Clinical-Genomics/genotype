@@ -99,6 +99,7 @@ class Analysis(Model):
     sex = Column(types.Enum(*SEXES))
     sample_id = Column(types.String(32), ForeignKey('sample.id'))
     created_at = Column(types.DateTime, default=datetime.now)
+    plate_id = Column(ForeignKey('plate.id'))
 
     genotypes = relationship('Genotype', order_by='Genotype.rsnumber',
                              cascade='all,delete', backref='analysis')
@@ -213,4 +214,20 @@ class SNP(Model):
 
 class User(Model, UserManagementMixin):
 
-    pass
+    plates = relationship('Plate', backref='user')
+
+
+class Plate(Model):
+
+    """Describe a MAF plate of samples and it's status."""
+
+    id = Column(types.Integer, primary_key=True)
+    created_at = Column(types.DateTime, default=datetime.now)
+    plate_id = Column(types.String(16), unique=True, nullable=False)
+
+    signed_by = Column(ForeignKey('user.id'))
+    signed_at = Column(types.DateTime)
+    method_document = Column(types.Integer, default=1477)
+    method_version = Column(types.Integer)
+
+    analyses = relationship('Analysis', backref='plate')
