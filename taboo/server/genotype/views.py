@@ -9,9 +9,10 @@ from werkzeug import secure_filename
 
 from taboo.match.core import check_sample
 from taboo.load.excel import load_excel
-from taboo.store.models import Analysis, Sample
+from taboo.store.models import Analysis, Sample, Plate
 from taboo.server.ext import db
 from taboo.store import api
+from taboo.load.plate import extract_plateid
 
 
 logger = logging.getLogger(__name__)
@@ -51,12 +52,16 @@ def upload():
                                   filename)
         req_file.save(excel_path)
 
+    plate_id = extract_plateid(excel_path)
+    new_plate = Plate(plate_id=plate_id)
     analyses = load_excel(filename, req_file.stream.read(),
                           include_key=include_key)
     for analysis in analyses:
         loaded_analysis = api.add_analysis(db, analysis, replace=True)
         if loaded_analysis:
             flash("added: {}".format(analysis.sample.id), 'info')
+            new_plate.analyses.append(analysis)
+    db.commit()
 
     return redirect(url_for('.dashboard'))
 
@@ -144,7 +149,7 @@ def samples():
     page = int(request.args.get('page', 1))
     page = sample_q.paginate(page, per_page=per_page)
     return render_template('genotype/samples.html', samples=page,
-                           req_args=req_args, plates=api.plates(db))
+                           req_args=req_args, plates=api.plates())
 
 
 @genotype_bp.route('/samples/<sample_id>/delete', methods=['POST'])
@@ -177,3 +182,26 @@ def missing(data):
     page_no = int(request.args.get('page', 1))
     page = query.paginate(page_no, per_page=per_page)
     return render_template('genotype/missing.html', samples=page, missing=data)
+
+
+@genotype_bp.route('/plates')
+@login_required
+def plates():
+    """List all added plates with status."""
+    plate_query = api.plates()
+    return render_template('genotype/plates.html', plates=plate_query)
+
+
+@genotype_bp.route('/plates/<plate_id>')
+@login_required
+def plate(plate_id):
+    """Provide details about a plate and option to sign off."""
+    plate_obj = api.plate(plate_id)
+    return render_template('genotype/plate.html', plate=plate_obj)
+
+
+@genotype_bp.route('/plates/<plate_id>/sign-off', methods=['POST'])
+@login_required
+def sign_off(plate_id):
+    """Sign off on a plate that it's complete."""
+    return redirect(request.referrer)

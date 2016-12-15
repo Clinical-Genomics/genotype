@@ -1,0 +1,41 @@
+{% extends "genotype/base.html" %}
+{% from "genotype/utils.html" import sample_item %}
+
+{% block title %}
+    {{ super() }} - Plate - {{ plate.plate_id }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">Plate: {{ plate.plate_id }}</h4>
+            </div>
+            {% if plate.signed_by %}
+                <div class="panel-body">
+                    Plate signed complete by {{ plate.signed_by.name }}
+                    on {{ plate.signed_at.date() }}.
+                </div>
+            {% endif %}
+            <ul class="list-group">
+                {% for analysis in plate.analyses %}
+                    {{ sample_item(analysis.sample) }}
+                {% endfor %}
+            </ul>
+            {% if not plate.signed_by %}
+                <div class="panel-footer">
+                    <form class="form-inline" action="{{ url_for('genotype.sign_off', plate_id=plate.plate_id) }}" method="POST">
+                        <div class="form-group">
+                            <label>Method document</label>
+                            <input name="method_document" type="number" min="0" step="1" value="{{ plate.method_document }}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <input name="method_version" type="number" min="0" step="1" class="form-control" placeholder="Method version" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sign off as {{ current_user.first_name }}</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

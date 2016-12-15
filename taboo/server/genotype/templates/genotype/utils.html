@@ -1,0 +1,31 @@
+{% macro sample_item(sample) %}
+    {% if sample.status == 'pass' %}
+        {% set bg_class = 'list-group-item-success' %}
+    {% elif sample.status == 'fail' %}
+        {% set bg_class = 'list-group-item-danger' %}
+    {% elif sample.status == 'cancel' %}
+        {% set bg_class = 'list-group-item-warning' %}
+    {% else %}
+        {% set bg_class = None %}
+    {% endif %}
+    <li class="list-group-item {{ bg_class if bg_class }}">
+        <div class="row">
+            <div class="col-xs-10">
+                <a href="{{ url_for('genotype.sample', sample_id=sample.id) }}">
+                    {{ sample.id }}
+                </a>
+                {% if sample.comment %}
+                    <span class="glyphicon glyphicon-comment"></span>
+                {% endif %}
+            </div>
+
+            <div class="col-xs-2">
+                <form action="{{ url_for('genotype.delete_sample', sample_id=sample.id) }}" method="POST" accept-charset="utf-8">
+                    <button class="btn btn-primary btn-xs pull-right" type="submit">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </li>
+{% endmacro %}

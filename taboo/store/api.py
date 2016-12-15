@@ -5,7 +5,7 @@ import os
 from alchy import Manager
 from sqlalchemy import func, or_
 
-from taboo.store.models import Analysis, Model, Sample, SNP
+from taboo.store.models import Analysis, Model, Sample, SNP, Plate
 
 log = logging.getLogger(__name__)
 
@@ -109,13 +109,16 @@ def samples(plate_id=None, no_status=False):
     return query
 
 
-def plates(db):
+def plates():
     """Return the plate ids loaded in the database."""
-    query = (db.query(Analysis.source).distinct()
-                                      .filter_by(type='genotype'))
-    all_plates = [(os.path.basename(analysis.source), analysis.source)
-                  for analysis in query]
-    return all_plates
+    query = Plate.query
+    return query
+
+
+def plate(plate_id):
+    """Return the plate with the given id."""
+    query = Plate.query.filter_by(plate_id=plate_id)
+    return query.first()
 
 
 def delete_analysis(db, old_analysis, log=True):
