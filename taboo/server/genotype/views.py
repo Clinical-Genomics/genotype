@@ -119,10 +119,11 @@ def update_status(sample_id):
 def samples():
     """Search for a sample in the database."""
     sample_q = Sample.query
-    source_id = request.args.get('plate')
-    if source_id:
+    plate_id = request.args.get('plate')
+    if plate_id:
+        plate_pattern = "%/{}\_%".format(plate_id)
         sample_q = (sample_q.join(Sample.analyses)
-                            .filter(Analysis.source == source_id))
+                            .filter(Analysis.source.like(plate_pattern)))
 
     if 'incomplete' in request.args:
         sample_q = api.incomplete(query=sample_q)

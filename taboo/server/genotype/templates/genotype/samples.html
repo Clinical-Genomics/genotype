@@ -71,9 +71,9 @@
                 <div class="col-xs-6">
                     <select class="form-control" name="plate">
                         <option value="">Select MAF plate</option>
-                        {% for name, source in plates %}
-                            <option value="{{ source }}" {% if req_args.plate == source %}selected{% endif %}>
-                                {{ name }}
+                        {% for plate in plates %}
+                            <option value="{{ plate.plate_id }}" {% if req_args.plate == plate.plate_id %}selected{% endif %}>
+                                {{ plate.plate_id }}
                             </option>
                         {% endfor %}
                     </select>
