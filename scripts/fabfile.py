@@ -4,7 +4,7 @@ from fabric.utils import puts
 
 env.use_ssh_config = True
 
-APP_NAME = 'taboo'
+APP_NAME = 'genotype'
 
 
 def update():

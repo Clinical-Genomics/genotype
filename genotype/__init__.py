@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-taboo
+genotype
 ~~~~~
 Taboo is a tool for comparing genotypes from different assays.
 
@@ -10,17 +10,9 @@ Taboo is a tool for comparing genotypes from different assays.
 import logging
 from pkg_resources import get_distribution, DistributionNotFound
 
-# Generate your own AsciiArt at:
-# patorjk.com/software/taag/#f=Calvin%20S&t=Taboo ID Typing Pipeline
-__banner__ = r"""
-╔╦╗┌─┐┌┐ ┌─┐┌─┐
- ║ ├─┤├┴┐│ ││ │  by Robin Andeer
- ╩ ┴ ┴└─┘└─┘└─┘
-"""
-
-__title__ = 'taboo'
+__title__ = 'genotype'
 __summary__ = 'tool for comparing genotypes from different assays.'
-__uri__ = 'https://github.com/Clinical-Genomics/taboo'
+__uri__ = 'https://github.com/Clinical-Genomics/genotype'
 
 try:
     __version__ = get_distribution(__title__).version

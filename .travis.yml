@@ -34,7 +34,7 @@ install:
 
 script:
   # command to run tests and collect test coverage
-  - coverage run --source taboo setup.py test
+  - coverage run --source genotype setup.py test
 
 after_success:
   coveralls

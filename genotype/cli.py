@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-taboo.cli
+genotype.cli
 ~~~~~~~~~~~
 Command line interface (console entry points). Based on Click_.
 
@@ -14,9 +14,9 @@ import pkg_resources
 import click
 import yaml
 
-from taboo import __title__, __version__
-from taboo.log import init_log
-from taboo.store import api
+from genotype import __title__, __version__
+from genotype.log import init_log
+from genotype.store import api
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class EntryPointsCLI(click.MultiCommand):
     def _iter_commands(self):
         """Iterate over all subcommands as defined by the entry point."""
         return {entry_point.name: entry_point for entry_point in
-                pkg_resources.iter_entry_points('taboo.subcommands.2')}
+                pkg_resources.iter_entry_points('genotype.subcommands.2')}
 
     def list_commands(self, ctx):
         """List the available commands."""
@@ -45,7 +45,7 @@ class EntryPointsCLI(click.MultiCommand):
 
 
 @click.group(cls=EntryPointsCLI)
-@click.option('-c', '--config', default='~/.taboo.yaml',
+@click.option('-c', '--config', default='~/.genotype.yaml',
               type=click.Path(), help='path to config file')
 @click.option('-d', '--database', help='path/URI of the SQL database')
 @click.option('-l', '--log-level', default='INFO')

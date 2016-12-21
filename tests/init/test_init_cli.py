@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from taboo.store.models import Sample, SNP
+from genotype.store.models import Sample, SNP
 
 
 def test_init(invoke_cli, existing_db, snp_path, snp_sequence):

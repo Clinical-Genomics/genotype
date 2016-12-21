@@ -4,9 +4,9 @@ import logging
 
 import xlrd
 
-from taboo.compat import zip
-from taboo.exc import SexConflictError
-from taboo.store.models import Analysis, Genotype
+from genotype.compat import zip
+from genotype.exc import SexConflictError
+from genotype.store.models import Analysis, Genotype
 
 log = logging.getLogger(__name__)
 

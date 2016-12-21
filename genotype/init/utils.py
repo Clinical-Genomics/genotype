@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from taboo.store.models import SNP
+from genotype.store.models import SNP
 
 
 def read_snps(sequence):

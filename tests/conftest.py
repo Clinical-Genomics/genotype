@@ -6,10 +6,10 @@ from click.testing import CliRunner
 import cyvcf2
 import pytest
 
-from taboo.cli import root
-from taboo.init.utils import read_snps
-from taboo.store import api
-from taboo.store.models import SNP, Genotype, Sample, Analysis
+from genotype.cli import root
+from genotype.init.utils import read_snps
+from genotype.store import api
+from genotype.store.models import SNP, Genotype, Sample, Analysis
 
 
 @pytest.fixture
@@ -51,20 +51,20 @@ def vcf(bcf_path):
 
 
 @pytest.yield_fixture(scope='function')
-def taboo_db():
-    _taboo_db = api.connect('sqlite://')
-    _taboo_db.create_all()
-    yield _taboo_db
-    _taboo_db.drop_all()
+def genotype_db():
+    _genotype_db = api.connect('sqlite://')
+    _genotype_db.create_all()
+    yield _genotype_db
+    _genotype_db.drop_all()
 
 
 @pytest.yield_fixture(scope='function')
 def existing_db(tmpdir):
     db_path = "sqlite:///{}".format(tmpdir.join('coverage.sqlite3'))
-    taboo_db = api.connect(db_path)
-    taboo_db.create_all()
-    yield taboo_db
-    taboo_db.drop_all()
+    genotype_db = api.connect(db_path)
+    genotype_db.create_all()
+    yield genotype_db
+    genotype_db.drop_all()
 
 
 @pytest.yield_fixture(scope='function')
@@ -78,12 +78,12 @@ def setexist_db(existing_db, snp_sequence, sample):
 
 
 @pytest.yield_fixture(scope='function')
-def sample_db(taboo_db, snp_sequence):
+def sample_db(genotype_db, snp_sequence):
     snp_records = read_snps(snp_sequence)
-    taboo_db.add_commit(*snp_records)
-    yield taboo_db
-    taboo_db.drop_all()
-    taboo_db.create_all()
+    genotype_db.add_commit(*snp_records)
+    yield genotype_db
+    genotype_db.drop_all()
+    genotype_db.create_all()
 
 
 @pytest.fixture

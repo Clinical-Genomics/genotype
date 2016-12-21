@@ -58,7 +58,7 @@ with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
-    name='taboo',
+    name='genotype',
 
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
@@ -69,13 +69,13 @@ setup(
                  "genotypes from different assays."),
     long_description=long_description,
     # What does your project relate to? Separate with spaces.
-    keywords='taboo development',
+    keywords='genotype development',
     author='Robin Andeer',
     author_email='robin.andeer@scilifelab.se',
     license='MIT',
 
     # The project's main homepage
-    url='https://github.com/robinandeer/taboo',
+    url='https://github.com/robinandeer/genotype',
 
     packages=find_packages(exclude=('tests*', 'docs', 'examples')),
 
@@ -83,7 +83,7 @@ setup(
     # installed, specify them here.
     include_package_data=True,
     package_data={
-        'taboo': [
+        'genotype': [
             'server/genotype/templates/genotype/*.html',
         ]
     },
@@ -110,20 +110,20 @@ setup(
     # target platform.
     entry_points={
         'console_scripts': [
-            'taboo = taboo.cli:root',
+            'genotype = genotype.cli:root',
         ],
-        'taboo.subcommands.2': [
-            'init = taboo.init.cli:init',
-            'load = taboo.load.cli:load',
-            'add-sex = taboo.store.cli:add_sex',
-            'mip-sex = taboo.store.cli:mip_sex',
-            'view = taboo.store.cli:view',
-            'match = taboo.match.cli:match',
-            'check = taboo.match.cli:check',
-            'delete = taboo.load.cli:delete',
-            'serve = taboo.server.cli:serve',
-            'ls = taboo.store.cli:ls',
-            'sample = taboo.store.cli:sample',
+        'genotype.subcommands.2': [
+            'init = genotype.init.cli:init',
+            'load = genotype.load.cli:load',
+            'add-sex = genotype.store.cli:add_sex',
+            'mip-sex = genotype.store.cli:mip_sex',
+            'view = genotype.store.cli:view',
+            'match = genotype.match.cli:match',
+            'check = genotype.match.cli:check',
+            'delete = genotype.load.cli:delete',
+            'serve = genotype.server.cli:serve',
+            'ls = genotype.store.cli:ls',
+            'sample = genotype.store.cli:sample',
         ]
     },
 

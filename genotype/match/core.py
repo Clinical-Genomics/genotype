@@ -2,7 +2,7 @@
 from collections import namedtuple, Counter
 import logging
 
-from taboo.compat import zip
+from genotype.compat import zip
 
 log = logging.getLogger(__name__)
 Result = namedtuple('Result', ['match', 'mismatch', 'unknown'])

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from taboo.store.models import Analysis, Sample
+from genotype.store.models import Analysis, Sample
 
 
 def test_add_sex(invoke_cli, setexist_db):

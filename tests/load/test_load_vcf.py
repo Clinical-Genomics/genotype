@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from taboo.load import vcf as vcf_mod
-from taboo.store.models import Analysis
+from genotype.load import vcf as vcf_mod
+from genotype.store.models import Analysis
 
 
 def test_load_vcf(bcf_path, snps):

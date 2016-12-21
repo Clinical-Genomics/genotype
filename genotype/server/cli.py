@@ -3,8 +3,8 @@ import logging
 
 import click
 
-from taboo.compat import iteritems
-from taboo.server import create_app
+from genotype.compat import iteritems
+from genotype.server import create_app
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 @click.pass_context
 def serve(context, debug, port, host):
     """Start up the web interface."""
-    flask_config = {"TABOO_{}".format(key.upper()): value for key, value
+    flask_config = {"GENOTYPE_{}".format(key.upper()): value for key, value
                     in iteritems(context.obj)}
     flask_config['SQLALCHEMY_DATABASE_URI'] = context.obj['database']
     flask_config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

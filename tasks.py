@@ -17,7 +17,7 @@ def clean():
     """clean - remove build artifacts."""
     run('rm -rf build/')
     run('rm -rf dist/')
-    run('rm -rf taboo.egg-info')
+    run('rm -rf genotype.egg-info')
     run('find . -name __pycache__ -delete')
     run('find . -name *.pyc -delete')
     run('find . -name *.pyo -delete')
@@ -28,13 +28,13 @@ def clean():
 @task
 def lint():
     """lint - check style with flake8."""
-    run('flake8 taboo tests')
+    run('flake8 genotype tests')
 
 
 @task
 def coverage():
     """coverage - check code coverage quickly with the default Python."""
-    run('coverage run --source taboo setup.py test')
+    run('coverage run --source genotype setup.py test')
     run('coverage report -m')
     run('coverage html')
     run('open htmlcov/index.html')

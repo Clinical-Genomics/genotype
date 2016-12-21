@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from taboo.init import utils
+from genotype.init import utils
 
 
 def test_read_snp(snp_sequence):

@@ -4,8 +4,8 @@ from collections import namedtuple
 
 from cyvcf2 import VCF
 
-from taboo.compat import itervalues
-from taboo.store.models import Analysis, Genotype
+from genotype.compat import itervalues
+from genotype.store.models import Analysis, Genotype
 
 Result = namedtuple('Result', ['sample', 'genotypes'])
 RawGenotype = namedtuple('RawGenotype', ['sample', 'allele_1', 'allele_2'])

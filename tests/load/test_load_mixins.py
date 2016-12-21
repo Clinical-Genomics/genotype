@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from taboo.store import api
-from taboo.store.models import Analysis, Genotype, Sample
+from genotype.store import api
+from genotype.store.models import Analysis, Genotype, Sample
 
 
 def test_add_analysis(sample_db):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from taboo.match import core
-from taboo.store.models import Analysis, Genotype
+from genotype.match import core
+from genotype.store.models import Analysis, Genotype
 
 
 def test_compare_genotypes(genotypes):

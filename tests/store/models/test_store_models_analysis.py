@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import pytest
-
-from taboo.store.models import Analysis
+from genotype.store.models import Analysis
 
 
 def test___str__():

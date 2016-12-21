@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from path import Path
 
-from taboo.store.models import Plate
+from genotype.store.models import Plate
 
 
 def extract_plateid(excel_path):

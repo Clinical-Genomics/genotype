@@ -2,8 +2,8 @@
 import pytest
 import xlrd
 
-from taboo.exc import SexConflictError
-from taboo.load import excel
+from genotype.exc import SexConflictError
+from genotype.load import excel
 
 
 def test_parse_sex():

@@ -5,8 +5,8 @@ import logging
 import click
 import yaml
 
-from taboo.store import api
-from taboo.constants import SEXES, TYPES
+from genotype.store import api
+from genotype.constants import SEXES, TYPES
 from .parsemip import parse_mipsex
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 @click.pass_context
 def add_sex(context, sample, analysis, sample_id):
     """Add sex determination to samples and analyses."""
-    taboo_db = context.obj['db']
+    genotype_db = context.obj['db']
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
     if sample:
         log.info("marking sample '%s' as '%s'", sample_id, sample)
@@ -34,7 +34,7 @@ def add_sex(context, sample, analysis, sample_id):
             analysis_obj.sex = sex
         else:
             log.warn("analysis not found: %s-%s", sample_id, analysis_type)
-    taboo_db.commit()
+    genotype_db.commit()
 
 
 @click.command('mip-sex')

@@ -7,12 +7,12 @@ from flask import (abort, Blueprint, current_app, flash, redirect,
 from flask_login import login_required
 from werkzeug import secure_filename
 
-from taboo.match.core import check_sample
-from taboo.load.excel import load_excel
-from taboo.store.models import Analysis, Sample, Plate
-from taboo.server.ext import db
-from taboo.store import api
-from taboo.load.plate import extract_plateid
+from genotype.match.core import check_sample
+from genotype.load.excel import load_excel
+from genotype.store.models import Analysis, Sample, Plate
+from genotype.server.ext import db
+from genotype.store import api
+from genotype.load.plate import extract_plateid
 
 
 logger = logging.getLogger(__name__)
@@ -42,13 +42,13 @@ def sample(sample_id):
 @login_required
 def upload():
     """Upload an Excel report file from MAF."""
-    include_key = current_app.config['TABOO_INCLUDE_KEY']
+    include_key = current_app.config['GENOTYPE_INCLUDE_KEY']
     req_file = request.files['excel']
     filename = secure_filename(req_file.filename)
     if not req_file or not filename.endswith('.xlsx'):
         return abort(500, 'Please select an Excel book for upload')
-    if not current_app.config.get('TABOO_NO_SAVE'):
-        excel_path = os.path.join(current_app.config['TABOO_GENOTYPE_DIR'],
+    if not current_app.config.get('GENOTYPE_NO_SAVE'):
+        excel_path = os.path.join(current_app.config['GENOTYPE_GENOTYPE_DIR'],
                                   filename)
         req_file.save(excel_path)
 
@@ -80,9 +80,9 @@ def check(sample_id=None):
         url = url_for('.dashboard')
 
     for sample in samples:
-        cutoffs = dict(max_nocalls=current_app.config['TABOO_MAX_NOCALLS'],
-                       max_mismatch=current_app.config['TABOO_MAX_MISMATCH'],
-                       min_matches=current_app.config['TABOO_MIN_MATCHES'],)
+        cutoffs = dict(max_nocalls=current_app.config['GENOTYPE_MAX_NOCALLS'],
+                       max_mismatch=current_app.config['GENOTYPE_MAX_MISMATCH'],
+                       min_matches=current_app.config['GENOTYPE_MIN_MATCHES'],)
         results = check_sample(sample, **cutoffs)
         sample.status = 'fail' if 'fail' in results.values() else 'pass'
     db.commit()

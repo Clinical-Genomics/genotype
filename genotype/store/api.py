@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
-import os
 
 from alchy import Manager
 from sqlalchemy import func, or_
 
-from taboo.store.models import Analysis, Model, Sample, SNP, Plate
+from genotype.store.models import Analysis, Model, Sample, SNP, Plate
 
 log = logging.getLogger(__name__)
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import pytest
-
-from taboo.store.models import Sample
+from genotype.store.models import Sample
 
 
 SAMPLE = Sample(id='ADM12')

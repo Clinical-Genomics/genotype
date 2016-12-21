@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from taboo.exc import UnknownAllelesError
+from genotype.exc import UnknownAllelesError
 
 
 def test_Genotype_alleles(genotypes):

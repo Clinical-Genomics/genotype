@@ -46,6 +46,7 @@ TRASH*
 *.tar.gz
 .vagrant
 _DEVELOP/
+alembic.ini
 
 # SublimeText: workspace files are user-specific
 *.sublime-workspace
@@ -61,8 +62,3 @@ output/*/index.html
 # Docs
 docs/_build
 _book/
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml

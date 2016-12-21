@@ -4,9 +4,9 @@ import math
 
 import click
 
-from taboo.constants import TYPES
-from taboo.store.models import Analysis
-from taboo.store import api
+from genotype.constants import TYPES
+from genotype.store.models import Analysis
+from genotype.store import api
 from .core import compare_analyses
 
 log = logging.getLogger(__name__)

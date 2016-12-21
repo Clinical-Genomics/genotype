@@ -9,9 +9,9 @@ from sqlalchemy import Column, ForeignKey, types
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
 
-from taboo.constants import SEXES, TYPES
-from taboo.exc import UnknownAllelesError, InsufficientAnalysesError
-from taboo.match.core import compare_analyses
+from genotype.constants import SEXES, TYPES
+from genotype.exc import UnknownAllelesError, InsufficientAnalysesError
+from genotype.match.core import compare_analyses
 
 
 def json_serial(obj):

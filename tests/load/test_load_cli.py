@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from taboo.store.models import Analysis, SNP, Sample
+from genotype.store.models import Analysis, SNP, Sample
 
 
 def test_load_bcf(invoke_cli, bcf_path, setexist_db):
