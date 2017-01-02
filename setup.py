@@ -51,6 +51,7 @@ class PyTest(TestCommand):
         import pytest
         sys.exit(pytest.main(self.test_args))
 
+
 # Get the long description from the relevant file
 here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
@@ -63,7 +64,7 @@ setup(
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
     # see http://packaging.python.org/en/latest/tutorial.html#version
-    version='2.0.0-beta5',
+    version='2.0.0',
 
     description=("Taboo provides an automated pipipeline for comparing"
                  "genotypes from different assays."),
