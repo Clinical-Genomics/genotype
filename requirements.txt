@@ -12,4 +12,4 @@ Flask-Bootstrap
 Flask-Alchy
 werkzeug
 Flask-Login
-Housekeeper>=1.1.0
+Housekeeper>=1.0.0
