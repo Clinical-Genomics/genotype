@@ -4,7 +4,7 @@ import logging
 import click
 
 from genotype.compat import iteritems
-from genotype.server import create_app
+from genotype.server.app import create_app
 
 log = logging.getLogger(__name__)
 

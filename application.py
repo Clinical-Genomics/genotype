@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from genotype.server import create_app
+from genotype.server.app import create_app
 
 config = {
     'GENOTYPE_INCLUDE_KEY': '-CG-',
