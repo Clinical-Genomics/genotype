@@ -7,7 +7,7 @@ from flask_bootstrap import Bootstrap
 from werkzeug.contrib.fixers import ProxyFix
 
 from .ext import db, user
-from .genotype.views import genotype_bp
+from .genotypebp import genotype_bp
 
 
 def create_app(config_obj):
