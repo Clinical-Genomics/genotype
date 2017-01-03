@@ -116,29 +116,27 @@
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <tbody>
+                        {% for analysis in sample.analyses %}
+                            <tr>
+                                <th>{{ analysis.type|capitalize }}</th>
+                                {% for genotype in analysis.genotypes %}
+                                    <td>{{ genotype.stringify() }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
                         {% if sample.analyses|length == 2 %}
                             <tr>
                                 {% for gt1, gt2, result in sample.genotype_comparisons() %}
                                     {% if result == 'unknown' %}
-                                        {% set bg_class = 'default' %}
+                                        <td>🤷</td>
                                     {% elif result == 'match' %}
-                                        {% set bg_class = 'success' %}
+                                        <td class="bg-success">👍</td>
                                     {% else %}
-                                        {% set bg_class = 'warning' %}
+                                        <td class="bg-warning">👎</td>
                                     {% endif %}
-                                    <td class="bg-{{ bg_class }}">{{ gt1.stringify() }} | {{ gt2.stringify() }}</td>
                                 {% endfor %}
                             </tr>
                         {% else %}
-                            {% for analysis in sample.analyses %}
-                                <tr>
-                                    <th>{{ analysis.type|capitalize }}</th>
-                                    {% for genotype in analysis.genotypes %}
-                                        <td>{{ genotype.stringify() }}</td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
                     </tbody>
                 </table>
             </div>
