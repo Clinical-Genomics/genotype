@@ -126,6 +126,7 @@
                         {% endfor %}
                         {% if sample.analyses|length == 2 %}
                             <tr>
+                                <td></td>
                                 {% for gt1, gt2, result in sample.genotype_comparisons() %}
                                     {% if result == 'unknown' %}
                                         <td>🤷</td>
