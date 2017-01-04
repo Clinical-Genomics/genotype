@@ -52,7 +52,7 @@ def upload():
                                   filename)
         req_file.save(excel_path)
 
-    plate_id = extract_plateid(excel_path)
+    plate_id = extract_plateid(filename)
     new_plate = Plate(plate_id=plate_id)
     analyses = load_excel(filename, req_file.stream.read(),
                           include_key=include_key)
