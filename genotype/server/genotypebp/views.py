@@ -53,6 +53,12 @@ def upload():
         req_file.save(excel_path)
 
     plate_id = extract_plateid(filename)
+    # check existing plates
+    existing_plate = Plate.query.filter_by(plate_id=plate_id).first()
+    if existing_plate:
+        flash("plate already uploaded: {}".format(plate_id))
+        return redirect(url_for('.dashboard'))
+
     new_plate = Plate(plate_id=plate_id)
     analyses = load_excel(filename, req_file.stream.read(),
                           include_key=include_key)
