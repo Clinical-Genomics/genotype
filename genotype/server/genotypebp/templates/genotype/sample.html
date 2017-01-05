@@ -30,7 +30,19 @@
         <form action="{{ url_for('genotype.update', sample_id=sample.id) }}" method="POST">
             <div class="panel panel-default">
                 <div class="panel-heading">{{ sample.id }}</div>
-                
+                {% set gt_analysis = sample.analysis('genotype') %}
+                {% if gt_analysis %}
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            Plate
+                            <span class="pull-right">
+                                <a href="{{ url_for('genotype.plate', plate_id=gt_analysis.plate_id) }}">
+                                    {{ gt_analysis.plate.plate_id }}
+                                </a>
+                            </span>
+                        </li>
+                    </ul>
+                {% endif %}
                 <table class="table table-bordered">
                     <thead>
                         <tr>
