@@ -34,9 +34,9 @@
                 {% if gt_analysis %}
                     <ul class="list-group">
                         <li class="list-group-item">
-                            Plate
+                            <strong>Plate</strong>
                             <span class="pull-right">
-                                <a href="{{ url_for('genotype.plate', plate_id=gt_analysis.plate_id) }}">
+                                <a href="{{ url_for('genotype.plate', plate_id=gt_analysis.plate.plate_id) }}">
                                     {{ gt_analysis.plate.plate_id }}
                                 </a>
                             </span>

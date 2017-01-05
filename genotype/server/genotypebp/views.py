@@ -204,6 +204,8 @@ def plates():
 def plate(plate_id):
     """Provide details about a plate and option to sign off."""
     plate_obj = api.plate(plate_id)
+    if plate_obj is None:
+        return abort(404, "plate not found: {}".format(plate_id))
     return render_template('genotype/plate.html', plate=plate_obj)
 
 
