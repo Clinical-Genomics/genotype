@@ -13,7 +13,7 @@
             </div>
             {% if plate.signed_by %}
                 <div class="panel-body">
-                    Plate signed complete by {{ plate.signed_by.name }}
+                    Plate signed complete by {{ plate.user.name }}
                     on {{ plate.signed_at.date() }}.
                 </div>
             {% endif %}
