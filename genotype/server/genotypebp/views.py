@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import logging
 import os
 
 from flask import (abort, Blueprint, current_app, flash, redirect,
                    render_template, request, url_for)
-from flask_login import login_required
+from flask_login import login_required, current_user
 from werkzeug import secure_filename
 
 from genotype.match.core import check_sample
@@ -213,4 +214,10 @@ def plate(plate_id):
 @login_required
 def sign_off(plate_id):
     """Sign off on a plate that it's complete."""
-    return redirect(request.referrer)
+    plate_obj = api.plate(plate_id)
+    plate_obj.user = current_user
+    plate_obj.signed_at = datetime.now()
+    plate_obj.method_document = int(request.form['method_document'])
+    plate_obj.method_version = int(request.form['method_version'])
+    db.commit()
+    return redirect(url_for('.plate', plate_id=plate_id))
