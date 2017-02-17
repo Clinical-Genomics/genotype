@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 from collections import Counter
 from datetime import datetime
 import json
@@ -231,3 +232,13 @@ class Plate(Model):
     method_version = Column(types.Integer)
 
     analyses = relationship('Analysis', backref='plate')
+
+    @property
+    def percent_done(self):
+        """Calculate percent of samples completed."""
+        all_samples = self.analyses
+        all_samples_count = len(all_samples)
+        done_samples = [analysis for analysis in all_samples if
+                        analysis.sample.status in ('pass', 'cancel')]
+        done_samples_count = len(done_samples)
+        return done_samples_count / all_samples_count * 100

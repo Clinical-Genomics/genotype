@@ -38,7 +38,7 @@
         </a>
 
         {% if plate.signed_by %}
-            <span class="badge">{{ plate.signed_by.first_name }}</span>
+            <span class="badge">{{ plate.user.first_name }}</span>
         {% endif %}
     </li>
 {% endmacro %}
