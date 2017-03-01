@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def parse_mipsex(qcm_data):
@@ -15,7 +18,10 @@ def parse_samples(qcm_data):
         for sample_id, values in qcm_data['sample'].items():
             for segment_id, data in values.items():
                 if '_lanes_' in segment_id:
-                    yield sample_id, data['chanjo_sexcheck']['gender']
+                    if 'chanjo_sexcheck' in data:
+                        yield sample_id, data['chanjo_sexcheck']['gender']
+                    else:
+                        log.warn("missing chanjo output under: %s", segment_id)
     else:
         # it's a MIP 3 analysis!
         fam_key = list(qcm_data.keys())[0]
