@@ -5,7 +5,7 @@ from datetime import datetime
 import json
 
 from alchy import ModelBase, make_declarative_base
-from housekeeper.server.admin import UserManagementMixin
+from flask_login import UserMixin
 from sqlalchemy import Column, ForeignKey, types
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -213,9 +213,19 @@ class SNP(Model):
     pos = Column(types.Integer)
 
 
-class User(Model, UserManagementMixin):
+class User(Model, UserMixin):
 
+    id = Column(types.Integer, primary_key=True)
+    google_id = Column(types.String(128), unique=True)
+    email = Column(types.String(128), unique=True)
+    name = Column(types.String(128))
+    avatar = Column(types.Text)
     plates = relationship('Plate', backref='user')
+
+    @property
+    def first_name(self):
+        """First part of name."""
+        return self.name.split(' ')[0]
 
 
 class Plate(Model):

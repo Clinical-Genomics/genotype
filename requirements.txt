@@ -12,4 +12,5 @@ Flask-Bootstrap
 Flask-Alchy
 werkzeug
 Flask-Login
-Housekeeper>=1.0.0
+Flask-Dance
+ruamel.yaml
