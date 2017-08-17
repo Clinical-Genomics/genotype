@@ -4,6 +4,7 @@ import logging
 from flask import Flask, render_template, redirect, url_for
 from flask_login import current_user
 from flask_bootstrap import Bootstrap
+from flask_reverse_proxy import FlaskReverseProxied
 from werkzeug.contrib.fixers import ProxyFix
 
 from .ext import db, user
@@ -30,6 +31,7 @@ def create_app(config_obj):
 
     # configure extensions
     Bootstrap(app)
+    FlaskReverseProxied(app)
     db.init_app(app)
     user.init_app(app)
 
