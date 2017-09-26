@@ -9,7 +9,9 @@ pymysql
 # server
 Flask
 Flask-Bootstrap
+Flask-Reverse-Proxy
 Flask-Alchy
 werkzeug
 Flask-Login
-Housekeeper>=1.0.0
+Flask-Dance
+ruamel.yaml

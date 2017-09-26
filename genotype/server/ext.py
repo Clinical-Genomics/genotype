@@ -2,7 +2,7 @@
 from flask_alchy import Alchy
 
 from genotype.store.models import Model, User
-from housekeeper.server.admin import UserManagement
+from .admin import UserManagement
 
 db = Alchy(Model=Model)
 user = UserManagement(db, User)
