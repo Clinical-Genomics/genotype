@@ -16,7 +16,6 @@ config = {
     # user management
     'GOOGLE_OAUTH_CLIENT_ID': os.environ['GOOGLE_OAUTH_CLIENT_ID'],
     'GOOGLE_OAUTH_CLIENT_SECRET': os.environ['GOOGLE_OAUTH_CLIENT_SECRET'],
-    'USER_DATABASE_PATH': os.environ['USER_DATABASE_PATH'],
 }
 
 application = create_app(config_obj=config)
