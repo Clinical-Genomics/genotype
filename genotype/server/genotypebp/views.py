@@ -48,9 +48,8 @@ def upload():
     filename = secure_filename(req_file.filename)
     if not req_file or not filename.endswith('.xlsx'):
         return abort(500, 'Please select an Excel book for upload')
-    if not current_app.config.get('GENOTYPE_NO_SAVE'):
-        excel_path = os.path.join(current_app.config['GENOTYPE_GENOTYPE_DIR'],
-                                  filename)
+    if current_app.config.get('GENOTYPE_GENOTYPE_DIR'):
+        excel_path = os.path.join(current_app.config['GENOTYPE_GENOTYPE_DIR'], filename)
         req_file.save(excel_path)
 
     plate_id = extract_plateid(filename)

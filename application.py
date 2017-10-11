@@ -11,7 +11,6 @@ config = {
     'GENOTYPE_MIN_MATCHES': 35,
     'SQLALCHEMY_DATABASE_URI': os.environ['SQLALCHEMY_DATABASE_URI'],
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-    'GENOTYPE_NO_SAVE': os.environ.get('GENOTYPE_NO_SAVE'),
 
     # user management
     'GOOGLE_OAUTH_CLIENT_ID': os.environ['GOOGLE_OAUTH_CLIENT_ID'],
