@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def log_result(sample_id, result, hide_fail=False):
     total_snps = api.snps().count()
     cutoff = math.floor(total_snps / 5)
-    if result.get('mismatch') == 0 or result.get('mismatch') <= cutoff:
+    if result.get('mismatch', 0) == 0 or result.get('mismatch', 0) <= cutoff:
         log_func = log.info
     else:
         if hide_fail:
