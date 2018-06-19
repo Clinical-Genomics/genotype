@@ -5,12 +5,15 @@ SQLAlchemy
 cyvcf2
 xlrd
 pymysql
+path.py
 
 # server
 Flask
 Flask-Bootstrap
 Flask-Reverse-Proxy
+Flask-SQLAlchemy==2.1
 Flask-Alchy
+Flask-Security
 werkzeug
 Flask-Login
 Flask-Dance
