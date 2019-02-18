@@ -7,6 +7,9 @@ xlrd
 pymysql
 path.py
 
+bioconda
+pysam
+
 # server
 Flask
 Flask-Bootstrap

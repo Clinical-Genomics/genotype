@@ -1,32 +1,18 @@
 # config file for automatic testing at travis-ci.org
 language: python
 
-notifications:
-    email: never
-
 python:
   - "3.6"
 
+cache: pip
+
 install:
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  # Useful for debugging any issues with conda
-  - conda info -a
+  - pip install -r requirements.txt -r requirements-dev.txt .
 
-  # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
-  - source activate test-environment
-  - conda install -c bioconda pysam
+    - pip check
 
-  # install dependencies
-  - pip install -r requirements-dev.txt
-
-  # install your own package + executables
-  - pip install --editable .
+before_script:
+    - git reset --soft ${TRAVIS_COMMIT_RANGE%...*} && git lint
 
 script:
   # command to run tests and collect test coverage
@@ -34,3 +20,6 @@ script:
 
 after_success:
   coveralls
+
+notifications:
+    email: never
