@@ -12,13 +12,13 @@ install:
   - pip check
 
 before_script:
-    - git reset --soft ${TRAVIS_COMMIT_RANGE%...*} && git lint
+  - git reset --soft ${TRAVIS_COMMIT_RANGE%...*} && git lint
 
 script:
-    - coverage run --source "$(basename "$PWD")" setup.py test
+  - coverage run --source "$(basename "$PWD")" setup.py test
 
 after_success:
   coveralls
 
 notifications:
-    email: never
+  email: never
