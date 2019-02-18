@@ -6,8 +6,6 @@ cyvcf2
 xlrd
 pymysql
 path.py
-
-bioconda
 pysam
 
 # server
