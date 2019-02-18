@@ -78,6 +78,9 @@ class Genotype(Model):
         else:
             return True
 
+    def __hash__(self):
+        return id(self.id)
+
 
 class Analysis(Model):
 
