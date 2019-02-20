@@ -73,22 +73,25 @@ def view(context, sample_id):
 @click.pass_context
 def ls(context, since, limit, offset, missing, plate, no_status):
     """List samples from the database."""
-    query = api.samples(plate_id=plate, no_status=no_status)
+
     if missing:
         date_obj = build_date(since) if since else None
+
         if missing == 'sex':
             query = api.missing_sex(since=date_obj)
         else:
             session = context.obj['db'].session
             query = api.missing_genotypes(session, missing, since=date_obj)
+    else:
+        query = api.samples(plate_id=plate, no_status=no_status)
 
-        query = query.offset(offset).limit(limit) if since is None else query
+    query = query.offset(offset).limit(limit) if since is None else query
 
-    # sex queries Sample table, genotypes queries Analysis table
-    id_key = 'id' if (plate or missing == 'sex') else 'sample_id'
     for record in query:
-        sample_id = getattr(record, id_key)
-        click.echo(sample_id)
+        if hasattr(record, 'sample_id'):
+            click.echo(record.sample_id)
+        else:
+            click.echo(record.id)
 
 
 @click.command()

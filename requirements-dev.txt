@@ -1,5 +1,3 @@
--r ./requirements.txt
-
 bumpversion
 coverage
 coveralls
@@ -12,3 +10,9 @@ sphinx-bootstrap-theme
 sphinxcontrib-napoleon
 ipdb
 ipython
+git-lint
+pylint
+pycodestyle
+yamllint
+docutils
+html-linter

@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 @click.command()
 @click.option('-k', '--include-key', help='prefix for relevant samples')
 @click.option('-f', '--force', is_flag=True)
-@click.argument('input_file', type=click.File())
+@click.argument('input_file', type=click.File('rb'))
 @click.pass_context
 def load(context, include_key, force, input_file):
     """Load data from genotype resources."""

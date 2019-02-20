@@ -2,10 +2,11 @@ click
 PyYAML
 Alchy
 SQLAlchemy
-cyvcf2
+cyvcf2<0.10.0
 xlrd
 pymysql
 path.py
+pysam
 
 # server
 Flask
