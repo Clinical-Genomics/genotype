@@ -61,7 +61,9 @@ class UserManagement(object):
         self.login_manager.init_app(app)
 
     def setup(self):
-        self.blueprint = make_google_blueprint(scope=['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'])
+        self.blueprint = make_google_blueprint(
+            scope=['openid', 'https://www.googleapis.com/auth/userinfo.email'],
+        )
 
         # setup login manager
         self.login_manager = LoginManager()
