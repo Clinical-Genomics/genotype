@@ -23,7 +23,7 @@ def compare(analysis_1, analysis_2):
 
     return compare_dict
 
-def build_sample(sample_id):
+def prepare_trending(sample_id):
     """Build genotype document for the genotype collection in the trending database"""
 
     sample = Sample.query.filter(Sample.id == sample_id).all()
