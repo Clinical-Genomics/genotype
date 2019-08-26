@@ -18,8 +18,8 @@ def compare(analysis_1, analysis_2):
 
     compare_dict = {}
 
-    for snp in analysis_1.keys():
-        if analysis_1[snp] == analysis_2[snp]:
+    for snp in set(list(analysis_1.keys()) + list(analysis_2.keys())):
+        if analysis_1.get(snp) == analysis_2.get(snp):
             compare_dict[snp] = True
         else:
             compare_dict[snp] = False
@@ -30,8 +30,12 @@ def compare(analysis_1, analysis_2):
 def prepare_trending(sample_id):
     """Build genotype document for the genotype collection in the trending database"""
 
-    sample = Sample.query.filter(Sample.id == sample_id).all()
-    analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
+    sample = Sample.query.filter(Sample.id == sample_id).first()
+    analyses = Analysis.query.filter(Analysis.sample_id == sample_id).all()
+
+    if not sample:
+        return {}
+
     genotype_doc = {
                 '_id' : sample.id,
                 'status' : sample.status,
