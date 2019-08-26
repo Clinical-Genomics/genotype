@@ -5,7 +5,7 @@ import logging
 import click
 import yaml
 
-from genotype.store import api
+from genotype.store import api, trending
 from genotype.constants import SEXES, TYPES
 from .parsemip import parse_mipsex
 
@@ -103,6 +103,15 @@ def sample(context, sample_id):
     click.echo(sample_obj.status)
     if sample_obj.status != 'pass':
         context.abort()
+
+
+@click.command('prepare-trending')
+@click.argument('sample_id')
+@click.pass_context
+def prepare_trending(context, sample_id):
+    """Get a sample from the database in mongo doc format."""
+    sample_doc = trending.prepare_trending(sample_id)
+    click.echo(sample_doc)
 
 
 def build_date(date_str):

@@ -125,6 +125,7 @@ setup(
             'serve = genotype.server.cli:serve',
             'ls = genotype.store.cli:ls',
             'sample = genotype.store.cli:sample',
+            'prepare-trending = genotype.store.cli:prepare_trending'
         ]
     },
 
