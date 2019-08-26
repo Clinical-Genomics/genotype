@@ -20,10 +20,10 @@ def test_prepare_trending(genotype_db):
 
     # THEN it should return a document ...
     doc = {'_id': sample_id,
-        'sample_created_in_genotype_db': date_time,
-        'sex': sample_sex,
-        'snps': {},
-        'status': sample_status}
+           'sample_created_in_genotype_db': date_time,
+           'sex': sample_sex,
+           'snps': {},
+           'status': sample_status}
 
     assert genotype_doc == doc
 
@@ -94,3 +94,4 @@ def test_compare_wrong_key():
 
     # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True, 'rs5': False}
+    

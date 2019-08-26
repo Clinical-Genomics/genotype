@@ -1,5 +1,5 @@
+"""Bla bla. What do you want here???"""
 from genotype.store.models import Analysis, Genotype, Sample
-
 
 
 def build_snp_dict(analysis_id):
@@ -37,15 +37,15 @@ def prepare_trending(sample_id):
         return {}
 
     genotype_doc = {
-                '_id' : sample.id,
-                'status' : sample.status,
-                'sample_created_in_genotype_db' : sample.created_at,
-                'sex' : sample.sex}
+                '_id': sample.id,
+                'status': sample.status,
+                'sample_created_in_genotype_db': sample.created_at,
+                'sex': sample.sex}
 
     snps = {}
     for analysis in analyses:
         if analysis.plate_id:
-            genotype_doc['plate']= analysis.plate_id
+            genotype_doc['plate'] = analysis.plate_id
         snps[analysis.type] = build_snp_dict(analysis.id)
         if snps.get('sequence') and snps.get('genotype'):
             snps['comp'] = compare(snps['sequence'], snps['genotype'])
