@@ -108,7 +108,7 @@ def sample(context, sample_id):
 @click.command('prepare-trending')
 @click.argument('sample_id')
 @click.pass_context
-def prepare_trending(context, sample_id):
+def prepare_trending(sample_id):
     """Get a sample from the database in mongo doc format."""
     sample_doc = trending.prepare_trending(sample_id)
     click.echo(sample_doc)
