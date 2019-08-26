@@ -1,5 +1,7 @@
 from genotype.store.models import Analysis, Genotype, Sample
 
+
+
 def build_snp_dict(analysis_id):
     """Building a dict of snps for a specific analysis."""
 
@@ -9,6 +11,7 @@ def build_snp_dict(analysis_id):
         snp_dict[genotype.rsnumber] = [genotype.allele_1, genotype.allele_2]
 
     return snp_dict
+
 
 def compare(analysis_1, analysis_2):
     """Compare inernal and external snps"""
@@ -22,6 +25,7 @@ def compare(analysis_1, analysis_2):
             compare_dict[snp] = False
 
     return compare_dict
+
 
 def prepare_trending(sample_id):
     """Build genotype document for the genotype collection in the trending database"""
