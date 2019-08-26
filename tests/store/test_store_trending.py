@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+"""Bla bla. What do you want here???"""
 from genotype.store.trending import build_snp_dict, compare, prepare_trending
-from genotype.store.models import Sample, Genotype, Analysis
+from genotype.store.models import Sample, Genotype
 
 
 def test_prepare_trending(genotype_db):
@@ -19,22 +20,22 @@ def test_prepare_trending(genotype_db):
 
     # THEN it should return a document ...
     doc = {'_id': sample_id,
-            'sample_created_in_genotype_db': date_time,
-            'sex': sample_sex,
-            'snps': {},
-            'status': sample_status}
+        'sample_created_in_genotype_db': date_time,
+        'sex': sample_sex,
+        'snps': {},
+        'status': sample_status}
 
     assert genotype_doc == doc
 
 
-def test_prepare_trending_no_sample(genotype_db):
+def test_prepare_trending_no_sample():
     # GIVEN a sample id that is not in the database
     sample_id = 'test_2'
 
     # WHEN running prepare_trending
     genotype_doc = prepare_trending(sample_id)
 
-    # THEN it shoould return a empty document 
+    # THEN it shoould return a empty document
     assert genotype_doc == {}
 
 
@@ -60,7 +61,7 @@ def test_build_snp_dict(genotype_db):
     assert snp_dict == {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
 
 
-def test_build_snp_dict_wrong_analysis(genotype_db):
+def test_build_snp_dict_wrong_analysis():
     # GIVEN a analysis_id that does not exist in the database
     analysis_id = 1
 
@@ -71,7 +72,7 @@ def test_build_snp_dict_wrong_analysis(genotype_db):
     assert snp_dict == {}
 
 
-def test_compare(genotype_db):
+def test_compare():
     # GIVEN two analysis dicts like this:
     analysis_1 = {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
     analysis_2 = {'rs1': ['A', 'C'], 'rs2': ['A', 'G']}
@@ -79,10 +80,11 @@ def test_compare(genotype_db):
     # WHEN running compare
     compare_dict = compare(analysis_1, analysis_2)
 
-    # THEN it shoould return a compare_dict like this: 
+    # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True}
 
-def test_compare_wrong_key(genotype_db):
+
+def test_compare_wrong_key():
     # GIVEN two analysis dicts like this:
     analysis_1 = {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
     analysis_2 = {'rs5': ['A', 'C'], 'rs2': ['A', 'G']}
@@ -90,8 +92,5 @@ def test_compare_wrong_key(genotype_db):
     # WHEN running compare
     compare_dict = compare(analysis_1, analysis_2)
 
-    # THEN it shoould return a compare_dict like this: 
+    # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True, 'rs5': False}
-
-
-
