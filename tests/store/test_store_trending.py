@@ -94,4 +94,3 @@ def test_compare_wrong_key():
 
     # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True, 'rs5': False}
-    
