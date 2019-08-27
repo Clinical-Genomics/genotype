@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime , timedelta
 from datetime import date as make_date
 import logging
 
@@ -106,13 +107,26 @@ def sample(context, sample_id):
 
 
 @click.command('prepare-trending')
-@click.argument('sample_id')
+@click.option('-s', '--sample-id', 
+                help = 'return sample with specific sample id.')
+@click.option('-d', '--days', type=click.INT,
+                help = 'return samples added a specific number of days ago.')
 @click.pass_context
-def prepare_trending(sample_id):
+def prepare_trending(context, days, sample_id):
     """Get a sample from the database in mongo doc format."""
-    sample_doc = trending.prepare_trending(sample_id)
-    click.echo(sample_doc)
 
+    if days:
+        all_samples = []
+        some_days_ago = datetime.utcnow() - timedelta(days = days)
+        samples = Sample.query.filter(Sample.created_at > some_days_ago).all()
+        for sample in samples:
+            sample_doc = trending.prepare_trending(sample_id)
+            all_samples.append(sample_doc)
+        return all_samples
+            
+    if sample_id:
+        sample_doc = trending.prepare_trending(sample_id)
+        return sample_doc
 
 def build_date(date_str):
     """Parse date out of string."""
