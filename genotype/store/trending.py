@@ -6,7 +6,10 @@ def build_snp_dict(analysis_id):
     """Building a dict of snps for a specific analysis."""
 
     snp_dict = {}
-    genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
+    try:
+        genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
+    except:
+        genotypes = []
     for genotype in genotypes:
         snp_dict[genotype.rsnumber] = [genotype.allele_1, genotype.allele_2]
 
@@ -30,10 +33,10 @@ def compare(analysis_1, analysis_2):
 def prepare_trending(sample_id):
     """Build genotype document for the genotype collection in the trending database"""
 
-    sample = Sample.query.filter(Sample.id == sample_id).first()
-    analyses = Analysis.query.filter(Analysis.sample_id == sample_id).all()
-
-    if not sample:
+    try:
+        sample = Sample.query.filter(Sample.id == sample_id).first()
+        analyses = Analysis.query.filter(Analysis.sample_id == sample_id).all()
+    except:
         return {}
 
     genotype_doc = {
