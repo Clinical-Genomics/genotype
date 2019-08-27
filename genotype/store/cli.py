@@ -126,7 +126,7 @@ def prepare_trending(context, days, sample_id):
             
     if sample_id:
         sample_doc = trending.prepare_trending(sample_id)
-        return sample_doc
+        return [sample_doc]
 
 def build_date(date_str):
     """Parse date out of string."""
