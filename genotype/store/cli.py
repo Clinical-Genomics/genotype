@@ -117,7 +117,7 @@ def prepare_trending(context, days, sample_id):
 
     if days:
         some_days_ago = datetime.utcnow() - timedelta(days = days)
-        samples = Sample.query.filter(Sample.created_at > some_days_ago).all()
+        samples = api.recent(days).all()
         for sample in samples:
             sample_doc = trending.prepare_trending(sample_id)
             click.echo(sample_doc)
