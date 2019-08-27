@@ -119,11 +119,11 @@ def prepare_trending(context, days, sample_id):
         some_days_ago = datetime.utcnow() - timedelta(days = days)
         samples = api.recent(days).all()
         for sample in samples:
-            sample_doc = trending.prepare_trending(sample_id)
+            sample_doc = trending.prepare_trending(sample=sample)
             click.echo(sample_doc)
             
     if sample_id:
-        sample_doc = trending.prepare_trending(sample_id)
+        sample_doc = trending.prepare_trending(sample_id=sample_id)
         click.echo(sample_doc)
 
 def build_date(date_str):

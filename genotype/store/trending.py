@@ -30,15 +30,19 @@ def compare(analysis_1, analysis_2):
     return compare_dict
 
 
-def prepare_trending(sample_id):
+def prepare_trending(sample_id=None, sample=None):
     """Build genotype document for the genotype collection in the trending database"""
 
-    try:
-        sample = Sample.query.filter(Sample.id == sample_id).first()
-        analyses = Analysis.query.filter(Analysis.sample_id == sample_id).all()
-    except:
+    if sample_id:
+        try:
+            sample = Sample.query.filter(Sample.id == sample_id).first()
+        except:
+            return {}
+
+    if not sample:
         return {}
 
+    analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
     genotype_doc = {
                 '_id': sample.id,
                 'status': sample.status,
