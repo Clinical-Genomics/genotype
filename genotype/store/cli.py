@@ -6,7 +6,6 @@ import logging
 import click
 import yaml
 import json
-from django.core.serializers.json import DjangoJSONEncoder
 
 
 from genotype.store import api, trending
@@ -120,16 +119,18 @@ def prepare_trending(context, days, sample_id):
     sample_dict = {}
     if days:
         some_days_ago = datetime.utcnow() - timedelta(days = int(days))
-        samples = api.recent(some_days_ago).all()
+        samples = api.recent_samples(some_days_ago).all()
         for sample in samples:
-            sample_doc = trending.prepare_trending(sample=sample)
-            sample_ = json.dumps(sample_doc, cls=DjangoJSONEncoder)            
-            sample_dict[sample.id] = json.loads(sample_)
-        click.echo(json.dumps(sample_dict))
-            
-    if sample_id:
+            sample_doc = trending.prepare_trending(sample=sample)           
+            sample_dict[sample.id] = sample_doc
+        click.echo(json.dumps(sample_dict))  
+    elif sample_id:
         sample_doc = trending.prepare_trending(sample_id=sample_id)
         click.echo(sample_doc)
+    else:
+        log.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
+
+
 
 def build_date(date_str):
     """Parse date out of string."""

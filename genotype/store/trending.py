@@ -1,22 +1,25 @@
-"""Bla bla. What do you want here???"""
+"""Functions to create trending specific data."""
+
 from genotype.store.models import Analysis, Genotype, Sample
+import logging
+log = logging.getLogger(__name__)
 
 
-def build_snp_dict(analysis_id):
+def build_snp_dict(analysis_id: str)-> dict:
     """Building a dict of snps for a specific analysis."""
 
-    snp_dict = {}
-    try:
-        genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
-    except:
-        genotypes = []
+    snp_dict = {}    
+
+    genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
+    if not genotypes:
+        log.warning('Did not find Genotype data for analysis_id %s', (analysis_id))
     for genotype in genotypes:
         snp_dict[genotype.rsnumber] = [genotype.allele_1, genotype.allele_2]
-
+    
     return snp_dict
 
 
-def compare(analysis_1, analysis_2):
+def compare(analysis_1: dict, analysis_2: dict)-> dict :
     """Compare inernal and external snps"""
 
     compare_dict = {}
@@ -30,8 +33,8 @@ def compare(analysis_1, analysis_2):
     return compare_dict
 
 
-def prepare_trending(sample_id=None, sample=None):
-    """Build genotype document for the genotype collection in the trending database"""
+def prepare_trending(sample_id:str = None, sample: Sample = None)-> dict:
+    """Build genotype document"""
 
     if sample_id:
         try:
@@ -46,7 +49,7 @@ def prepare_trending(sample_id=None, sample=None):
     genotype_doc = {
                 '_id': sample.id,
                 'status': sample.status,
-                'sample_created_in_genotype_db': sample.created_at,
+                'sample_created_in_genotype_db': sample.created_at.isoformat(),
                 'sex': sample.sex}
 
     snps = {}
