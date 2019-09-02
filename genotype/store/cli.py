@@ -125,7 +125,6 @@ def prepare_trending(context, days, sample_id):
             sample_doc = trending.prepare_trending(sample=sample)
             sample_ = json.dumps(sample_doc, cls=DjangoJSONEncoder)            
             sample_dict[sample.id] = json.loads(sample_)
-            #click.echo(sample_doc)
         click.echo(json.dumps(sample_dict))
             
     if sample_id:
