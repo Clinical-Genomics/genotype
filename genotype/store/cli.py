@@ -5,6 +5,9 @@ import logging
 
 import click
 import yaml
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 from genotype.store import api, trending
 from genotype.constants import SEXES, TYPES
@@ -109,18 +112,21 @@ def sample(context, sample_id):
 @click.command('prepare-trending')
 @click.option('-s', '--sample-id', 
                 help = 'return sample with specific sample id.')
-@click.option('-d', '--days', type=click.INT,
+@click.option('-d', '--days',
                 help = 'return samples added a specific number of days ago.')
 @click.pass_context
 def prepare_trending(context, days, sample_id):
     """Get a sample/samples from the database in mongo doc format."""
-
+    sample_dict = {}
     if days:
-        some_days_ago = datetime.utcnow() - timedelta(days = days)
-        samples = api.recent(days).all()
+        some_days_ago = datetime.utcnow() - timedelta(days = int(days))
+        samples = api.recent(some_days_ago).all()
         for sample in samples:
             sample_doc = trending.prepare_trending(sample=sample)
-            click.echo(sample_doc)
+            sample_ = json.dumps(sample_doc, cls=DjangoJSONEncoder)            
+            sample_dict[sample.id] = json.loads(sample_)
+            #click.echo(sample_doc)
+        click.echo(json.dumps(sample_dict))
             
     if sample_id:
         sample_doc = trending.prepare_trending(sample_id=sample_id)

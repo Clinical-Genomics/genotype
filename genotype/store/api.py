@@ -34,9 +34,9 @@ def failing():
     query = Sample.query.filter_by(status='fail')
     return query
 
-def recent(days):
-    """Return samples created within recent days"""
-    query = Sample.query.filter(Sample.created_at > days)
+def recent(date):
+    """Return samples created since date"""
+    query = Sample.query.filter(Sample.created_at > date)
     return query
 
 def passing():
