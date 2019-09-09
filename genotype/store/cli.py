@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime , timedelta
+from datetime import datetime, timedelta
 from datetime import date as make_date
 import logging
 
+import json
 import click
 import yaml
-import json
-
 
 from genotype.store import api, trending
 from genotype.constants import SEXES, TYPES
@@ -109,21 +108,21 @@ def sample(context, sample_id):
 
 
 @click.command('prepare-trending')
-@click.option('-s', '--sample-id', 
-                help = 'return sample with specific sample id.')
+@click.option('-s', '--sample-id',
+              help='return sample with specific sample id.')
 @click.option('-d', '--days',
-                help = 'return samples added a specific number of days ago.')
+              help='return samples added a specific number of days ago.')
 @click.pass_context
 def prepare_trending(context, days, sample_id):
     """Get a sample/samples from the database in mongo doc format."""
     sample_dict = {}
     if days:
-        some_days_ago = datetime.utcnow() - timedelta(days = int(days))
+        some_days_ago = datetime.utcnow() - timedelta(days=int(days))
         samples = api.recent_samples(some_days_ago).all()
-        for sample in samples:
-            sample_doc = trending.prepare_trending(sample=sample)           
-            sample_dict[sample.id] = sample_doc
-        click.echo(json.dumps(sample_dict))  
+        for recent_sample in samples:
+            sample_doc = trending.prepare_trending(sample=recent_sample)
+            sample_dict[recent_sample.id] = sample_doc
+        click.echo(json.dumps(sample_dict))
     elif sample_id:
         sample_doc = trending.prepare_trending(sample_id=sample_id)
         click.echo(sample_doc)
