@@ -1,6 +1,7 @@
 """Functions to create trending specific data."""
 
 from genotype.store.models import Analysis, Genotype, Sample
+import genotype.store.api as api
 import logging
 log = logging.getLogger(__name__)
 
@@ -37,10 +38,7 @@ def prepare_trending(sample_id:str = None, sample: Sample = None)-> dict:
     """Build genotype document"""
 
     if sample_id:
-        try:
-            sample = Sample.query.filter(Sample.id == sample_id).first()
-        except:
-            return {}
+        sample = Sample.query.get(sample_id)
 
     if not sample:
         return {}
