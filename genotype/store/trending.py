@@ -5,7 +5,7 @@ from genotype.store.models import Analysis, Genotype, Sample
 LOG = logging.getLogger(__name__)
 
 
-def build_snp_dict(analysis_id: str)-> dict:
+def build_snp_dict(analysis_id: str) -> dict:
     """Building a dict of snps for a specific analysis."""
 
     snp_dict = {}
@@ -18,7 +18,7 @@ def build_snp_dict(analysis_id: str)-> dict:
     return snp_dict
 
 
-def compare(analysis_1: dict, analysis_2: dict)-> dict:
+def compare(analysis_1: dict, analysis_2: dict) -> dict:
     """Compare inernal and external snps"""
 
     compare_dict = {}
@@ -32,7 +32,7 @@ def compare(analysis_1: dict, analysis_2: dict)-> dict:
     return compare_dict
 
 
-def prepare_trending(sample_id: str = None, sample: Sample = None)-> dict:
+def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
     """Build genotype document"""
 
     if sample_id:
