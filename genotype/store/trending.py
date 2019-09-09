@@ -9,7 +9,6 @@ def build_snp_dict(analysis_id : str)-> dict:
     """Building a dict of snps for a specific analysis."""
 
     snp_dict = {}   
-
     genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
     if not genotypes:
         LOG.warning('Did not find Genotype data for analysis_id %s', (analysis_id))

@@ -14,13 +14,12 @@ def test_prepare_trending(genotype_db):
     sample.sex = sample_sex
     genotype_db.add_commit(sample)
     date_time = sample.created_at
-
     # WHEN running prepare_trending
     genotype_doc = prepare_trending(sample_id)
 
     # THEN it should return a document ...
     doc = {'_id': sample_id,
-           'sample_created_in_genotype_db': date_time,
+           'sample_created_in_genotype_db': date_time.isoformat(),
            'sex': sample_sex,
            'snps': {},
            'status': sample_status}
@@ -28,7 +27,7 @@ def test_prepare_trending(genotype_db):
     assert genotype_doc == doc
 
 
-def test_prepare_trending_no_sample():
+def test_prepare_trending_no_sample(genotype_db):
     # GIVEN a sample id that is not in the database
     sample_id = 'test_2'
 
@@ -61,7 +60,7 @@ def test_build_snp_dict(genotype_db):
     assert snp_dict == {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
 
 
-def test_build_snp_dict_wrong_analysis():
+def test_build_snp_dict_wrong_analysis(genotype_db):
     # GIVEN a analysis_id that does not exist in the database
     analysis_id = 1
 
