@@ -2,7 +2,7 @@
 import logging
 from genotype.store.models import Analysis, Genotype, Sample
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def build_snp_dict(analysis_id : str)-> dict:
@@ -12,7 +12,7 @@ def build_snp_dict(analysis_id : str)-> dict:
 
     genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
     if not genotypes:
-        log.warning('Did not find Genotype data for analysis_id %s', (analysis_id))
+        LOG.warning('Did not find Genotype data for analysis_id %s', (analysis_id))
     for genotype in genotypes:
         snp_dict[genotype.rsnumber] = [genotype.allele_1, genotype.allele_2]
 
