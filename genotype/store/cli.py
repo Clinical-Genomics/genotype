@@ -112,8 +112,7 @@ def sample(context, sample_id):
               help='return sample with specific sample id.')
 @click.option('-d', '--days',
               help='return samples added a specific number of days ago.')
-@click.pass_context
-def prepare_trending(context, days, sample_id):
+def prepare_trending(days, sample_id):
     """Get a sample/samples from the database in mongo doc format."""
     sample_dict = {}
     if days:
