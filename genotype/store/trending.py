@@ -18,8 +18,9 @@ def build_snp_dict(analysis_id: str) -> dict:
     return snp_dict
 
 
-def compare(analysis_1: dict, analysis_2: dict) -> dict:
-    """Compare inernal and external snps"""
+def compare_snps(analysis_1: dict, analysis_2: dict) -> dict:
+    """Compare inernal and external snps for visualisation of the differences 
+    between external and internal analysis."""
 
     compare_dict = {}
 
@@ -45,7 +46,7 @@ def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
     genotype_doc = {
                 '_id': sample.id,
                 'status': sample.status,
-                'sample_created_in_genotype_db': sample.created_at.isoformat(),
+                'sample_created_in_genotype_db': sample.created_at.date().isoformat(),
                 'sex': sample.sex}
 
     snps = {}
@@ -54,7 +55,7 @@ def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
             genotype_doc['plate'] = analysis.plate_id
         snps[analysis.type] = build_snp_dict(analysis.id)
         if snps.get('sequence') and snps.get('genotype'):
-            snps['comp'] = compare(snps['sequence'], snps['genotype'])
+            snps['comp'] = compare_snps(snps['sequence'], snps['genotype'])
 
     genotype_doc['snps'] = snps
 

@@ -11,7 +11,7 @@ from genotype.store import api, trending
 from genotype.constants import SEXES, TYPES
 from .parsemip import parse_mipsex
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 @click.command('add-sex')
@@ -25,17 +25,17 @@ def add_sex(context, sample, analysis, sample_id):
     genotype_db = context.obj['db']
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
     if sample:
-        log.info("marking sample '%s' as '%s'", sample_id, sample)
+        LOG.info("marking sample '%s' as '%s'", sample_id, sample)
         sample_obj.sex = sample
     for analysis_type, sex in analysis:
-        log.debug("looking up analysis: '%s-%s'", sample_id, analysis_type)
+        LOG.debug("looking up analysis: '%s-%s'", sample_id, analysis_type)
         analysis_obj = api.analysis(sample_id, analysis_type).first()
         if analysis_obj:
-            log.info("marking analysis '%s-%s' as '%s'",
+            LOG.info("marking analysis '%s-%s' as '%s'",
                      analysis_obj.sample_id, analysis_obj.type, sex)
             analysis_obj.sex = sex
         else:
-            log.warn("analysis not found: %s-%s", sample_id, analysis_type)
+            LOG.warn("analysis not found: %s-%s", sample_id, analysis_type)
     genotype_db.commit()
 
 
@@ -117,8 +117,9 @@ def prepare_trending(days, sample_id):
     sample_dict = {}
     if days:
         some_days_ago = datetime.utcnow() - timedelta(days=int(days))
-        samples = api.recent_samples(some_days_ago).all()
-        for recent_sample in samples:
+        samples = api.get_samples_after(some_days_ago).all()
+        LOG.info(f'Preparing documents for {len(samples)} samples.')
+        for i, recent_sample in enumerate(samples):
             sample_doc = trending.prepare_trending(sample=recent_sample)
             sample_dict[recent_sample.id] = sample_doc
         click.echo(json.dumps(sample_dict))
@@ -126,7 +127,7 @@ def prepare_trending(days, sample_id):
         sample_doc = trending.prepare_trending(sample_id=sample_id)
         click.echo(sample_doc)
     else:
-        log.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
+        LOG.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
 
 
 

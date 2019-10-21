@@ -35,7 +35,7 @@ def failing():
     return query
 
 
-def recent_samples(date):
+def get_samples_after(date):
     """Return samples created since date"""
     query = Sample.query.filter(Sample.created_at > date)
     return query

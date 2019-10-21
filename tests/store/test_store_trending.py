@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Bla bla. What do you want here???"""
-from genotype.store.trending import build_snp_dict, compare, prepare_trending
+from genotype.store.trending import build_snp_dict, compare_snps, prepare_trending
 from genotype.store.models import Sample, Genotype
 
 
@@ -19,7 +19,7 @@ def test_prepare_trending(genotype_db):
 
     # THEN it should return a document ...
     doc = {'_id': sample_id,
-           'sample_created_in_genotype_db': date_time.isoformat(),
+           'sample_created_in_genotype_db': date_time.date().isoformat(),
            'sex': sample_sex,
            'snps': {},
            'status': sample_status}
@@ -77,7 +77,7 @@ def test_compare():
     analysis_2 = {'rs1': ['A', 'C'], 'rs2': ['A', 'G']}
 
     # WHEN running compare
-    compare_dict = compare(analysis_1, analysis_2)
+    compare_dict = compare_snps(analysis_1, analysis_2)
 
     # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True}
@@ -89,7 +89,7 @@ def test_compare_wrong_key():
     analysis_2 = {'rs5': ['A', 'C'], 'rs2': ['A', 'G']}
 
     # WHEN running compare
-    compare_dict = compare(analysis_1, analysis_2)
+    compare_dict = compare_snps(analysis_1, analysis_2)
 
     # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True, 'rs5': False}
