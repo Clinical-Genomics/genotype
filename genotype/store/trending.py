@@ -52,7 +52,7 @@ def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
     snps = {}
     for analysis in analyses:
         if analysis.plate_id:
-            genotype_doc['plate'] = analysis.plate_id
+            genotype_doc['plate'] = analysis.plate.plate_id
         snps[analysis.type] = build_snp_dict(analysis.id)
         if snps.get('sequence') and snps.get('genotype'):
             snps['comp'] = compare_snps(snps['sequence'], snps['genotype'])
