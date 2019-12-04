@@ -18,9 +18,9 @@ def build_snp_dict(analysis_id: str) -> dict:
     return snp_dict
 
 
-def compare_snps(analysis_1: dict, analysis_2: dict) -> dict:
-    """Compare inernal and external snps for visualisation of the differences 
-    between external and internal analysis."""
+def get_equality(analysis_1: dict, analysis_2: dict) -> dict:
+    """Compares the two dictionaries and generates a new dictionary, 
+    representing the equality between them."""
 
     compare_dict = {}
 
@@ -33,8 +33,8 @@ def compare_snps(analysis_1: dict, analysis_2: dict) -> dict:
     return compare_dict
 
 
-def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
-    """Build genotype document"""
+def get_trending_dict(sample_id: str = None, sample: Sample = None) -> dict:
+    """Build genotype dict"""
 
     if sample_id:
         sample = Sample.query.get(sample_id)
@@ -43,7 +43,7 @@ def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
         return {}
 
     analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
-    genotype_doc = {
+    genotype_dict = {
                 '_id': sample.id,
                 'status': sample.status,
                 'sample_created_in_genotype_db': sample.created_at.date().isoformat(),
@@ -52,11 +52,11 @@ def prepare_trending(sample_id: str = None, sample: Sample = None) -> dict:
     snps = {}
     for analysis in analyses:
         if analysis.plate_id:
-            genotype_doc['plate'] = analysis.plate.plate_id
+            genotype_dict['plate'] = analysis.plate.plate_id
         snps[analysis.type] = build_snp_dict(analysis.id)
         if snps.get('sequence') and snps.get('genotype'):
-            snps['comp'] = compare_snps(snps['sequence'], snps['genotype'])
+            snps['comp'] = get_equality(snps['sequence'], snps['genotype'])
 
-    genotype_doc['snps'] = snps
+    genotype_dict['snps'] = snps
 
-    return genotype_doc
+    return genotype_dict
