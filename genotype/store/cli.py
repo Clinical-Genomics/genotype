@@ -112,7 +112,10 @@ def sample(context, sample_id):
               help='return sample with specific sample id.')
 @click.option('-d', '--days',
               help='return samples added a specific number of days ago.')
-def prepare_trending(days, sample_id):
+@click.option('-p', '--plot', args=+,
+              help='Type of data. Valid options are: status, analysis')
+
+def prepare_trending(days, sample_id, plot):
     """Get a sample/samples from the database in mongo doc format."""
     sample_dict = {}
     if days:
@@ -120,8 +123,11 @@ def prepare_trending(days, sample_id):
         samples = api.get_samples_after(some_days_ago).all()
         LOG.info(f'Preparing documents for {len(samples)} samples.')
         for i, recent_sample in enumerate(samples):
-            sample_doc = trending.prepare_trending(sample=recent_sample)
-            sample_dict[recent_sample.id] = sample_doc
+            if plot == 'status':
+                sample_doc = trending.prepare_trending(sample=recent_sample)
+                sample_dict[recent_sample.id] = sample_doc
+            if plot == 'analysis':
+                .....
         click.echo(json.dumps(sample_dict))
     elif sample_id:
         sample_doc = trending.prepare_trending(sample_id=sample_id)
