@@ -107,31 +107,49 @@ def sample(context, sample_id):
         context.abort()
 
 
-@click.command('prepare-trending')
+@click.command('prepare-sample')
 @click.option('-s', '--sample-id',
               help='return sample with specific sample id.')
 @click.option('-d', '--days',
               help='return samples added a specific number of days ago.')
-@click.option('-p', '--plot', args=+,
-              help='Type of data. Valid options are: status, analysis')
-
-def prepare_trending(days, sample_id, plot):
-    """Get a sample/samples from the database in mongo doc format."""
-    sample_dict = {}
+def prepare_sample(days, sample_id):
+    """Gets data for sample/samples from the sample table, formated as dict of dicts."""
+    samples_dict = {}
     if days:
         some_days_ago = datetime.utcnow() - timedelta(days=int(days))
         samples = api.get_samples_after(some_days_ago).all()
-        LOG.info(f'Preparing documents for {len(samples)} samples.')
+        LOG.info(f'Getting sample data for {len(samples)} samples.')
         for i, recent_sample in enumerate(samples):
-            if plot == 'status':
-                sample_doc = trending.prepare_trending(sample=recent_sample)
-                sample_dict[recent_sample.id] = sample_doc
-            if plot == 'analysis':
-                .....
-        click.echo(json.dumps(sample_dict))
+            sample_dict = trending.get_sample(sample=recent_sample)
+            samples_dict[recent_sample.id] = sample_dict
+        click.echo(json.dumps(samples_dict))
     elif sample_id:
-        sample_doc = trending.prepare_trending(sample_id=sample_id)
-        click.echo(sample_doc)
+        sample_dict = trending.get_sample(sample_id=sample_id)
+        click.echo(sample_dict)
+    else:
+        LOG.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
+
+
+@click.command('prepare-analysis')
+@click.option('-s', '--sample-id',
+              help='return sample with specific sample id.')
+@click.option('-d', '--days',
+              help='return samples added a specific number of days ago.')
+def prepare_analysis(days, sample_id):
+    """Gets analysis data for sample/samples from the analysis and genotype tables, formated as dict 
+    of dicts."""
+    samples_dict = {}
+    if days:
+        some_days_ago = datetime.utcnow() - timedelta(days=int(days))
+        samples = api.get_samples_after(some_days_ago).all()
+        LOG.info(f'Getting analysis data for {len(samples)} samples.')
+        for i, recent_sample in enumerate(samples):
+            sample_dict = trending.get_analysis_equalities(sample=recent_sample)
+            samples_dict[recent_sample.id] = sample_dict
+        click.echo(json.dumps(samples_dict))
+    elif sample_id:
+        sample_dict = trending.get_analysis_equalities(sample_id=sample_id)
+        click.echo(sample_dict)
     else:
         LOG.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
 

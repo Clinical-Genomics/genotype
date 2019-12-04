@@ -5,8 +5,16 @@ from genotype.store.models import Analysis, Genotype, Sample
 LOG = logging.getLogger(__name__)
 
 
-def get_status_over_time(sample_id: str = None, sample: Sample = None) -> dict:
-    """Get sample status and sample cration date."""
+def get_sample(sample_id: str = None, sample: Sample = None) -> dict:
+    """Get data from sample table in dict format.
+    
+    Args:
+        sample_id(str) or sample(Sample)
+    Returns:
+        sample_dict(dict):  Eg: {"_id": "ADM1464A1", "status": null, 
+                                "sample_created_in_genotype_db": "2019-09-02", 
+                                "sex": "female", 
+                                "comment": "hej hej"}"""
 
     if sample_id:
         sample = Sample.query.get(sample_id)
@@ -14,17 +22,22 @@ def get_status_over_time(sample_id: str = None, sample: Sample = None) -> dict:
     if not sample:
         return {}
 
-    genotype_dict = {
+    sample_dict = {
                 '_id': sample.id,
                 'status': sample.status,
                 'sample_created_in_genotype_db': sample.created_at.date().isoformat(),
-                'sex': sample.sex}
+                'sex': sample.sex,
+                'comment': sample.comment}
 
-    return genotype_dict
+    return sample_dict
 
 
-def get_snp_dict(analysis_id: str) -> dict:
-    """Building a dict of snps for a specific analysis."""
+def _get_snp_dict(analysis_id: str) -> dict:
+    """Builds a dict of snps for a specific analysis.
+
+    Returns:
+        snp_dict(dict): Eg: {'rs10144418': ['T', 'C'], 'rs1037256': ['G', 'A'],...
+    """
 
     snp_dict = {}
     genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
@@ -32,19 +45,18 @@ def get_snp_dict(analysis_id: str) -> dict:
         LOG.warning('Did not find Genotype data for analysis_id %s', (analysis_id))
     for genotype in genotypes:
         snp_dict[genotype.rsnumber] = [genotype.allele_1, genotype.allele_2]
-
     return snp_dict
 
 
-def get_equality(analysis_1: dict, analysis_2: dict) -> dict:
-    """Compares the two dictionaries and generates a new dictionary, 
-    representing the equality between them.
+def _get_equality(analysis_1: dict, analysis_2: dict) -> dict:
+    """Compares the two input dictionaries and generates a new dictionary, 
+    representing the equality between the two.
     
     Args:
-        analysis_1(dict):
-        analysis_2(dict):
+        analysis_1(dict): Eg: {'rs10144418': ['T', 'C'], 'rs1037256': ['G', 'A'],... }
+        analysis_2(dict): Eg: {'rs10144418': ['A', 'C'], 'rs1037256': ['G', 'A'],... }
     Returns:
-        compare_dict(dict):
+        compare_dict(dict): Eg: {'rs10144418': False, 'rs1037256': True,... }
         """
 
     compare_dict = {}
@@ -59,12 +71,19 @@ def get_equality(analysis_1: dict, analysis_2: dict) -> dict:
 
 
 def get_analysis_equalities(sample_id: str = None, sample: Sample = None) -> dict:
-    """Get a dict with genotype analysis.
+    """Get a dict with the genotype analysises and the comparison dict for a sample
     
     Args:
         sample(Sample) or sample_id(str)
     Returns:
-        analysis_comparison(dict): {}
+        analysis_equalities(dict): Eg:
+                                    {'_id': 'ACC2559A1', 
+                                    'plate': 'ID43', 
+                                    'snps': {'genotype': {'rs10144418': ['C', 'C'],...},
+                                            'sequence': {'rs10144418': ['T', 'C'], ...},
+                                            'comp': {'rs10144418': True, ...}
+                                            }
+                                    }
     """
 
     if sample_id:
@@ -74,17 +93,15 @@ def get_analysis_equalities(sample_id: str = None, sample: Sample = None) -> dic
         return {}
 
     analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
-    analysis_comparison = {
-                '_id': sample.id,
+    analysis_equalities = {'_id': sample.id}
 
     snps = {}
     for analysis in analyses:
         if analysis.plate_id:
-            analysis_comparison['plate'] = analysis.plate.plate_id
-        snps[analysis.type] = get_snp_dict(analysis.id)
+            analysis_equalities['plate'] = analysis.plate.plate_id
+        snps[analysis.type] = _get_snp_dict(analysis.id)
         if snps.get('sequence') and snps.get('genotype'):
-            snps['comp'] = get_equality(snps['sequence'], snps['genotype'])
+            snps['comp'] = _get_equality(snps['sequence'], snps['genotype'])
 
-    analysis_comparison['snps'] = snps
-
-    return analysis_comparison
+    analysis_equalities['snps'] = snps
+    return analysis_equalities
