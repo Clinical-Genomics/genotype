@@ -120,11 +120,11 @@ def prepare_trending(days, sample_id):
         samples = api.get_samples_after(some_days_ago).all()
         LOG.info(f'Preparing documents for {len(samples)} samples.')
         for i, recent_sample in enumerate(samples):
-            sample_doc = trending.prepare_trending(sample=recent_sample)
+            sample_doc = trending.get_trending_dict(sample=recent_sample)
             sample_dict[recent_sample.id] = sample_doc
         click.echo(json.dumps(sample_dict))
     elif sample_id:
-        sample_doc = trending.prepare_trending(sample_id=sample_id)
+        sample_doc = trending.get_trending_dict(sample_id=sample_id)
         click.echo(sample_doc)
     else:
         LOG.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
