@@ -108,7 +108,7 @@ def sample(context, sample_id):
 
 
 @click.command('export-sample')
-@click.option('-d', '--days',
+@click.option('-d', '--days', required=True,
               help='return samples added within a specific number of days ago.')
 def export_sample(days):
     """Gets data for samples from the sample table, formated as dict of dicts.
@@ -119,7 +119,7 @@ def export_sample(days):
                                     "sample_created_in_genotype_db": "2019-09-02", 
                                     "sex": "female", 
                                     "comment": "hej hej"},
-                                "ACC5218A8": {"_id": "ACC5218A8", ...
+                                "ACC5218A8": {"status": null, ...
                                 } """
     samples_dict = {}
     some_days_ago = datetime.utcnow() - timedelta(days=int(days))
@@ -133,7 +133,7 @@ def export_sample(days):
 
 
 @click.command('export-sample-analysis')
-@click.option('-d', '--days',
+@click.option('-d', '--days', required=True,
               help='return samples added within a specific number of days ago.')
 def export_sample_analysis(days):
     """Gets analysis data for samples from the analysis and genotype tables, formated as dict 
