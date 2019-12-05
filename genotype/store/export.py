@@ -1,29 +1,22 @@
-"""Functions to create trending specific data."""
+"""Export functions."""
 import logging
 from genotype.store.models import Analysis, Genotype, Sample
 
 LOG = logging.getLogger(__name__)
 
 
-def get_sample(sample_id: str = None, sample: Sample = None) -> dict:
+def get_sample(sample: Sample = None) -> dict:
     """Get data from sample table in dict format.
     
     Args:
-        sample_id(str) or sample(Sample)
+        sample(Sample)
     Returns:
-        sample_dict(dict):  Eg: {"_id": "ADM1464A1", "status": null, 
+        sample_dict(dict):  Eg: {"status": null, 
                                 "sample_created_in_genotype_db": "2019-09-02", 
                                 "sex": "female", 
                                 "comment": "hej hej"}"""
 
-    if sample_id:
-        sample = Sample.query.get(sample_id)
-
-    if not sample:
-        return {}
-
     sample_dict = {
-                '_id': sample.id,
                 'status': sample.status,
                 'sample_created_in_genotype_db': sample.created_at.date().isoformat(),
                 'sex': sample.sex,
@@ -70,15 +63,14 @@ def _get_equality(analysis_1: dict, analysis_2: dict) -> dict:
     return compare_dict
 
 
-def get_analysis_equalities(sample_id: str = None, sample: Sample = None) -> dict:
+def get_analysis_equalities(sample: Sample = None) -> dict:
     """Get a dict with the genotype analysises and the comparison dict for a sample
     
     Args:
-        sample(Sample) or sample_id(str)
+        sample(Sample)
     Returns:
         analysis_equalities(dict): Eg:
-                                    {'_id': 'ACC2559A1', 
-                                    'plate': 'ID43', 
+                                    {'plate': 'ID43', 
                                     'snps': {'genotype': {'rs10144418': ['C', 'C'],...},
                                             'sequence': {'rs10144418': ['T', 'C'], ...},
                                             'comp': {'rs10144418': True, ...}
@@ -86,14 +78,8 @@ def get_analysis_equalities(sample_id: str = None, sample: Sample = None) -> dic
                                     }
     """
 
-    if sample_id:
-        sample = Sample.query.get(sample_id)
-
-    if not sample:
-        return {}
-
     analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
-    analysis_equalities = {'_id': sample.id}
+    analysis_equalities = {}
 
     snps = {}
     for analysis in analyses:

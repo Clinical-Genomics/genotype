@@ -7,7 +7,7 @@ import json
 import click
 import yaml
 
-from genotype.store import api, trending
+from genotype.store import api, export
 from genotype.constants import SEXES, TYPES
 from .parsemip import parse_mipsex
 
@@ -77,7 +77,7 @@ def ls(context, since, limit, offset, missing, plate, no_status):
     """List samples from the database."""
 
     if missing:
-        date_obj = build_date(since) if since else None
+        date_obj = parse_date(since) if since else None
 
         if missing == 'sex':
             query = api.missing_sex(since=date_obj)
@@ -107,54 +107,58 @@ def sample(context, sample_id):
         context.abort()
 
 
-@click.command('prepare-sample')
-@click.option('-s', '--sample-id',
-              help='return sample with specific sample id.')
+@click.command('export-sample')
 @click.option('-d', '--days',
-              help='return samples added a specific number of days ago.')
-def prepare_sample(days, sample_id):
-    """Gets data for sample/samples from the sample table, formated as dict of dicts."""
+              help='return samples added within a specific number of days ago.')
+def export_sample(days):
+    """Gets data for samples from the sample table, formated as dict of dicts.
+    
+    Returns
+        samples_dict(dict): Eg: {"ADM1464A1": {
+                                    "status": null, 
+                                    "sample_created_in_genotype_db": "2019-09-02", 
+                                    "sex": "female", 
+                                    "comment": "hej hej"},
+                                "ACC5218A8": {"_id": "ACC5218A8", ...
+                                } """
     samples_dict = {}
-    if days:
-        some_days_ago = datetime.utcnow() - timedelta(days=int(days))
-        samples = api.get_samples_after(some_days_ago).all()
-        LOG.info(f'Getting sample data for {len(samples)} samples.')
-        for i, recent_sample in enumerate(samples):
-            sample_dict = trending.get_sample(sample=recent_sample)
-            samples_dict[recent_sample.id] = sample_dict
-        click.echo(json.dumps(samples_dict))
-    elif sample_id:
-        sample_dict = trending.get_sample(sample_id=sample_id)
-        click.echo(sample_dict)
-    else:
-        LOG.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
+    some_days_ago = datetime.utcnow() - timedelta(days=int(days))
+    samples = api.get_samples_after(some_days_ago).all()
+    LOG.info('Getting sample data for %s samples.' % str(len(samples)) )
+    for i, recent_sample in enumerate(samples):
+        sample_dict = export.get_sample(sample=recent_sample)
+        samples_dict[recent_sample.id] = sample_dict
+    click.echo(json.dumps(samples_dict))
 
 
-@click.command('prepare-analysis')
-@click.option('-s', '--sample-id',
-              help='return sample with specific sample id.')
+
+@click.command('export-sample-analysis')
 @click.option('-d', '--days',
-              help='return samples added a specific number of days ago.')
-def prepare_analysis(days, sample_id):
-    """Gets analysis data for sample/samples from the analysis and genotype tables, formated as dict 
-    of dicts."""
+              help='return samples added within a specific number of days ago.')
+def export_sample_analysis(days):
+    """Gets analysis data for samples from the analysis and genotype tables, formated as dict 
+    of dicts.
+    
+    Returns:
+        dict: Eg: {"ACC2559A1": {   'plate': 'ID43', 
+                                    'snps': {'genotype': {'rs10144418': ['C', 'C'],...},
+                                            'sequence': {'rs10144418': ['T', 'C'], ...},
+                                            'comp': {'rs10144418': True, ...}
+                                            }
+                                    },
+                    "ACC5346A3": {'plate': 'ID44',,...
+                    }
+    """
     samples_dict = {}
-    if days:
-        some_days_ago = datetime.utcnow() - timedelta(days=int(days))
-        samples = api.get_samples_after(some_days_ago).all()
-        LOG.info(f'Getting analysis data for {len(samples)} samples.')
-        for i, recent_sample in enumerate(samples):
-            sample_dict = trending.get_analysis_equalities(sample=recent_sample)
-            samples_dict[recent_sample.id] = sample_dict
-        click.echo(json.dumps(samples_dict))
-    elif sample_id:
-        sample_dict = trending.get_analysis_equalities(sample_id=sample_id)
-        click.echo(sample_dict)
-    else:
-        LOG.error('prepare-trending needs to be run with one of the options: (--sample-id/--days)')
+    some_days_ago = datetime.utcnow() - timedelta(days=int(days))
+    samples = api.get_samples_after(some_days_ago).all()
+    LOG.info('Getting analysis data for %s samples.' % str(len(samples)) )
+    for i, recent_sample in enumerate(samples):
+        sample_dict = export.get_analysis_equalities(sample=recent_sample)
+        samples_dict[recent_sample.id] = sample_dict
+    click.echo(json.dumps(samples_dict))
 
 
-
-def build_date(date_str):
+def parse_date(date_str):
     """Parse date out of string."""
     return make_date(*map(int, date_str.split('-')))

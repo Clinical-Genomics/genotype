@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Bla bla. What do you want here???"""
+"""Tests for store export"""
 from genotype.store.trending import build_snp_dict, compare_snps, prepare_trending
 from genotype.store.models import Sample, Genotype
 
