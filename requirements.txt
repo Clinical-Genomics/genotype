@@ -19,3 +19,6 @@ werkzeug
 Flask-Login
 Flask-Dance
 ruamel.yaml
+
+# indirect dependencies
+six~=1.12 # due to astroid
