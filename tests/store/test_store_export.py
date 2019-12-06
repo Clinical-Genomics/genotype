@@ -6,11 +6,11 @@ from genotype.store.models import Sample, Genotype, Analysis
 
 def test_get_analysis_equalities(genotype_db):
     # GIVEN a sample with two analyses
- 
+
     sample_id = 'test'
     sample = Sample(id=sample_id)
     genotype_db.add_commit(sample)
- 
+
     analysis_id = 1
     analysis = Analysis(id=analysis_id)
     analysis.sample_id = sample_id
@@ -50,8 +50,8 @@ def test_get_analysis_equalities(genotype_db):
 
     # THEN it should return a dictionary like this:
     doc = {'snps': {'genotype': {'rs1': ['T', 'C'], 'rs2': ['A', 'G']},
-           'sequence': {'rs1': ['T', 'C'], 'rs2': ['T', 'G']},
-           'comp': {'rs1': True, 'rs2': False}}}
+                    'sequence': {'rs1': ['T', 'C'], 'rs2': ['T', 'G']},
+                    'comp': {'rs1': True, 'rs2': False}}}
 
     assert genotype_doc == doc
 
@@ -115,7 +115,6 @@ def test_get_sample_no_atributes(genotype_db):
     assert genotype_doc == doc
 
 
-
 def test_get_snp_dict(genotype_db):
     # GIVEN two genotypes in the database, with the same analysis_id
     analysis_id = 1
@@ -171,4 +170,3 @@ def test_get_equality_wrong_key():
 
     # THEN it shoould return a compare_dict like this:
     assert compare_dict == {'rs1': False, 'rs2': True, 'rs5': False}
-    
