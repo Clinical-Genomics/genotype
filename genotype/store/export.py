@@ -11,9 +11,9 @@ def get_sample(sample: Sample = None) -> dict:
     Args:
         sample(Sample)
     Returns:
-        sample_dict(dict):  Eg: {"status": null, 
-                                "sample_created_in_genotype_db": "2019-09-02", 
-                                "sex": "female", 
+        sample_dict(dict):  Eg: {"status": null,
+                                "sample_created_in_genotype_db": "2019-09-02",
+                                "sex": "female",
                                 "comment": "Lorem ipsum"}"""
 
     sample_dict = {
@@ -77,7 +77,7 @@ def get_analysis_equalities(sample: Sample = None) -> dict:
                                             }
                                     }
     """
-    
+
     analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
     analysis_equalities = {}
 
