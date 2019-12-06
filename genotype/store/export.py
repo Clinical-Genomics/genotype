@@ -11,10 +11,10 @@ def get_sample(sample: Sample = None) -> dict:
     Args:
         sample(Sample)
     Returns:
-        sample_dict(dict):  Eg: {"status": null,
-                                "sample_created_in_genotype_db": "2019-09-02",
-                                "sex": "female",
-                                "comment": "hej hej"}"""
+        sample_dict(dict):  Eg: {"status": null, 
+                                "sample_created_in_genotype_db": "2019-09-02", 
+                                "sex": "female", 
+                                "comment": "Lorem ipsum"}"""
 
     sample_dict = {
                 'status': sample.status,
