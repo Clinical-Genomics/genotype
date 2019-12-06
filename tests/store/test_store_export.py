@@ -6,11 +6,11 @@ from genotype.store.models import Sample, Genotype, Analysis
 
 def test_get_analysis_equalities(genotype_db):
     # GIVEN a sample with two analyses
-    
+ 
     sample_id = 'test'
     sample = Sample(id=sample_id)
     genotype_db.add_commit(sample)
-    
+ 
     analysis_id = 1
     analysis = Analysis(id=analysis_id)
     analysis.sample_id = sample_id
@@ -42,18 +42,19 @@ def test_get_analysis_equalities(genotype_db):
     genotype_4.rsnumber = 'rs2'
     genotype_4.allele_1 = 'A'
     genotype_4.allele_2 = 'G'
-    
+
     genotype_db.add_commit(genotype_1, genotype_2, genotype_3, genotype_4)
 
     # WHEN running get_analysis_equalities
     genotype_doc = get_analysis_equalities(sample)
 
     # THEN it should return a dictionary like this:
-    doc = {'snps': {'genotype': {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}, 
-            'sequence': {'rs1': ['T', 'C'], 'rs2': ['T', 'G']}, 
-            'comp': {'rs1': True, 'rs2': False}}}
+    doc = {'snps': {'genotype': {'rs1': ['T', 'C'], 'rs2': ['A', 'G']},
+           'sequence': {'rs1': ['T', 'C'], 'rs2': ['T', 'G']},
+           'comp': {'rs1': True, 'rs2': False}}}
 
     assert genotype_doc == doc
+
 
 def test_get_analysis_equalities_no_analysis(genotype_db):
     # GIVEN a sample with no analysis
@@ -68,9 +69,10 @@ def test_get_analysis_equalities_no_analysis(genotype_db):
 
     assert genotype_doc == doc
 
+
 def test_get_sample(genotype_db):
     # GIVEN a sample id that exits in the database
-    
+
     sample_sex = 'male'
     sample_status = 'pass'
     sample_comment = 'Hpho!'
@@ -93,9 +95,10 @@ def test_get_sample(genotype_db):
 
     assert genotype_doc == doc
 
+
 def test_get_sample_no_atributes(genotype_db):
     # GIVEN a sample id that exits in the database
-    
+
     sample = Sample(id='test')
     genotype_db.add_commit(sample)
     date_time = sample.created_at
@@ -104,10 +107,10 @@ def test_get_sample_no_atributes(genotype_db):
     genotype_doc = get_sample(sample)
 
     # THEN it should return a dictionary like this:
-    doc = {'comment': None, 
-            'sex': None, 
-            'status': None, 
-            'sample_created_in_genotype_db': date_time.date().isoformat()}
+    doc = {'comment': None,
+           'sex': None,
+           'status': None,
+           'sample_created_in_genotype_db': date_time.date().isoformat()}
 
     assert genotype_doc == doc
 
