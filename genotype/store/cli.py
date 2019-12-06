@@ -35,7 +35,7 @@ def add_sex(context, sample, analysis, sample_id):
                      analysis_obj.sample_id, analysis_obj.type, sex)
             analysis_obj.sex = sex
         else:
-            LOG.warn("analysis not found: %s-%s", sample_id, analysis_type)
+            LOG.warning("analysis not found: %s-%s", sample_id, analysis_type)
     genotype_db.commit()
 
 
@@ -112,35 +112,34 @@ def sample(context, sample_id):
               help='return samples added within a specific number of days ago.')
 def export_sample(days):
     """Gets data for samples from the sample table, formated as dict of dicts.
-    
+
     Returns
         samples_dict(dict): Eg: {"ADM1464A1": {
-                                    "status": null, 
-                                    "sample_created_in_genotype_db": "2019-09-02", 
-                                    "sex": "female", 
+                                    "status": null,
+                                    "sample_created_in_genotype_db": "2019-09-02",
+                                    "sex": "female",
                                     "comment": "hej hej"},
                                 "ACC5218A8": {"status": null, ...
                                 } """
     samples_dict = {}
     some_days_ago = datetime.utcnow() - timedelta(days=int(days))
     samples = api.get_samples_after(some_days_ago).all()
-    LOG.info('Getting sample data for %s samples.' % str(len(samples)) )
-    for i, recent_sample in enumerate(samples):
+    LOG.info('Getting sample data for %s samples.' % str(len(samples)))
+    for recent_sample in samples:
         sample_dict = export.get_sample(sample=recent_sample)
         samples_dict[recent_sample.id] = sample_dict
     click.echo(json.dumps(samples_dict))
-
 
 
 @click.command('export-sample-analysis')
 @click.option('-d', '--days', required=True,
               help='return samples added within a specific number of days ago.')
 def export_sample_analysis(days):
-    """Gets analysis data for samples from the analysis and genotype tables, formated as dict 
+    """Gets analysis data for samples from the analysis and genotype tables, formated as dict
     of dicts.
-    
+
     Returns:
-        dict: Eg: {"ACC2559A1": {   'plate': 'ID43', 
+        dict: Eg: {"ACC2559A1": {   'plate': 'ID43',
                                     'snps': {'genotype': {'rs10144418': ['C', 'C'],...},
                                             'sequence': {'rs10144418': ['T', 'C'], ...},
                                             'comp': {'rs10144418': True, ...}
@@ -152,8 +151,8 @@ def export_sample_analysis(days):
     samples_dict = {}
     some_days_ago = datetime.utcnow() - timedelta(days=int(days))
     samples = api.get_samples_after(some_days_ago).all()
-    LOG.info('Getting analysis data for %s samples.' % str(len(samples)) )
-    for i, recent_sample in enumerate(samples):
+    LOG.info('Getting analysis data for %s samples.' % str(len(samples)))
+    for recent_sample in samples:
         sample_dict = export.get_analysis_equalities(sample=recent_sample)
         samples_dict[recent_sample.id] = sample_dict
     click.echo(json.dumps(samples_dict))
