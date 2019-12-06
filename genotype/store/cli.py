@@ -118,7 +118,7 @@ def export_sample(days):
                                     "status": null, 
                                     "sample_created_in_genotype_db": "2019-09-02", 
                                     "sex": "female", 
-                                    "comment": "hej hej"},
+                                    "comment": "Lorem ipsum"},
                                 "ACC5218A8": {"status": null, ...
                                 } """
     samples_dict = {}
