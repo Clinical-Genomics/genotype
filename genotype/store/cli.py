@@ -115,9 +115,9 @@ def export_sample(days):
 
     Returns
         samples_dict(dict): Eg: {"ADM1464A1": {
-                                    "status": null, 
-                                    "sample_created_in_genotype_db": "2019-09-02", 
-                                    "sex": "female", 
+                                    "status": null,
+                                    "sample_created_in_genotype_db": "2019-09-02",
+                                    "sex": "female",
                                     "comment": "Lorem ipsum"},
                                 "ACC5218A8": {"status": null, ...
                                 } """
