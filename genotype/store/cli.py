@@ -134,7 +134,8 @@ def export_sample(days):
 @click.command('export-sample-analysis')
 @click.option('-d', '--days', required=True,
               help='return samples added within a specific number of days ago.')
-def export_sample_analysis(days):
+@click.pass_context
+def export_sample_analysis(context, days):
     """Gets analysis data for samples from the analysis and genotype tables, formated as dict
     of dicts.
 
@@ -152,8 +153,9 @@ def export_sample_analysis(days):
     some_days_ago = datetime.utcnow() - timedelta(days=int(days))
     samples = api.get_samples_after(some_days_ago).all()
     LOG.info('Getting analysis data for %s samples.' % str(len(samples)))
+    session = context.obj['db'].session
     for recent_sample in samples:
-        sample_dict = export.get_analysis_equalities(sample=recent_sample)
+        sample_dict = export.get_analysis_equalities(session, sample=recent_sample)
         samples_dict[recent_sample.id] = sample_dict
     click.echo(json.dumps(samples_dict))
 

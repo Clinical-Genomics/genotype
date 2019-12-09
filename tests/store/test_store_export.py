@@ -46,7 +46,7 @@ def test_get_analysis_equalities(genotype_db):
     genotype_db.add_commit(genotype_1, genotype_2, genotype_3, genotype_4)
 
     # WHEN running get_analysis_equalities
-    genotype_doc = get_analysis_equalities(sample)
+    genotype_doc = get_analysis_equalities(genotype_db, sample)
 
     # THEN it should return a dictionary like this:
     doc = {'snps': {'genotype': {'rs1': ['T', 'C'], 'rs2': ['A', 'G']},
@@ -62,7 +62,7 @@ def test_get_analysis_equalities_no_analysis(genotype_db):
     genotype_db.add_commit(sample)
 
     # WHEN running get_analysis_equalities
-    genotype_doc = get_analysis_equalities(sample)
+    genotype_doc = get_analysis_equalities(genotype_db, sample)
 
     # THEN it should return a dictionary like this:
     doc = {'snps': {}}
@@ -131,7 +131,7 @@ def test_get_snp_dict(genotype_db):
     genotype_db.add_commit(genotype_1, genotype_2)
 
     # WHEN running _get_snp_dict for that analysis_id
-    snp_dict = _get_snp_dict(analysis_id)
+    snp_dict = _get_snp_dict(genotype_db, analysis_id)
 
     # THEN it shoould return a dict holding the rs numbers and allels from the two genotypes
     assert snp_dict == {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
@@ -142,7 +142,7 @@ def test_get_snp_dict_wrong_analysis(genotype_db):
     analysis_id = 1
 
     # WHEN running _get_snp_dict for that analysis_id
-    snp_dict = _get_snp_dict(analysis_id)
+    snp_dict = _get_snp_dict(genotype_db, analysis_id)
 
     # THEN it shoould return a empty dict
     assert snp_dict == {}

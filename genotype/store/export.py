@@ -1,6 +1,7 @@
 """Export functions."""
 import logging
 from genotype.store.models import Analysis, Genotype, Sample
+from genotype.store.api import genotypes_by_analysis, analysis_by_sample
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def get_sample(sample: Sample = None) -> dict:
     return sample_dict
 
 
-def _get_snp_dict(analysis_id: str) -> dict:
+def _get_snp_dict(session, analysis_id: str) -> dict:
     """Builds a dict of snps for a specific analysis.
 
     Returns:
@@ -33,7 +34,7 @@ def _get_snp_dict(analysis_id: str) -> dict:
     """
 
     snp_dict = {}
-    genotypes = Genotype.query.filter(Genotype.analysis_id == analysis_id).all()
+    genotypes = genotypes_by_analysis(session, analysis_id)
     if not genotypes:
         LOG.warning('Did not find Genotype data for analysis_id %s', (analysis_id))
     for genotype in genotypes:
@@ -63,7 +64,7 @@ def _get_equality(analysis_1: dict, analysis_2: dict) -> dict:
     return compare_dict
 
 
-def get_analysis_equalities(sample: Sample = None) -> dict:
+def get_analysis_equalities(session, sample: Sample = None) -> dict:
     """Get a dict with the genotype analysises and the comparison dict for a sample
 
     Args:
@@ -77,15 +78,15 @@ def get_analysis_equalities(sample: Sample = None) -> dict:
                                             }
                                     }
     """
+    analyses = analysis_by_sample(session, sample.id)
 
-    analyses = Analysis.query.filter(Analysis.sample_id == sample.id).all()
     analysis_equalities = {}
 
     snps = {}
     for analysis in analyses:
         if analysis.plate_id:
             analysis_equalities['plate'] = analysis.plate.plate_id
-        snps[analysis.type] = _get_snp_dict(analysis.id)
+        snps[analysis.type] = _get_snp_dict(session, analysis.id)
         if snps.get('sequence') and snps.get('genotype'):
             snps['comp'] = _get_equality(snps['sequence'], snps['genotype'])
     analysis_equalities['snps'] = snps
