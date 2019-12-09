@@ -48,6 +48,7 @@ def load_vcf(vcf_file, snps):
 def variant_genotypes(sample_ids, variant):
     """Build Genotype objects from a BCF variant."""
     for sample_id, bases in zip(sample_ids, variant.gt_bases):
+        bases = bases.replace('|', '/')
         allele_1, allele_2 = bases.split('/')
         yield RawGenotype(sample_id, allele_1, allele_2)
 
