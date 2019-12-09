@@ -229,6 +229,5 @@ def analysis_by_sample(session, sample_id):
         query: SQLAlchemy query object
     """
     query = session.query(Analysis).filter(Analysis.sample_id == sample_id).all()
-    
-    return query
 
+    return query

@@ -124,7 +124,7 @@ def export_sample(days):
     samples_dict = {}
     some_days_ago = datetime.utcnow() - timedelta(days=int(days))
     samples = api.get_samples_after(some_days_ago).all()
-    LOG.info('Getting sample data for %s samples.' % str(len(samples)))
+    LOG.info('Getting sample data for %s samples.', str(len(samples)))
     for recent_sample in samples:
         sample_dict = export.get_sample(sample=recent_sample)
         samples_dict[recent_sample.id] = sample_dict
@@ -152,7 +152,7 @@ def export_sample_analysis(context, days):
     samples_dict = {}
     some_days_ago = datetime.utcnow() - timedelta(days=int(days))
     samples = api.get_samples_after(some_days_ago).all()
-    LOG.info('Getting analysis data for %s samples.' % str(len(samples)))
+    LOG.info('Getting analysis data for %s samples.', str(len(samples)))
     session = context.obj['db'].session
     for recent_sample in samples:
         sample_dict = export.get_analysis_equalities(session, sample=recent_sample)
