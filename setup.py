@@ -125,6 +125,8 @@ setup(
             'serve = genotype.server.cli:serve',
             'ls = genotype.store.cli:ls',
             'sample = genotype.store.cli:sample',
+            'export-sample = genotype.store.cli:export_sample',
+            'export-sample-analysis = genotype.store.cli:export_sample_analysis'
         ]
     },
 

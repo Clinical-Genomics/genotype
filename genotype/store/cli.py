@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
 from datetime import date as make_date
 import logging
 
+import json
 import click
 import yaml
 
-from genotype.store import api
+from genotype.store import api, export
 from genotype.constants import SEXES, TYPES
 from .parsemip import parse_mipsex
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 @click.command('add-sex')
@@ -23,17 +25,17 @@ def add_sex(context, sample, analysis, sample_id):
     genotype_db = context.obj['db']
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
     if sample:
-        log.info("marking sample '%s' as '%s'", sample_id, sample)
+        LOG.info("marking sample '%s' as '%s'", sample_id, sample)
         sample_obj.sex = sample
     for analysis_type, sex in analysis:
-        log.debug("looking up analysis: '%s-%s'", sample_id, analysis_type)
+        LOG.debug("looking up analysis: '%s-%s'", sample_id, analysis_type)
         analysis_obj = api.analysis(sample_id, analysis_type).first()
         if analysis_obj:
-            log.info("marking analysis '%s-%s' as '%s'",
+            LOG.info("marking analysis '%s-%s' as '%s'",
                      analysis_obj.sample_id, analysis_obj.type, sex)
             analysis_obj.sex = sex
         else:
-            log.warn("analysis not found: %s-%s", sample_id, analysis_type)
+            LOG.warning("analysis not found: %s-%s", sample_id, analysis_type)
     genotype_db.commit()
 
 
@@ -75,7 +77,7 @@ def ls(context, since, limit, offset, missing, plate, no_status):
     """List samples from the database."""
 
     if missing:
-        date_obj = build_date(since) if since else None
+        date_obj = parse_date(since) if since else None
 
         if missing == 'sex':
             query = api.missing_sex(since=date_obj)
@@ -105,6 +107,59 @@ def sample(context, sample_id):
         context.abort()
 
 
-def build_date(date_str):
+@click.command('export-sample')
+@click.option('-d', '--days', required=True,
+              help='return samples added within a specific number of days ago.')
+def export_sample(days):
+    """Gets data for samples from the sample table, formated as dict of dicts.
+
+    Returns
+        samples_dict(dict): Eg: {"ADM1464A1": {
+                                    "status": null,
+                                    "sample_created_in_genotype_db": "2019-09-02",
+                                    "sex": "female",
+                                    "comment": "Lorem ipsum"},
+                                "ACC5218A8": {"status": null, ...
+                                } """
+    samples_dict = {}
+    some_days_ago = datetime.utcnow() - timedelta(days=int(days))
+    samples = api.get_samples_after(some_days_ago).all()
+    LOG.info('Getting sample data for %s samples.', str(len(samples)))
+    for recent_sample in samples:
+        sample_dict = export.get_sample(sample=recent_sample)
+        samples_dict[recent_sample.id] = sample_dict
+    click.echo(json.dumps(samples_dict))
+
+
+@click.command('export-sample-analysis')
+@click.option('-d', '--days', required=True,
+              help='return samples added within a specific number of days ago.')
+@click.pass_context
+def export_sample_analysis(context, days):
+    """Gets analysis data for samples from the analysis and genotype tables, formated as dict
+    of dicts.
+
+    Returns:
+        dict: Eg: {"ACC2559A1": {   'plate': 'ID43',
+                                    'snps': {'genotype': {'rs10144418': ['C', 'C'],...},
+                                            'sequence': {'rs10144418': ['T', 'C'], ...},
+                                            'comp': {'rs10144418': True, ...}
+                                            }
+                                    },
+                    "ACC5346A3": {'plate': 'ID44',,...
+                    }
+    """
+    samples_dict = {}
+    some_days_ago = datetime.utcnow() - timedelta(days=int(days))
+    samples = api.get_samples_after(some_days_ago).all()
+    LOG.info('Getting analysis data for %s samples.', str(len(samples)))
+    session = context.obj['db'].session
+    for recent_sample in samples:
+        sample_dict = export.get_analysis_equalities(session, sample=recent_sample)
+        samples_dict[recent_sample.id] = sample_dict
+    click.echo(json.dumps(samples_dict))
+
+
+def parse_date(date_str):
     """Parse date out of string."""
     return make_date(*map(int, date_str.split('-')))

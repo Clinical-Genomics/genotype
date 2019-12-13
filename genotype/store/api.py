@@ -4,7 +4,7 @@ import logging
 from alchy import Manager
 from sqlalchemy import func, or_
 
-from genotype.store.models import Analysis, Model, Sample, SNP, Plate
+from genotype.store.models import Analysis, Genotype, Model, Sample, SNP, Plate
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +32,12 @@ def pending():
 def failing():
     """Return all samples that have failed some check."""
     query = Sample.query.filter_by(status='fail')
+    return query
+
+
+def get_samples_after(date):
+    """Return samples created since date"""
+    query = Sample.query.filter(Sample.created_at > date)
     return query
 
 
@@ -196,4 +202,32 @@ def analysis(sample_id, type):
         query: SQLAlchemy query object
     """
     query = Analysis.query.filter_by(sample_id=sample_id, type=type)
+    return query
+
+
+def genotypes_by_analysis(session, analysis_id):
+    """Ask the database for the genotype records with a specific analysis id.
+
+    Args:
+        analysis_id (str): unique analysis id
+
+    Returns:
+        query: SQLAlchemy query object
+    """
+    query = session.query(Genotype).filter(Genotype.analysis_id == analysis_id).all()
+
+    return query
+
+
+def analysis_by_sample(session, sample_id):
+    """Ask the database for the genotype records with a specific analysis id.
+
+    Args:
+        sample_id (str): unique sample id
+
+    Returns:
+        query: SQLAlchemy query object
+    """
+    query = session.query(Analysis).filter(Analysis.sample_id == sample_id).all()
+
     return query
