@@ -18,3 +18,4 @@ docutils
 html-linter
 black
 pre-commit
+coverage<5
