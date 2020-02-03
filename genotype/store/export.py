@@ -56,7 +56,7 @@ def _get_equality(analysis_1: dict, analysis_2: dict) -> dict:
     compare_dict = {}
 
     for snp in set(list(analysis_1.keys()) + list(analysis_2.keys())):
-        if analysis_1.get(snp).sort() == analysis_2.get(snp).sort():
+        if set(analysis_1.get(snp)) == set(analysis_2.get(snp)):
             compare_dict[snp] = True
         else:
             compare_dict[snp] = False
