@@ -9,41 +9,16 @@ def test_get_analysis_equalities(genotype_db):
 
     sample_id = 'test'
     sample = Sample(id=sample_id)
-    genotype_db.add_commit(sample)
 
-    analysis_id = 1
-    analysis = Analysis(id=analysis_id)
-    analysis.sample_id = sample_id
-    analysis.type = 'sequence'
-    genotype_db.add_commit(analysis)
-    genotype_1 = Genotype(id=1)
-    genotype_1.analysis_id = analysis_id
-    genotype_1.rsnumber = 'rs1'
-    genotype_1.allele_1 = 'T'
-    genotype_1.allele_2 = 'C'
-    genotype_2 = Genotype(id=2)
-    genotype_2.analysis_id = analysis_id
-    genotype_2.rsnumber = 'rs2'
-    genotype_2.allele_1 = 'T'
-    genotype_2.allele_2 = 'G'
+    analyses = [Analysis(id=1, sample_id=sample_id, type='sequence'),
+                Analysis(id=2, sample_id=sample_id, type='genotype')]
 
-    analysis_id = 2
-    analysis = Analysis(id=analysis_id)
-    analysis.sample_id = sample_id
-    analysis.type = 'genotype'
-    genotype_db.add_commit(analysis)
-    genotype_3 = Genotype(id=3)
-    genotype_3.analysis_id = analysis_id
-    genotype_3.rsnumber = 'rs1'
-    genotype_3.allele_1 = 'C'
-    genotype_3.allele_2 = 'T'
-    genotype_4 = Genotype(id=4)
-    genotype_4.analysis_id = analysis_id
-    genotype_4.rsnumber = 'rs2'
-    genotype_4.allele_1 = 'A'
-    genotype_4.allele_2 = 'G'
+    genotypes = [Genotype(id=1, analysis_id=1, rsnumber='rs1', allele_1='T', allele_2='C'),
+                 Genotype(id=2, analysis_id=1, rsnumber='rs2', allele_1='T', allele_2='G'),
+                 Genotype(id=3, analysis_id=2, rsnumber='rs1', allele_1='C', allele_2='T'),
+                 Genotype(id=4, analysis_id=2, rsnumber='rs2', allele_1='A', allele_2='G')]
 
-    genotype_db.add_commit(genotype_1, genotype_2, genotype_3, genotype_4)
+    genotype_db.add_commit(sample, analyses, genotypes)
 
     # WHEN running get_analysis_equalities
     genotype_doc = get_analysis_equalities(genotype_db, sample)
@@ -117,21 +92,12 @@ def test_get_sample_no_atributes(genotype_db):
 
 def test_get_snp_dict(genotype_db):
     # GIVEN two genotypes in the database, with the same analysis_id
-    analysis_id = 1
-    genotype_1 = Genotype(id=1)
-    genotype_1.analysis_id = analysis_id
-    genotype_1.rsnumber = 'rs1'
-    genotype_1.allele_1 = 'T'
-    genotype_1.allele_2 = 'C'
-    genotype_2 = Genotype(id=2)
-    genotype_2.analysis_id = analysis_id
-    genotype_2.rsnumber = 'rs2'
-    genotype_2.allele_1 = 'A'
-    genotype_2.allele_2 = 'G'
-    genotype_db.add_commit(genotype_1, genotype_2)
+    genotypes = [Genotype(id=1, analysis_id=1, rsnumber='rs1', allele_1='T', allele_2='C'),
+                 Genotype(id=2, analysis_id=1, rsnumber='rs2', allele_1='A', allele_2='G')]
+    genotype_db.add_commit(genotypes)
 
-    # WHEN running _get_snp_dict for that analysis_id
-    snp_dict = _get_snp_dict(genotype_db, analysis_id)
+    # WHEN running _get_snp_dict for that analysis_id = 1
+    snp_dict = _get_snp_dict(genotype_db, analysis_id=1)
 
     # THEN it shoould return a dict holding the rs numbers and allels from the two genotypes
     assert snp_dict == {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
@@ -150,7 +116,7 @@ def test_get_snp_dict_wrong_analysis(genotype_db):
 
 def test_compare():
     # GIVEN two analysis dicts like this:
-    analysis_1 = {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
+    analysis_1 = {'rs1': ['T', 'C'], 'rs2': ['G', 'A']}
     analysis_2 = {'rs1': ['A', 'C'], 'rs2': ['A', 'G']}
 
     # WHEN running _get_equality
@@ -163,27 +129,12 @@ def test_compare():
 def test_get_analysis_equalities_one_analysi_missing(genotype_db):
     # GIVEN a sample with two analyses
 
-    sample_id = 'test'
-    sample = Sample(id=sample_id)
-    genotype_db.add_commit(sample)
+    sample = Sample(id='test')
+    analysis = Analysis(id=1, sample_id='test', type='genotype')
+    genotypes = [Genotype(id=1, analysis_id=1, rsnumber='rs1', allele_1='C', allele_2='T'),
+                 Genotype(id=2, analysis_id=1, rsnumber='rs2', allele_1='A', allele_2='G')]
 
-    analysis_id = 2
-    analysis = Analysis(id=analysis_id)
-    analysis.sample_id = sample_id
-    analysis.type = 'genotype'
-    genotype_db.add_commit(analysis)
-    genotype_3 = Genotype(id=3)
-    genotype_3.analysis_id = analysis_id
-    genotype_3.rsnumber = 'rs1'
-    genotype_3.allele_1 = 'C'
-    genotype_3.allele_2 = 'T'
-    genotype_4 = Genotype(id=4)
-    genotype_4.analysis_id = analysis_id
-    genotype_4.rsnumber = 'rs2'
-    genotype_4.allele_1 = 'A'
-    genotype_4.allele_2 = 'G'
-
-    genotype_db.add_commit(genotype_3, genotype_4)
+    genotype_db.add_commit(sample, analysis, genotypes)
 
     # WHEN running get_analysis_equalities
     genotype_doc = get_analysis_equalities(genotype_db, sample)
