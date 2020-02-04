@@ -35,8 +35,8 @@ def test_get_analysis_equalities(genotype_db):
     genotype_3 = Genotype(id=3)
     genotype_3.analysis_id = analysis_id
     genotype_3.rsnumber = 'rs1'
-    genotype_3.allele_1 = 'T'
-    genotype_3.allele_2 = 'C'
+    genotype_3.allele_1 = 'C'
+    genotype_3.allele_2 = 'T'
     genotype_4 = Genotype(id=4)
     genotype_4.analysis_id = analysis_id
     genotype_4.rsnumber = 'rs2'
@@ -49,7 +49,7 @@ def test_get_analysis_equalities(genotype_db):
     genotype_doc = get_analysis_equalities(genotype_db, sample)
 
     # THEN it should return a dictionary like this:
-    doc = {'snps': {'genotype': {'rs1': ['T', 'C'], 'rs2': ['A', 'G']},
+    doc = {'snps': {'genotype': {'rs1': ['C', 'T'], 'rs2': ['A', 'G']},
                     'sequence': {'rs1': ['T', 'C'], 'rs2': ['T', 'G']},
                     'comp': {'rs1': True, 'rs2': False}}}
 
@@ -160,13 +160,35 @@ def test_compare():
     assert compare_dict == {'rs1': False, 'rs2': True}
 
 
-def test_get_equality_wrong_key():
-    # GIVEN two analysis dicts like this:
-    analysis_1 = {'rs1': ['T', 'C'], 'rs2': ['A', 'G']}
-    analysis_2 = {'rs5': ['A', 'C'], 'rs2': ['A', 'G']}
+def test_get_analysis_equalities_one_analysi_missing(genotype_db):
+    # GIVEN a sample with two analyses
 
-    # WHEN running _get_equality
-    compare_dict = _get_equality(analysis_1, analysis_2)
+    sample_id = 'test'
+    sample = Sample(id=sample_id)
+    genotype_db.add_commit(sample)
 
-    # THEN it shoould return a compare_dict like this:
-    assert compare_dict == {'rs1': False, 'rs2': True, 'rs5': False}
+    analysis_id = 2
+    analysis = Analysis(id=analysis_id)
+    analysis.sample_id = sample_id
+    analysis.type = 'genotype'
+    genotype_db.add_commit(analysis)
+    genotype_3 = Genotype(id=3)
+    genotype_3.analysis_id = analysis_id
+    genotype_3.rsnumber = 'rs1'
+    genotype_3.allele_1 = 'C'
+    genotype_3.allele_2 = 'T'
+    genotype_4 = Genotype(id=4)
+    genotype_4.analysis_id = analysis_id
+    genotype_4.rsnumber = 'rs2'
+    genotype_4.allele_1 = 'A'
+    genotype_4.allele_2 = 'G'
+
+    genotype_db.add_commit(genotype_3, genotype_4)
+
+    # WHEN running get_analysis_equalities
+    genotype_doc = get_analysis_equalities(genotype_db, sample)
+
+    # THEN it should return a dictionary like this:
+    doc = {'snps': {'genotype': {'rs1': ['C', 'T'], 'rs2': ['A', 'G']}}}
+
+    assert genotype_doc == doc
