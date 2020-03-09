@@ -14,7 +14,7 @@ Flask-Reverse-Proxy
 Flask-SQLAlchemy==2.1
 Flask-Alchy
 Flask-Security
-werkzeug
+werkzeug<1.0.0  #due to breaking change
 Flask-Login
 Flask-Dance
 ruamel.yaml
