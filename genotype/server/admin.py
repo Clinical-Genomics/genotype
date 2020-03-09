@@ -5,7 +5,7 @@ from flask_dance.consumer import oauth_authorized
 from flask import flash, redirect, request, session, url_for
 from flask_login import (LoginManager, login_user, login_required, logout_user,
                          AnonymousUserMixin)
-from path import Path
+from pathlib import Path
 import ruamel.yaml
 
 
