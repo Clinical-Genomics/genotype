@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from path import Path
+from pathlib import Path
 
 from genotype.store.models import Plate
 
