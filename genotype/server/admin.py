@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+"""Admin views"""
+from pathlib import Path
 from flask import current_app
 from flask_dance.contrib.google import make_google_blueprint
 from flask_dance.consumer import oauth_authorized
 from flask import flash, redirect, request, session, url_for
 from flask_login import (LoginManager, login_user, login_required, logout_user,
                          AnonymousUserMixin)
-from pathlib import Path
 import ruamel.yaml
 
 
