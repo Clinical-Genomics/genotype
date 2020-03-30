@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-from pathlib import Path
+import os
 
 from genotype.store.models import Plate
 
 
 def extract_plateid(excel_path):
     """Extract ID from Excel book path."""
-    name = Path(excel_path).basename()
+    name = os.path.basename(excel_path)
     plate_id = name.split('_', 1)[0]
     return plate_id
 

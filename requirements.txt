@@ -5,10 +5,10 @@ SQLAlchemy
 cyvcf2<0.10.0
 xlrd
 pymysql
-pysam
+pysam==0.15.2           # due to inability to rebuild newer pysam version
 
 # server
-Flask
+Flask>=1.1.1
 Flask-Bootstrap
 Flask-Reverse-Proxy
 Flask-SQLAlchemy==2.1
