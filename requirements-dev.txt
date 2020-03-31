@@ -1,20 +1,33 @@
-bumpversion
+# pytest
+pytest>=5.2     # due to pytest-flask, pytest-cov
+pytest-mock
+
+# coverage
 coverage<5
+pytest-cov
 coveralls
+python-coveralls>=2.9.3     # due to conflict on coverage package
+
+# linting
+git-lint
+pylint
+six~=1.12               # due to astroid
+pycodestyle
+yamllint
+docutils
+html-linter
+tidy
 flake8
+
+# black
+black
+pre-commit
+
 invoke
-pytest
 wheel>=0.23.0
 Sphinx
 sphinx-bootstrap-theme
 sphinxcontrib-napoleon
 ipdb
 ipython
-git-lint
-pylint
-pycodestyle
-yamllint
-docutils
-html-linter
-black
-pre-commit
+bumpversion
