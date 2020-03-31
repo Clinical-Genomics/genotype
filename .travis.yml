@@ -26,7 +26,7 @@ jobs:
       if: type = pull_request
       python: "3.6.2"             # version in prod170926
       install:
-        - pip install pip==9.0.1  # pip version in prod170926
+        - pip install pip==20.0.2  # pip version in P_genotype
         - pip install cython
         - pip install .
       script: pip check
