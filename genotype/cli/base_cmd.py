@@ -12,6 +12,9 @@ from genotype import __title__, __version__
 from genotype.store import api
 
 from .serve import serve_cmd
+from .init_cmd import init_cmd
+from .load_cmd import load_cmd
+from .delete_cmd import delete_cmd
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +28,7 @@ LOG = logging.getLogger(__name__)
 @click.version_option(__version__, prog_name=__title__)
 @click.pass_context
 def root(context, config, database, log_level, log_file):
-    """Interact with Taboo genotype comparison tool."""
+    """Interact with genotype comparison tool."""
     coloredlogs.install(level=log_level)
 
     LOG.debug("%s: version %s", __title__, __version__)
@@ -45,3 +48,9 @@ def root(context, config, database, log_level, log_file):
         # setup database
         uri = context.obj['database'] or 'sqlite://'
         context.obj['db'] = api.connect(uri)
+
+root.add_command(serve_cmd)
+root.add_command(init_cmd)
+root.add_command(load_cmd)
+root.add_command(delete_cmd)
+

@@ -1,6 +1,9 @@
-# -*- coding: utf-8 -*-
-import os
+"""Code for reading excel sheet with genotype information"""
+
 import logging
+import os
+
+from typing import List
 
 import xlrd
 
@@ -8,20 +11,14 @@ from genotype.compat import zip
 from genotype.exc import SexConflictError
 from genotype.store.models import Analysis, Genotype
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-def load_excel(file_path, file_contents, include_key=None):
+def load_excel(file_path: str, file_contents: str, include_key: bool = None) -> List[Analysis]:
     """Load genotypes from an Excel file.
 
     3. go over SNPs, build genotypes and link to analyses
     4. return analyses
-
-    Args:
-        excel_file (path): path to to Excel file
-
-    Returns:
-        List[Analysis]: list of Analysis records
     """
     # import Excel (book) file
     book = xlrd.open_workbook(file_contents=file_contents)
