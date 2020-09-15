@@ -15,6 +15,7 @@ from .serve import serve_cmd
 from .init_cmd import init_cmd
 from .load_cmd import load_cmd
 from .delete_cmd import delete_cmd
+from .match_cmd import match_cmd, check_cmd
 
 LOG = logging.getLogger(__name__)
 
@@ -53,4 +54,6 @@ root.add_command(serve_cmd)
 root.add_command(init_cmd)
 root.add_command(load_cmd)
 root.add_command(delete_cmd)
+root.add_command(match_cmd)
+root.add_command(check_cmd)
 
