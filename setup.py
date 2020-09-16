@@ -1,24 +1,24 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""Based on https://github.com/pypa/sampleproject/blob/master/setup.py."""
-# To use a consistent encoding
-import codecs
+"""Code that describes the package"""
+
+import io
 import os
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
-import sys
 
-# Shortcut for building/publishing to Pypi
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist bdist_wheel upload')
-    sys.exit()
+NAME = "genotype"
+DESCRIPTION = ("genotype provides an automated pipipeline for comparing"
+               "genotypes from different assays.")
+URL = "https://github.com/Clinical-Genomics/genotype"
+AUTHOR = "Robin Andeer"
+EMAIL = "mans.magnusson@scilifelab.se"
+
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 def parse_reqs(req_path='./requirements.txt'):
     """Recursively parse requirements from nested pip files."""
     install_requires = []
-    with codecs.open(req_path, 'r') as handle:
+    with io.open(os.path.join(HERE, req_path), encoding="utf-8") as handle:
         # remove comments and empty lines
         lines = (line.strip() for line in handle
                  if line.strip() and not line.startswith('#'))
@@ -33,51 +33,28 @@ def parse_reqs(req_path='./requirements.txt'):
     return install_requires
 
 
-# This is a plug-in for setuptools that will invoke py.test
-# when you run python setup.py test
-class PyTest(TestCommand):
-
-    """Set up the py.test test runner."""
-
-    def finalize_options(self):
-        """Set options for the command line."""
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        """Execute the test runner command."""
-        # Import here, because outside the required eggs aren't loaded yet
-        import pytest
-        sys.exit(pytest.main(self.test_args))
-
-
-# Get the long description from the relevant file
-here = os.path.abspath(os.path.dirname(__file__))
-with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+# Import the README and use it as the long-description.
+# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
+try:
+    with io.open(os.path.join(HERE, "README.md"), encoding="utf-8") as f:
+        LONG_DESCRIPTION = "\n" + f.read()
+except FileNotFoundError:
+    LONG_DESCRIPTION = DESCRIPTION
 
 
 setup(
-    name='genotype',
-
-    # Versions should comply with PEP440. For a discussion on
-    # single-sourcing the version across setup.py and the project code,
-    # see http://packaging.python.org/en/latest/tutorial.html#version
+    name=NAME,
     version='2.4.1',
-
-    description=("Taboo provides an automated pipipeline for comparing"
-                 "genotypes from different assays."),
-    long_description=long_description,
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type="text/markdown",
     # What does your project relate to? Separate with spaces.
     keywords='genotype development',
-    author='Robin Andeer',
-    author_email='robin.andeer@scilifelab.se',
+    author=AUTHOR,
+    author_email=EMAIL,
     license='MIT',
-
     # The project's main homepage
-    url='https://github.com/robinandeer/genotype',
-
+    url=URL,
     packages=find_packages(exclude=('tests*', 'docs', 'examples')),
 
     # If there are data files included in your packages that need to be
@@ -90,25 +67,9 @@ setup(
     },
     zip_safe=False,
 
-    # Although 'package_data' is the preferred approach, in some case you
-    # may need to place data files outside of your packages.
-    # In this case, 'data_file' will be installed into:
-    # '<sys.prefix>/my_data'
-    # data_files=[('my_data',tr ['data/data_file'])],
-
     # Install requirements loaded from ``requirements.txt``
     install_requires=parse_reqs(),
-    tests_require=[
-        'pytest',
-    ],
-    cmdclass=dict(
-        test=PyTest,
-    ),
 
-    # To provide executable scripts, use entry points in preference to the
-    # "scripts" keyword. Entry points provide cross-platform support and
-    # allow pip to create the appropriate form of executable for the
-    # target platform.
     entry_points={
         'console_scripts': [
             'genotype = genotype.cli:root',
@@ -147,11 +108,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.6',
 
         'Environment :: Console',
     ],
