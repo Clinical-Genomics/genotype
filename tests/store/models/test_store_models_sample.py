@@ -2,8 +2,8 @@
 from genotype.store.models import Sample
 
 
-SAMPLE = Sample(id='ADM12')
-SAMPLE_FILLED_IN = Sample(id='ADM13', sex='female', status='PASS')
+SAMPLE = Sample(id="ADM12")
+SAMPLE_FILLED_IN = Sample(id="ADM13", sex="female", status="PASS")
 
 
 def test___str__():

@@ -6,7 +6,7 @@ from genotype.store.models import Plate
 def extract_plateid(excel_path):
     """Extract ID from Excel book path."""
     name = os.path.basename(excel_path)
-    plate_id = name.split('_', 1)[0]
+    plate_id = name.split("_", 1)[0]
     return plate_id
 
 

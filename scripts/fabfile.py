@@ -4,12 +4,12 @@ from fabric.utils import puts
 
 env.use_ssh_config = True
 
-APP_NAME = 'genotype'
+APP_NAME = "genotype"
 
 
 def update():
     with cd("~/{}".format(APP_NAME)):
         puts("updating {}...".format(APP_NAME))
-        run('git pull')
-    puts('restarting server...')
+        run("git pull")
+    puts("restarting server...")
     run("supervisorctl restart {}".format(APP_NAME))

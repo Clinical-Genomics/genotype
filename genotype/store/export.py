@@ -18,10 +18,11 @@ def get_sample(sample: Sample = None) -> dict:
                                 "comment": "Lorem ipsum"}"""
 
     sample_dict = {
-                'status': sample.status,
-                'sample_created_in_genotype_db': sample.created_at.date().isoformat(),
-                'sex': sample.sex,
-                'comment': sample.comment}
+        "status": sample.status,
+        "sample_created_in_genotype_db": sample.created_at.date().isoformat(),
+        "sex": sample.sex,
+        "comment": sample.comment,
+    }
 
     return sample_dict
 
@@ -36,7 +37,7 @@ def _get_snp_dict(session, analysis_id: str) -> dict:
     snp_dict = {}
     genotypes = genotypes_by_analysis(session, analysis_id)
     if not genotypes:
-        LOG.warning('Did not find Genotype data for analysis_id %s', (analysis_id))
+        LOG.warning("Did not find Genotype data for analysis_id %s", (analysis_id))
     for genotype in genotypes:
         snp_dict[genotype.rsnumber] = [genotype.allele_1, genotype.allele_2]
     return snp_dict
@@ -51,7 +52,7 @@ def _get_equality(analysis_1: dict, analysis_2: dict) -> dict:
         analysis_2(dict): Eg: {'rs10144418': ['A', 'C'], 'rs1037256': ['G', 'A'],... }
     Returns:
         compare_dict(dict): Eg: {'rs10144418': False, 'rs1037256': True,... }
-        """
+    """
 
     compare_dict = {}
 
@@ -85,9 +86,9 @@ def get_analysis_equalities(session, sample: Sample = None) -> dict:
     snps = {}
     for analysis in analyses:
         if analysis.plate_id:
-            analysis_equalities['plate'] = analysis.plate.plate_id
+            analysis_equalities["plate"] = analysis.plate.plate_id
         snps[analysis.type] = _get_snp_dict(session, analysis.id)
-        if snps.get('sequence') and snps.get('genotype'):
-            snps['comp'] = _get_equality(snps['sequence'], snps['genotype'])
-    analysis_equalities['snps'] = snps
+        if snps.get("sequence") and snps.get("genotype"):
+            snps["comp"] = _get_equality(snps["sequence"], snps["genotype"])
+    analysis_equalities["snps"] = snps
     return analysis_equalities
