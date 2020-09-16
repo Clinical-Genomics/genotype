@@ -27,8 +27,10 @@ class EntryPointsCLI(click.MultiCommand):
 
     def _iter_commands(self):
         """Iterate over all subcommands as defined by the entry point."""
-        return {entry_point.name: entry_point for entry_point in
-                pkg_resources.iter_entry_points('genotype.subcommands.2')}
+        return {
+            entry_point.name: entry_point
+            for entry_point in pkg_resources.iter_entry_points("genotype.subcommands.2")
+        }
 
     def list_commands(self, ctx):
         """List the available commands."""
@@ -45,11 +47,12 @@ class EntryPointsCLI(click.MultiCommand):
 
 
 @click.group(cls=EntryPointsCLI)
-@click.option('-c', '--config', default='~/.genotype.yaml',
-              type=click.Path(), help='path to config file')
-@click.option('-d', '--database', help='path/URI of the SQL database')
-@click.option('-l', '--log-level', default='INFO')
-@click.option('--log-file', type=click.Path())
+@click.option(
+    "-c", "--config", default="~/.genotype.yaml", type=click.Path(), help="path to config file"
+)
+@click.option("-d", "--database", help="path/URI of the SQL database")
+@click.option("-l", "--log-level", default="INFO")
+@click.option("--log-file", type=click.Path())
 @click.version_option(__version__, prog_name=__title__)
 @click.pass_context
 def root(context, config, database, log_level, log_file):
@@ -65,10 +68,10 @@ def root(context, config, database, log_level, log_file):
         context.obj = {}
 
     context.default_map = context.obj
-    if context.obj.get('database') is None:
-        context.obj['database'] = database
+    if context.obj.get("database") is None:
+        context.obj["database"] = database
 
-    if context.invoked_subcommand != 'serve':
+    if context.invoked_subcommand != "serve":
         # setup database
-        uri = context.obj['database'] or 'sqlite://'
-        context.obj['db'] = api.connect(uri)
+        uri = context.obj["database"] or "sqlite://"
+        context.obj["db"] = api.connect(uri)

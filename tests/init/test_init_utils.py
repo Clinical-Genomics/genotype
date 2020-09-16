@@ -11,7 +11,7 @@ def test_read_snp(snp_sequence):
     assert len(snps) == no_rows
     # first row: rs10144418, T, 14, 55817708
     first_snp = snps[0]
-    first_row = snp_sequence[0].split('\t')
+    first_row = snp_sequence[0].split("\t")
     assert first_snp.id == first_row[0]
     assert first_snp.ref == first_row[1]
     assert first_snp.chrom == first_row[2]

@@ -7,12 +7,12 @@ def test_root(invoke_cli):
     result = invoke_cli()
     # THEN it should execute normally and print version string
     assert result.exit_code == 0
-    assert result.output.startswith('Usage:')
+    assert result.output.startswith("Usage:")
 
 
 def test_missing_command(invoke_cli):
     # GIVEN a missing subcommand
-    command = 'idontexist'
+    command = "idontexist"
     # WHEN calling the CLI with the missing subcommand
     result = invoke_cli([command])
     # THEN the CLI should error and exit
@@ -23,8 +23,8 @@ def test_logging_to_file(tmpdir, invoke_cli):
     # GIVEN an empty directory
     assert tmpdir.listdir() == []
     # WHEN running the CLI to display some help for a subcommand
-    log_path = tmpdir.join('stderr.log')
-    result = invoke_cli(['--log-file', str(log_path), 'add-sex', '--help'])
+    log_path = tmpdir.join("stderr.log")
+    result = invoke_cli(["--log-file", str(log_path), "add-sex", "--help"])
     assert result.exit_code == 0
     assert tmpdir.listdir() == [log_path]
 
@@ -32,6 +32,6 @@ def test_logging_to_file(tmpdir, invoke_cli):
 def test_with_config(invoke_cli, config_path):
     # GIVEN a config file
     # WHEN running the CLI with the config
-    result = invoke_cli(['--config', config_path, 'add-sex', '--help'])
+    result = invoke_cli(["--config", config_path, "add-sex", "--help"])
     # THEN is should work :P
     assert result.exit_code == 0

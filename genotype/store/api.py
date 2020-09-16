@@ -10,16 +10,18 @@ log = logging.getLogger(__name__)
 
 
 def connect(uri):
-    log.debug('open connection to database: %s', uri)
+    log.debug("open connection to database: %s", uri)
     manager = Manager(config=dict(SQLALCHEMY_DATABASE_URI=uri), Model=Model)
     return manager
 
 
 def complete():
     """Return samples that have been annotated completely."""
-    query = (Sample.query.join(Sample.analyses)
-                         .group_by(Analysis.sample_id)
-                         .having(func.count(Analysis.sample_id) == 2))
+    query = (
+        Sample.query.join(Sample.analyses)
+        .group_by(Analysis.sample_id)
+        .having(func.count(Analysis.sample_id) == 2)
+    )
     return query
 
 
@@ -31,7 +33,7 @@ def pending():
 
 def failing():
     """Return all samples that have failed some check."""
-    query = Sample.query.filter_by(status='fail')
+    query = Sample.query.filter_by(status="fail")
     return query
 
 
@@ -43,18 +45,16 @@ def get_samples_after(date):
 
 def passing():
     """Return all samples that have passed the checks."""
-    query = Sample.query.filter_by(status='pass')
+    query = Sample.query.filter_by(status="pass")
     return query
 
 
 def incomplete(query=None, since=None):
     """Return samples that haven't been annotated completely."""
     base_query = query or Sample.query
-    base_query = (base_query.join(Sample.analyses)
-                            .order_by(Analysis.created_at.desc()))
+    base_query = base_query.join(Sample.analyses).order_by(Analysis.created_at.desc())
     # filter analyses on which are lacking genotypes
-    base_query = (base_query.group_by(Analysis.sample_id)
-                            .having(func.count(Analysis.sample_id) < 2))
+    base_query = base_query.group_by(Analysis.sample_id).having(func.count(Analysis.sample_id) < 2)
     if since:
         base_query = base_query.filter(Analysis.created_at > since)
     return base_query
@@ -62,14 +62,15 @@ def incomplete(query=None, since=None):
 
 def missing_genotypes(session, analysis_type, since=None):
     """Return analyses where the complementing genotype info is missing."""
-    subquery = (session.query(Analysis, Sample.sex.label('sample_sex'))
-                       .join(Analysis.sample)
-                       .order_by(Analysis.created_at.desc())
-                       .group_by(Analysis.sample_id)
-                       .having(func.count(Analysis.sample_id) < 2)
-                       .subquery())
-    query = (session.query(subquery)
-                    .filter(subquery.c.type != analysis_type))
+    subquery = (
+        session.query(Analysis, Sample.sex.label("sample_sex"))
+        .join(Analysis.sample)
+        .order_by(Analysis.created_at.desc())
+        .group_by(Analysis.sample_id)
+        .having(func.count(Analysis.sample_id) < 2)
+        .subquery()
+    )
+    query = session.query(subquery).filter(subquery.c.type != analysis_type)
     if since:
         query = query.filter(Analysis.created_at > since)
     return query
@@ -78,11 +79,13 @@ def missing_genotypes(session, analysis_type, since=None):
 def missing_sex(since=None):
     """Return Samples lacking sex but having all genotypes."""
     nosex_filter = or_(Sample.sex == None, Analysis.sex == None)
-    query = (Sample.query.join(Sample.analyses)
-                         .order_by(Analysis.created_at.desc())
-                         .filter(nosex_filter)
-                         .group_by(Analysis.sample_id)
-                         .having(func.count(Analysis.sample_id) == 2))
+    query = (
+        Sample.query.join(Sample.analyses)
+        .order_by(Analysis.created_at.desc())
+        .filter(nosex_filter)
+        .group_by(Analysis.sample_id)
+        .having(func.count(Analysis.sample_id) == 2)
+    )
     if since:
         query = query.filter(Analysis.created_at > since)
     return query
@@ -90,7 +93,7 @@ def missing_sex(since=None):
 
 def snps():
     """Return all the SNPs in order."""
-    query = SNP.query.order_by('id')
+    query = SNP.query.order_by("id")
     return query
 
 
@@ -107,8 +110,7 @@ def samples(plate_id=None, no_status=False):
     """List samples in the database."""
     query = Sample.query
     if plate_id:
-        query = (query.join(Sample.analyses)
-                      .filter(Analysis.source.like("%{}\_%".format(plate_id))))
+        query = query.join(Sample.analyses).filter(Analysis.source.like("%{}\_%".format(plate_id)))
     if no_status:
         query = query.filter(Sample.status == None)
     return query
@@ -138,7 +140,9 @@ def delete_analysis(db, old_analysis, log=True):
 Source: {analysis.source}
 Type: {analysis.type}
 Sex: {analysis.sex}
-----------  AUTO: end replace  ----------\n""".format(analysis=old_analysis)
+----------  AUTO: end replace  ----------\n""".format(
+        analysis=old_analysis
+    )
     if old_analysis.sample.comment:
         old_analysis.sample.comment += log_msg
     else:
@@ -162,15 +166,12 @@ def add_analysis(db, new_analysis, replace=False):
     Returns:
         Analysis/None: the analysis if successful, otherwise `None`
     """
-    analysis_kwargs = dict(sample_id=new_analysis.sample_id,
-                           type=new_analysis.type)
+    analysis_kwargs = dict(sample_id=new_analysis.sample_id, type=new_analysis.type)
     old_analysis = analysis(**analysis_kwargs).first()
     if old_analysis:
-        log.debug("found old analysis: %s-%s",
-                  new_analysis.sample_id, new_analysis.type)
+        log.debug("found old analysis: %s-%s", new_analysis.sample_id, new_analysis.type)
         if replace:
-            log.info("deleting old analysis: %s-%s",
-                     new_analysis.sample_id, new_analysis.type)
+            log.info("deleting old analysis: %s-%s", new_analysis.sample_id, new_analysis.type)
             delete_analysis(db, old_analysis)
         else:
             return None
@@ -178,7 +179,7 @@ def add_analysis(db, new_analysis, replace=False):
     # check if sample already in database
     sample_obj = Sample.query.get(new_analysis.sample_id)
     if sample_obj:
-        log.debug('found sample in database')
+        log.debug("found sample in database")
         new_analysis.sample = sample_obj
     else:
         sample_obj = Sample(id=new_analysis.sample_id)

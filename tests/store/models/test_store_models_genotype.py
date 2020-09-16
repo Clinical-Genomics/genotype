@@ -10,7 +10,7 @@ def test_Genotype_alleles(genotypes):
     # WHEN accessing them both
     alleles = genotype.alleles
     # THEN they should be returned as a list in sorted order
-    assert alleles == ['A', 'G']
+    assert alleles == ["A", "G"]
 
 
 def test_Genotype__eq__(genotypes):
@@ -29,7 +29,7 @@ def test_Genotype__eq__(genotypes):
     assert is_the_same is True
 
     # GIVEN one of the genotypes is of a unknown alleles
-    genotype_2 = genotypes['unknown']
+    genotype_2 = genotypes["unknown"]
     # WHEN comparing
     # THEN it should raise an exception
     with pytest.raises(UnknownAllelesError):
@@ -42,7 +42,7 @@ def test_Genotype_stringify(genotypes):
     # WHEN stringifying it
     genotype_str = genotype.stringify()
     # THEN it should serialize into a string with sorted alleles
-    assert genotype_str == 'AG'
+    assert genotype_str == "AG"
 
 
 def test_Genotype_is_ok(genotypes):
@@ -54,7 +54,7 @@ def test_Genotype_is_ok(genotypes):
     assert is_ok is True
 
     # GIVEN a genotype with unknown alleles
-    unknown_alleles = genotypes['unknown']
+    unknown_alleles = genotypes["unknown"]
     # WHEN checking if it's OK
     is_ok = unknown_alleles.is_ok
     # THEN it should report _not_ OK

@@ -20,11 +20,10 @@ def json_serial(obj):
     if isinstance(obj, datetime):
         serial = obj.isoformat()
         return serial
-    raise TypeError('Type not serializable')
+    raise TypeError("Type not serializable")
 
 
 class JsonModel(ModelBase):
-
     def to_json(self, pretty=False):
         """Serialize Model to JSON."""
         kwargs = dict(indent=4, sort_keys=True) if pretty else dict()
@@ -45,12 +44,11 @@ class Genotype(Model):
         allele_2 (str): second allele base
     """
 
-    __table_args__ = (UniqueConstraint('analysis_id', 'rsnumber',
-                                       name='_analysis_rsnumber'),)
+    __table_args__ = (UniqueConstraint("analysis_id", "rsnumber", name="_analysis_rsnumber"),)
 
     id = Column(types.Integer, primary_key=True)
     rsnumber = Column(types.String(10))
-    analysis_id = Column(types.Integer, ForeignKey('analysis.id'))
+    analysis_id = Column(types.Integer, ForeignKey("analysis.id"))
     allele_1 = Column(types.String(1))
     allele_2 = Column(types.String(1))
 
@@ -62,7 +60,7 @@ class Genotype(Model):
 
     def __eq__(self, other):
         """Compare if two genotypes are the same."""
-        if '0' in self.alleles or '0' in other.alleles:
+        if "0" in self.alleles or "0" in other.alleles:
             raise UnknownAllelesError()
         return self.alleles == other.alleles
 
@@ -73,7 +71,7 @@ class Genotype(Model):
     @property
     def is_ok(self):
         """Check that the allele determination is okey."""
-        if '0' in self.alleles:
+        if "0" in self.alleles:
             return False
         else:
             return True
@@ -94,30 +92,29 @@ class Analysis(Model):
         genotypes (List[Genotype]): related genotypes from the analysis
     """
 
-    __table_args__ = (UniqueConstraint('sample_id', 'type',
-                                       name='_sample_type'),)
+    __table_args__ = (UniqueConstraint("sample_id", "type", name="_sample_type"),)
 
     id = Column(types.Integer, primary_key=True)
     type = Column(types.Enum(*TYPES), nullable=False)
     source = Column(types.Text())
     sex = Column(types.Enum(*SEXES))
-    sample_id = Column(types.String(32), ForeignKey('sample.id'))
+    sample_id = Column(types.String(32), ForeignKey("sample.id"))
     created_at = Column(types.DateTime, default=datetime.now)
-    plate_id = Column(ForeignKey('plate.id'))
+    plate_id = Column(ForeignKey("plate.id"))
 
-    genotypes = relationship('Genotype', order_by='Genotype.rsnumber',
-                             cascade='all,delete', backref='analysis')
+    genotypes = relationship(
+        "Genotype", order_by="Genotype.rsnumber", cascade="all,delete", backref="analysis"
+    )
 
     def __str__(self):
         """Stringify genotypes."""
         genotype_strs = [gt.stringify() for gt in self.genotypes]
-        parts = [self.sample_id, self.type, self.sex or '[sex]'] + genotype_strs
-        return '\t'.join(parts)
+        parts = [self.sample_id, self.type, self.sex or "[sex]"] + genotype_strs
+        return "\t".join(parts)
 
     def check(self):
         """Check that genotypes look okey."""
-        calls = ['known' if genotype.is_ok else 'unknown' for genotype
-                 in self.genotypes]
+        calls = ["known" if genotype.is_ok else "unknown" for genotype in self.genotypes]
         counter = Counter(calls)
         return counter
 
@@ -133,24 +130,25 @@ class Sample(Model):
     """
 
     id = Column(types.String(32), primary_key=True)
-    status = Column(types.Enum('pass', 'fail', 'cancel'))
+    status = Column(types.Enum("pass", "fail", "cancel"))
     comment = Column(types.Text(convert_unicode=True))
     sex = Column(types.Enum(*SEXES))
     created_at = Column(types.DateTime, default=datetime.now)
 
-    analyses = relationship('Analysis', cascade='all,delete', backref='sample')
+    analyses = relationship("Analysis", cascade="all,delete", backref="sample")
 
     def __str__(self):
         """Stringify sample record."""
-        parts = [self.id, self.status or '[status]', self.sex or '[sex]']
-        return '\t'.join(parts)
+        parts = [self.id, self.status or "[status]", self.sex or "[sex]"]
+        return "\t".join(parts)
 
     def update_status(self, new_status, comment_update):
         """Update the status with a required comment."""
         comment_update = u"""MANUAL STATUS UPDATE: {old} -> {new}
 Date: {date}
-{comment}""".format(old=self.status, new=new_status, date=datetime.now(),
-                    comment=comment_update)
+{comment}""".format(
+            old=self.status, new=new_status, date=datetime.now(), comment=comment_update
+        )
         self.status = new_status
         if self.comment:
             self.comment = u"{}\n\n{}".format(self.comment, comment_update)
@@ -171,24 +169,25 @@ Date: {date}
 
     def genotype_comparisons(self):
         """Return compared genotypes."""
-        genotype_pairs = zip(self.analysis('genotype').genotypes,
-                             self.analysis('sequence').genotypes)
+        genotype_pairs = zip(
+            self.analysis("genotype").genotypes, self.analysis("sequence").genotypes
+        )
         for gt1, gt2 in genotype_pairs:
-            if '0' in gt1.alleles or '0' in gt2.alleles:
-                yield gt1, gt2, 'unknown'
+            if "0" in gt1.alleles or "0" in gt2.alleles:
+                yield gt1, gt2, "unknown"
             elif gt1.alleles == gt2.alleles:
-                yield gt1, gt2, 'match'
+                yield gt1, gt2, "match"
             else:
-                yield gt1, gt2, 'mismatch'
+                yield gt1, gt2, "mismatch"
 
     def check_sex(self):
         """Check that the sex determination is okey."""
         assert self.sex is not None, "need to set expected sex on sample"
-        assert self.sex is not 'unknown', "need to specify known sex on sample"
+        assert self.sex is not "unknown", "need to specify known sex on sample"
         sexes = list(self.sexes)
         if len(sexes) == 1:
             raise ValueError("need to add sex information to analyses")
-        elif 'unkonwn' in sexes:
+        elif "unkonwn" in sexes:
             return False
         uniq_sexes = set(sexes)
         if len(uniq_sexes) == 1:
@@ -223,12 +222,12 @@ class User(Model, UserMixin):
     email = Column(types.String(128), unique=True)
     name = Column(types.String(128))
     avatar = Column(types.Text)
-    plates = relationship('Plate', backref='user')
+    plates = relationship("Plate", backref="user")
 
     @property
     def first_name(self):
         """First part of name."""
-        return self.name.split(' ')[0]
+        return self.name.split(" ")[0]
 
 
 class Plate(Model):
@@ -239,19 +238,20 @@ class Plate(Model):
     created_at = Column(types.DateTime, default=datetime.now)
     plate_id = Column(types.String(16), unique=True, nullable=False)
 
-    signed_by = Column(ForeignKey('user.id'))
+    signed_by = Column(ForeignKey("user.id"))
     signed_at = Column(types.DateTime)
     method_document = Column(types.Integer, default=1477)
     method_version = Column(types.Integer)
 
-    analyses = relationship('Analysis', backref='plate')
+    analyses = relationship("Analysis", backref="plate")
 
     @property
     def percent_done(self):
         """Calculate percent of samples completed."""
         all_samples = self.analyses
         all_samples_count = len(all_samples)
-        done_samples = [analysis for analysis in all_samples if
-                        analysis.sample.status in ('pass', 'cancel')]
+        done_samples = [
+            analysis for analysis in all_samples if analysis.sample.status in ("pass", "cancel")
+        ]
         done_samples_count = len(done_samples)
         return done_samples_count / all_samples_count * 100

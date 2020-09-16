@@ -9,6 +9,7 @@ pymysql
 cyvcf2<0.10.0
 xlrd
 pysam==0.15.2           # due to inability to rebuild newer pysam version
+pyyaml
 
 # server
 Flask>=1.1.1
