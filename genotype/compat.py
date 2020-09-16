@@ -22,9 +22,10 @@ if not is_py2:  # pragma: no cover
 
     # lazy iterators
     from itertools import filterfalse
-    iteritems = operator.methodcaller('items')
-    iterkeys = operator.methodcaller('keys')
-    itervalues = operator.methodcaller('values')
+
+    iteritems = operator.methodcaller("items")
+    iterkeys = operator.methodcaller("keys")
+    itervalues = operator.methodcaller("values")
 
 else:
     # Python 2
@@ -37,6 +38,7 @@ else:
     # lazy iterators
     range = xrange
     from itertools import izip as zip, ifilterfalse as filterfalse
-    iteritems = operator.methodcaller('iteritems')
-    iterkeys = operator.methodcaller('iterkeys')
-    itervalues = operator.methodcaller('itervalues')
+
+    iteritems = operator.methodcaller("iteritems")
+    iterkeys = operator.methodcaller("iterkeys")
+    itervalues = operator.methodcaller("itervalues")

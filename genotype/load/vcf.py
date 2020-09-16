@@ -7,8 +7,8 @@ from cyvcf2 import VCF
 from genotype.compat import itervalues
 from genotype.store.models import Analysis, Genotype
 
-Result = namedtuple('Result', ['sample', 'genotypes'])
-RawGenotype = namedtuple('RawGenotype', ['sample', 'allele_1', 'allele_2'])
+Result = namedtuple("Result", ["sample", "genotypes"])
+RawGenotype = namedtuple("RawGenotype", ["sample", "allele_1", "allele_2"])
 
 
 def load_vcf(vcf_file, snps):
@@ -24,22 +24,23 @@ def load_vcf(vcf_file, snps):
     vcf = VCF(vcf_file)
     # generate Analysis records for each included sample
     source = os.path.abspath(vcf_file)
-    analyses = {sample_id: Analysis(type='sequence', source=source,
-                                    sample_id=sample_id)
-                for sample_id in vcf.samples}
+    analyses = {
+        sample_id: Analysis(type="sequence", source=source, sample_id=sample_id)
+        for sample_id in vcf.samples
+    }
     for snp in snps:
         variant = fetch_snp(vcf, snp)
         if variant is None:
             # assume REF/REF
             for analysis in itervalues(analyses):
-                genotype = Genotype(rsnumber=snp.id, allele_1=snp.ref,
-                                    allele_2=snp.ref)
+                genotype = Genotype(rsnumber=snp.id, allele_1=snp.ref, allele_2=snp.ref)
                 analysis.genotypes.append(genotype)
         else:
             raw_genotypes = variant_genotypes(vcf.samples, variant)
             for raw_gt in raw_genotypes:
-                genotype = Genotype(rsnumber=snp.id, allele_1=raw_gt.allele_1,
-                                    allele_2=raw_gt.allele_2)
+                genotype = Genotype(
+                    rsnumber=snp.id, allele_1=raw_gt.allele_1, allele_2=raw_gt.allele_2
+                )
                 analysis = analyses[raw_gt.sample]
                 analysis.genotypes.append(genotype)
     return itervalues(analyses)
@@ -48,8 +49,8 @@ def load_vcf(vcf_file, snps):
 def variant_genotypes(sample_ids, variant):
     """Build Genotype objects from a BCF variant."""
     for sample_id, bases in zip(sample_ids, variant.gt_bases):
-        bases = bases.replace('|', '/')
-        allele_1, allele_2 = bases.split('/')
+        bases = bases.replace("|", "/")
+        allele_1, allele_2 = bases.split("/")
         yield RawGenotype(sample_id, allele_1, allele_2)
 
 
@@ -65,4 +66,4 @@ def fetch_snp(vcf, snp):
         return None
     else:  # pragma: no cover
         # weird SNP position lookup, not even possible; right?
-        raise ValueError('multiple variants found for SNP')
+        raise ValueError("multiple variants found for SNP")

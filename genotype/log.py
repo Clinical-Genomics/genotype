@@ -2,9 +2,9 @@
 import logging
 
 LEVELS = {
-    0: 'WARNING',
-    1: 'INFO',
-    2: 'DEBUG',
+    0: "WARNING",
+    1: "INFO",
+    2: "DEBUG",
 }
 
 
@@ -23,11 +23,11 @@ def init_log(logger, filename=None, loglevel=None):
 
     # We will always print warnings and higher to stderr
     console = logging.StreamHandler()
-    console.setLevel('WARNING')
+    console.setLevel("WARNING")
     console.setFormatter(formatter)
 
     if filename:
-        file_handler = logging.FileHandler(filename, encoding='utf-8')
+        file_handler = logging.FileHandler(filename, encoding="utf-8")
         if loglevel:
             file_handler.setLevel(getattr(logging, loglevel))
         file_handler.setFormatter(formatter)
