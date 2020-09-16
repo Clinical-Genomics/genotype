@@ -16,7 +16,12 @@ Try to use the follwing format:
 
 ### Fixed
 
-## [2.4.2]
+## [2.5.1]
+
+### Changed
+- Use mkdocs for publishing documentation
+
+## [2.5.0]
 
 ### Added
 - Adds this CHANGELOG
