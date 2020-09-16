@@ -2,17 +2,10 @@
 pytest>=5.2     # due to pytest-flask, pytest-cov
 pytest-mock
 
-# coverage
-pytest-cov
-coveralls
-
-pre-commit
-
 invoke
-wheel>=0.23.0
 Sphinx
 sphinx-bootstrap-theme
 sphinxcontrib-napoleon
-ipdb
-ipython
-bumpversion
+
+
+
