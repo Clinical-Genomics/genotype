@@ -2,10 +2,9 @@
 pytest>=5.2     # due to pytest-flask, pytest-cov
 pytest-mock
 
-invoke
-Sphinx
-sphinx-bootstrap-theme
-sphinxcontrib-napoleon
+mkdocs
+mkdocs-material
+
 
 
 

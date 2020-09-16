@@ -1,0 +1,13 @@
+site_name: Genotype documentation
+site_url: https://taboo.readthedocs.io/en/latest/
+repo_url: https://github.com/Clinical-Genomics/genotype/
+site_author: Clinical Genomics bioinfo team
+
+theme:
+  name: 'material'
+  palette:
+    primary: 'blue grey'
+    accent: 'cyan'
+
+nav:
+  - Home: 'README.md'
