@@ -16,6 +16,7 @@ from .init_cmd import init_cmd
 from .load_cmd import load_cmd
 from .delete_cmd import delete_cmd
 from .match_cmd import match_cmd, check_cmd
+from .store_cmd import add_sex, mip_sex, view, ls, sample, export_sample, export_sample_analysis
 
 LOG = logging.getLogger(__name__)
 
@@ -50,10 +51,17 @@ def root(context, config, database, log_level, log_file):
         uri = context.obj['database'] or 'sqlite://'
         context.obj['db'] = api.connect(uri)
 
+
 root.add_command(serve_cmd)
 root.add_command(init_cmd)
 root.add_command(load_cmd)
 root.add_command(delete_cmd)
 root.add_command(match_cmd)
 root.add_command(check_cmd)
-
+root.add_command(add_sex)
+root.add_command(mip_sex)
+root.add_command(view)
+root.add_command(ls)
+root.add_command(sample)
+root.add_command(export_sample)
+root.add_command(export_sample_analysis)

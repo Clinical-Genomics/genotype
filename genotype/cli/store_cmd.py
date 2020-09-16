@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+"""CLI code for commands that interact with the store"""
+
 from datetime import datetime, timedelta
 from datetime import date as make_date
 import logging
@@ -9,7 +10,7 @@ import yaml
 
 from genotype.store import api, export
 from genotype.constants import SEXES, TYPES
-from .parsemip import parse_mipsex
+from genotype.store.parsemip import parse_mipsex
 
 LOG = logging.getLogger(__name__)
 
