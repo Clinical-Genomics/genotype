@@ -22,11 +22,12 @@ LOG = logging.getLogger(__name__)
 
 
 @click.group()
-@click.option('-c', '--config', default='~/.genotype.yaml',
-              type=click.Path(), help='path to config file')
-@click.option('-d', '--database', help='path/URI of the SQL database')
-@click.option('-l', '--log-level', default='INFO')
-@click.option('--log-file', type=click.Path())
+@click.option(
+    "-c", "--config", default="~/.genotype.yaml", type=click.Path(), help="path to config file"
+)
+@click.option("-d", "--database", help="path/URI of the SQL database")
+@click.option("-l", "--log-level", default="INFO")
+@click.option("--log-file", type=click.Path())
 @click.version_option(__version__, prog_name=__title__)
 @click.pass_context
 def root(context, config, database, log_level, log_file):
@@ -45,13 +46,13 @@ def root(context, config, database, log_level, log_file):
         context.obj = {}
 
     context.default_map = context.obj
-    if context.obj.get('database') is None:
-        context.obj['database'] = database
+    if context.obj.get("database") is None:
+        context.obj["database"] = database
 
-    if context.invoked_subcommand != 'serve':
+    if context.invoked_subcommand != "serve":
         # setup database
-        uri = context.obj['database'] or 'sqlite://'
-        context.obj['db'] = api.connect(uri)
+        uri = context.obj["database"] or "sqlite://"
+        context.obj["db"] = api.connect(uri)
 
 
 root.add_command(serve_cmd)

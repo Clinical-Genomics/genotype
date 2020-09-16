@@ -16,24 +16,27 @@ LOG = logging.getLogger(__name__)
 def log_result(sample_id, result, hide_fail=False):
     total_snps = api.snps().count()
     cutoff = math.floor(total_snps / 5)
-    if result.get('mismatch', 0) == 0 or result.get('mismatch', 0) <= cutoff:
+    if result.get("mismatch", 0) == 0 or result.get("mismatch", 0) <= cutoff:
         log_func = LOG.info
     else:
         if hide_fail:
             log_func = LOG.debug
         else:
             log_func = LOG.warning
-    template = ("{sample} | matches: {match}, mismatches: {mismatch}, "
-                "unknown: {unknown}")
-    log_func(template.format(sample=sample_id,
-                             match=result.get('match', 0),
-                             mismatch=result.get('mismatch', 0),
-                             unknown=result.get('unknown', 0)))
+    template = "{sample} | matches: {match}, mismatches: {mismatch}, " "unknown: {unknown}"
+    log_func(
+        template.format(
+            sample=sample_id,
+            match=result.get("match", 0),
+            mismatch=result.get("mismatch", 0),
+            unknown=result.get("unknown", 0),
+        )
+    )
 
 
 @click.command("match")
-@click.option('-a', '--analysis', default='genotype', type=click.Choice(TYPES))
-@click.argument('sample_ids', nargs=-1)
+@click.option("-a", "--analysis", default="genotype", type=click.Choice(TYPES))
+@click.argument("sample_ids", nargs=-1)
 @click.pass_context
 def match_cmd(context, sample_ids, analysis):
     """Match genotypes for an analysis against all samples."""
@@ -58,7 +61,7 @@ def match_cmd(context, sample_ids, analysis):
 
 
 @click.command("check")
-@click.argument('sample_id')
+@click.argument("sample_id")
 @click.pass_context
 def check_cmd(context, sample_id):
     """Check integrity of a sample."""
@@ -67,15 +70,15 @@ def check_cmd(context, sample_id):
     # 1. check no calls from genotyping (could be sign of contamination)
     total_snps = api.snps().count()
     cutoff = math.floor(total_snps / 3)
-    genotype_analysis = sample_obj.analysis('genotype')
+    genotype_analysis = sample_obj.analysis("genotype")
     if genotype_analysis:
         calls = genotype_analysis.check()
-        if calls['unknown'] >= cutoff:
-            LOG.warning("genotyping: fail (%s no-calls)", calls['unknown'])
+        if calls["unknown"] >= cutoff:
+            LOG.warning("genotyping: fail (%s no-calls)", calls["unknown"])
         else:
-            LOG.debug("no-calls from genotyping: %s", calls['unknown'])
+            LOG.debug("no-calls from genotyping: %s", calls["unknown"])
     else:
-        LOG.debug('no genotyping analysis loaded')
+        LOG.debug("no genotyping analysis loaded")
 
     # 2. compare genotypes across analyses (sign of sample mixup)
     if len(sample_obj.analyses) == 2:
@@ -85,11 +88,11 @@ def check_cmd(context, sample_id):
         LOG.debug("analyses for samples not loaded")
 
     # 3. check sex determinations
-    if sample_obj.sex and sample_obj.sex is not 'unknown':
+    if sample_obj.sex and sample_obj.sex is not "unknown":
         if sample_obj.check_sex():
             LOG.info("sex determination: pass")
         else:
-            sex_str = '|'.join(list(sample_obj.sexes))
+            sex_str = "|".join(list(sample_obj.sexes))
             LOG.warning("sex determination: fail (%s)", sex_str)
         return
 

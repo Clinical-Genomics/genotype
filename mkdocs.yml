@@ -1,0 +1,12 @@
+site_name: Genotype documentation
+repo_url: https://github.com/Clinical-Genomics/genotype/
+site_author: Clinical Genomics bioinfo team
+
+theme:
+  name: 'material'
+  palette:
+    primary: 'blue grey'
+    accent: 'cyan'
+
+nav:
+  - Home: 'README.md'

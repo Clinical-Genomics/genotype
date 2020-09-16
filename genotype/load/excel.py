@@ -27,15 +27,16 @@ def load_excel(file_path: str, file_contents: str, include_key: bool = None) -> 
     sample_ids = parse_sampleids(sheet, include_key=include_key)
     # create new Analyses records
     source = os.path.abspath(file_path)
-    analyses = [Analysis(type='genotype', source=source, sample_id=sample_id)
-                for sample_id in sample_ids]
+    analyses = [
+        Analysis(type="genotype", source=source, sample_id=sample_id) for sample_id in sample_ids
+    ]
 
     # figure our where SNP columns begin
     header_row = sheet.row_values(0)
-    snp_start = find_column(header_row, pattern='rs')
+    snp_start = find_column(header_row, pattern="rs")
     rsnumber_columns = header_row[snp_start:]
     # find out the start of sex prediction columns
-    sex_start = find_column(header_row, pattern='ZF_')
+    sex_start = find_column(header_row, pattern="ZF_")
     sex_cols = slice(sex_start, sex_start + 3)
 
     # parse rows that match the "include key"
@@ -56,8 +57,9 @@ def parse_sampleids(sheet, include_key=None):
     """Build samples from Excel sheet."""
     sample_ids = (cell.value for cell in sheet.col_slice(1, 1))
     if include_key:
-        sample_ids = (sample_id.split('-')[-1] for sample_id
-                      in sample_ids if include_key in sample_id)
+        sample_ids = (
+            sample_id.split("-")[-1] for sample_id in sample_ids if include_key in sample_id
+        )
     return sample_ids
 
 
@@ -65,8 +67,7 @@ def build_genotypes(rsnumbers, row_values):
     """Build genotypes from an Excel row."""
     for rsnumber, genotype_str in zip(rsnumbers, row_values):
         alleles = genotype_str.split()
-        new_genotype = Genotype(rsnumber=rsnumber, allele_1=alleles[0],
-                                allele_2=alleles[1])
+        new_genotype = Genotype(rsnumber=rsnumber, allele_1=alleles[0], allele_2=alleles[1])
         yield new_genotype
 
 
@@ -75,28 +76,28 @@ def parse_sex(sex_cells):
     predictions = set()
 
     # first marker
-    if sex_cells[0] == 'T C':
-        predictions.add('male')
-    elif sex_cells[0] == 'C C':
-        predictions.add('female')
+    if sex_cells[0] == "T C":
+        predictions.add("male")
+    elif sex_cells[0] == "C C":
+        predictions.add("female")
 
     # second marker
-    if sex_cells[1] == 'T C':
-        predictions.add('male')
-    elif sex_cells[1] == 'C C':
-        predictions.add('female')
+    if sex_cells[1] == "T C":
+        predictions.add("male")
+    elif sex_cells[1] == "C C":
+        predictions.add("female")
 
     # third marker
-    if sex_cells[2] == 'C T':
-        predictions.add('male')
-    elif sex_cells[2] == 'T T':
-        predictions.add('female')
+    if sex_cells[2] == "C T":
+        predictions.add("male")
+    elif sex_cells[2] == "T T":
+        predictions.add("female")
 
     if len(predictions) == 1:
         return predictions.pop()
     elif len(predictions) == 0:
         # all assays failed
-        return 'unknown'
+        return "unknown"
     elif len(predictions) == 2:
         # assays returned conflicting results
         message = "conflicting sex predictions: {}".format(sex_cells)
@@ -120,10 +121,9 @@ def find_sheet(book, sheet_id=0):
         return book.sheet_by_name(sheet_id)
 
 
-def find_column(header_row, pattern='rs'):
+def find_column(header_row, pattern="rs"):
     """Find the first column in a row that matches a pattern."""
-    snp_columns = (index for index, column in enumerate(header_row)
-                   if column.startswith(pattern))
+    snp_columns = (index for index, column in enumerate(header_row) if column.startswith(pattern))
 
     # return the first index
     return next(snp_columns)

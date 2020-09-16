@@ -12,12 +12,12 @@ LOG = logging.getLogger(__name__)
 
 
 @click.command("delete")
-@click.option('-a', '--analysis', type=click.Choice(TYPES))
-@click.argument('sample_id')
+@click.option("-a", "--analysis", type=click.Choice(TYPES))
+@click.argument("sample_id")
 @click.pass_context
 def delete_cmd(context, analysis, sample_id):
     """Delete analyses and samples from the database."""
-    genotype_db = context.obj['db']
+    genotype_db = context.obj["db"]
     if analysis:
         LOG.info("deleting analysis: %s, %s", sample_id, analysis)
         old_analysis = api.analysis(sample_id, analysis).first()
