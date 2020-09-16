@@ -1,4 +1,4 @@
-name: CG Installation tests
+name: Installation tests
 
 on: ["pull_request"]
 
@@ -47,17 +47,3 @@ jobs:
       run: |
         pip install -r requirements-dev.txt
         pip check
-
-  install-with-pipenv:
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-    - uses: actions/checkout@v2
-
-    # Set up python
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7

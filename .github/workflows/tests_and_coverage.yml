@@ -31,7 +31,7 @@ jobs:
 
     - name: Test with pytest & Coveralls
       run: |
-        pytest --cov=cg/
+        pytest --cov=genotype/
         coveralls
       env:
         GITHUB: 1
