@@ -30,7 +30,9 @@ LOG = logging.getLogger(__name__)
 @click.version_option(__version__, prog_name=__title__)
 @click.pass_context
 def root(context, config, database, log_level, log_file):
-    """Interact with genotype comparison tool."""
+    """
+    Interact with genotype comparison tool.
+    """
     coloredlogs.install(level=log_level)
 
     LOG.debug("%s: version %s", __title__, __version__)
