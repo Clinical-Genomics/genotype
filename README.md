@@ -6,7 +6,6 @@
 
 
 # Genotype 
-[![Documentation Status][readthedocs-img]][readthedocs-url]
 ![Build Status - Github][gh-actions-badge]
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![GitHub issues-closed][closed-issues-img]][closed-issues-url]
@@ -20,12 +19,12 @@ Manage SNP calling comparisons at Clinical Genomics. The package exposes a CLI a
 
 ```bash
 $ conda install -c bioconda pysam pyyaml sqlalchemy flask
-$ pip install genotype==2.0.0-beta3
+$ pip install genotype
 ```
 
-## License
-MIT. See the [LICENSE](LICENSE) file for more details.
+## Help?
 
+Please check out the documentation
 
 
 [readthedocs-url]: https://readthedocs.org/projects/genotype/?badge=latest
