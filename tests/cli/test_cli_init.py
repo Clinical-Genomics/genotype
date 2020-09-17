@@ -19,16 +19,6 @@ def test_missing_command(invoke_cli):
     assert result.exit_code != 0
 
 
-def test_logging_to_file(tmpdir, invoke_cli):
-    # GIVEN an empty directory
-    assert tmpdir.listdir() == []
-    # WHEN running the CLI to display some help for a subcommand
-    log_path = tmpdir.join("stderr.log")
-    result = invoke_cli(["--log-file", str(log_path), "add-sex", "--help"])
-    assert result.exit_code == 0
-    assert tmpdir.listdir() == [log_path]
-
-
 def test_with_config(invoke_cli, config_path):
     # GIVEN a config file
     # WHEN running the CLI with the config
