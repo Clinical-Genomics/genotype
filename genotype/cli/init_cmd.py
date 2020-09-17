@@ -29,3 +29,4 @@ def init_cmd(context, reset, snps):
         LOG.warning("database already setup with genotypes")
         database_api.session.rollback()
         raise click.Abort
+    LOG.info("Database successfully setup")
