@@ -3,26 +3,30 @@
 import codecs
 from functools import partial
 from pathlib import Path
-from typing import List, Iterable
+from typing import List
 
-from click.testing import CliRunner
-from alchy import Manager
 import cyvcf2
 import pytest
+from alchy import Manager
+from click.testing import CliRunner
 
 from genotype.cli import root
 from genotype.init.utils import read_snps
 from genotype.store import api
-from genotype.store.models import SNP, Genotype, Sample, Analysis
+from genotype.store.models import SNP, Analysis, Genotype, Sample
 
 
 # Name fixtures
-
-
 @pytest.fixture(name="sample_id")
 def fixture_sample_id() -> str:
     """Return a sample id"""
     return "sample"
+
+
+@pytest.fixture(name="vcf_sample_id")
+def fixture_vcf_sample_id() -> str:
+    """Return a sample id that exists in the test VCF"""
+    return "000139T"
 
 
 # Test paths fixtures
@@ -67,7 +71,7 @@ def fixture_config_path(sample_dir: Path) -> Path:
 @pytest.fixture(name="snp_sequence")
 def fixture_snp_sequence(snp_path: Path) -> List[str]:
     """Return a list with snp information"""
-    with codecs.open(snp_path, "r") as sequence:
+    with codecs.open(str(snp_path), "r") as sequence:
         lines = [line for line in sequence]
     return lines
 
@@ -107,14 +111,24 @@ def fixture_genotype_db(empty_db: Manager, snps: List[SNP]) -> Manager:
     return empty_db
 
 
-@pytest.yield_fixture(scope="function")
-def existing_db(tmpdir) -> Manager:
+@pytest.yield_fixture(scope="function", name="existing_db")
+def fixture_existing_db(tmpdir) -> Manager:
     """Return a manager with a existing instantiated database"""
     db_path = "sqlite:///{}".format(tmpdir.join("coverage.sqlite3"))
     genotype_db = api.connect(db_path)
     genotype_db.create_all()
     yield genotype_db
     genotype_db.drop_all()
+
+
+@pytest.yield_fixture(scope="function", name="populated_db")
+def populated_db(existing_db: Manager, snps: List[SNP], sample: Sample) -> Manager:
+    """Return a manager with a database populated with snps and a sample"""
+    existing_db.add_commit(snps)
+    existing_db.add_commit(sample)
+    yield existing_db
+    existing_db.drop_all()
+    existing_db.create_all()
 
 
 @pytest.yield_fixture(scope="function")
@@ -127,8 +141,8 @@ def setexist_db(existing_db: Manager, snps: List[SNP], sample: Sample) -> Manage
     existing_db.create_all()
 
 
-@pytest.yield_fixture(scope="function")
-def sample_db(genotype_db: Manager, snps: List[SNP]) -> Manager:
+@pytest.yield_fixture(scope="function", name="sample_db")
+def fixture_sample_db(genotype_db: Manager, snps: List[SNP]) -> Manager:
     genotype_db.add_commit(snps)
     yield genotype_db
     genotype_db.drop_all()
@@ -159,7 +173,7 @@ def fixture_genotypes() -> dict:
 
 
 @pytest.fixture(name="sample")
-def fixture_sample() -> Sample:
+def fixture_sample(sample_id: str) -> Sample:
     """Return a sample object"""
     genotypes = [
         Genotype(rsnumber="rs9988021", allele_1="G", allele_2="G"),
@@ -168,6 +182,6 @@ def fixture_sample() -> Sample:
         Genotype(rsnumber="rs5918195", allele_1="T", allele_2="C"),
     ]
     analysis = Analysis(type="genotype", source="file.xlsx", sex="female", genotypes=genotypes)
-    _sample = Sample(id="sample")
+    _sample = Sample(id=sample_id)
     _sample.analyses.append(analysis)
     return _sample
