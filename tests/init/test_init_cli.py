@@ -11,6 +11,7 @@ from genotype.cli.init_cmd import init_cmd
 
 
 def test_init(cli_runner: CliRunner, existing_db: Manager, snp_path: Path, snp_count: int):
+    """Test to initialize a database with some snps"""
     # GIVEN an empty exising database
     db_uri = existing_db.engine.url
     assert Sample.query.count() == 0
@@ -42,6 +43,7 @@ def test_init_already_initialised(
 def test_reset_initialized(
     cli_runner: CliRunner, genotype_db: Manager, snp_count: int, snp_path: str
 ):
+    """Test to re initialise a database by using the 'reset' flag"""
     # GIVEN a database which is already set up
     context = {"db": genotype_db}
     assert SNP.query.count() == snp_count
