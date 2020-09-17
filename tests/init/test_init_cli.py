@@ -1,31 +1,54 @@
-# -*- coding: utf-8 -*-
+"""Test to initialize databases"""
+
+from pathlib import Path
+
+from click.testing import CliRunner
+from alchy import Manager
+
 from genotype.store.models import Sample, SNP
+from genotype.cli.base_cmd import root
+from genotype.cli.init_cmd import init_cmd
 
 
-def test_init(invoke_cli, existing_db, snp_path, snp_sequence):
+def test_init(cli_runner: CliRunner, existing_db: Manager, snp_path: Path, snp_count: int):
     # GIVEN an empty exising database
-    snp_count = len(snp_sequence)
     db_uri = existing_db.engine.url
     assert Sample.query.count() == 0
     assert SNP.query.count() == 0
+
     # WHEN running 'init' subcommand in CLI
-    result = invoke_cli(["-d", db_uri, "init", snp_path])
+    result = cli_runner.invoke(root, ["-d", db_uri, "init", str(snp_path)])
+
     # THEN it should work and populate the database with SNPs
     assert result.exit_code == 0
     assert SNP.query.count() == snp_count
 
+
+def test_init_already_initialised(
+    cli_runner: CliRunner, existing_db: Manager, snp_count: int, snp_path: str
+):
+    """Test to intitialize a database that is already initialized"""
     # GIVEN a database which is already set up
+    db_uri = existing_db.engine.url
+    cli_runner.invoke(root, ["-d", db_uri, "init", str(snp_path)])
     assert SNP.query.count() == snp_count
     # WHEN running 'init' subcommand again
-    result = invoke_cli(["-d", db_uri, "init", snp_path])
+    result = cli_runner.invoke(root, ["-d", db_uri, "init", str(snp_path)])
     # THEN it should abort and log a warning
     assert result.exit_code != 0
     assert "WARNING" in result.output
 
+
+def test_reset_initialized(
+    cli_runner: CliRunner, genotype_db: Manager, snp_count: int, snp_path: str
+):
     # GIVEN a database which is already set up
+    context = {"db": genotype_db}
     assert SNP.query.count() == snp_count
+
     # WHEN running 'init' subcommand again **with reset flag**
-    result = invoke_cli(["-d", db_uri, "init", "--reset", snp_path])
+    result = cli_runner.invoke(init_cmd, ["--reset", str(snp_path)], obj=context)
+
     # THEN it should tear down the db first and work!
     assert result.exit_code == 0
     assert SNP.query.count() == snp_count
