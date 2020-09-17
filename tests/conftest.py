@@ -16,6 +16,15 @@ from genotype.store import api
 from genotype.store.models import SNP, Genotype, Sample, Analysis
 
 
+# Name fixtures
+
+
+@pytest.fixture(name="sample_id")
+def fixture_sample_id() -> str:
+    """Return a sample id"""
+    return "sample"
+
+
 # Test paths fixtures
 @pytest.fixture(name="fixtures_path")
 def fixture_fixtures_path() -> Path:
