@@ -53,9 +53,7 @@ def test_delete_existing_sample(
     assert Sample.query.count() == 0
 
 
-def test_delete_non_existing_sample(
-    cli_runner: CliRunner, populated_db: Manager, sample_id: str, caplog
-):
+def test_delete_non_existing_sample(cli_runner: CliRunner, populated_db: Manager, caplog):
     # GIVEN a non-existing sample id
     sample_id = "i_dont_exist"
 
