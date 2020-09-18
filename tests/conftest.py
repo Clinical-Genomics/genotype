@@ -126,9 +126,7 @@ def populated_db(existing_db: Manager, snps: List[SNP], sample: Sample) -> Manag
     """Return a manager with a database populated with snps and a sample"""
     existing_db.add_commit(snps)
     existing_db.add_commit(sample)
-    yield existing_db
-    existing_db.drop_all()
-    existing_db.create_all()
+    return existing_db
 
 
 @pytest.yield_fixture(scope="function")
@@ -136,9 +134,7 @@ def setexist_db(existing_db: Manager, snps: List[SNP], sample: Sample) -> Manage
     """Return a manager with a populated database"""
     existing_db.add_commit(snps)
     existing_db.add_commit(sample)
-    yield existing_db
-    existing_db.drop_all()
-    existing_db.create_all()
+    return existing_db
 
 
 @pytest.yield_fixture(scope="function", name="sample_db")

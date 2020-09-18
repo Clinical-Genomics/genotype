@@ -10,3 +10,7 @@ minversion = "6.0"
 testpaths = [
     "tests",
 ]
+
+[tool.isort]
+profile = "black"
+line_length = 100
