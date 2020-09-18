@@ -57,3 +57,21 @@ def test_load_excel(cli_runner: CliRunner, excel_path: Path, populated_db: Manag
     assert result.exit_code == 0
     assert Sample.query.count() > 0
     assert Analysis.query.count() == Sample.query.count()
+
+
+def test_load_unknown_format(
+    cli_runner: CliRunner, config_path: Path, populated_db: Manager, caplog
+):
+    caplog.set_level(logging.DEBUG)
+    # GIVEN a database with some SNPs loaded and a sample
+    assert SNP.query.count() > 0
+    assert Sample.query.count() == 1
+
+    context = {"db": populated_db}
+    # WHEN loading an and using a file in unknown format
+    result = cli_runner.invoke(load_cmd, [str(config_path)], obj=context)
+
+    # THEN it should exit with non zero exit code
+    assert result.exit_code == 1
+    # THEN the correct information should be displayed
+    assert f"unknown input format: {config_path}" in caplog.text
