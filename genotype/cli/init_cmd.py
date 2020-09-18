@@ -4,6 +4,7 @@ import logging
 
 import click
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
 
 from genotype.init.utils import read_snps
 
@@ -25,8 +26,9 @@ def init_cmd(context, reset, snps):
     snp_records = read_snps(snps)
     try:
         database_api.add_commit(*snp_records)
-    except IntegrityError:
+    except (IntegrityError, FlushError):
         LOG.warning("database already setup with genotypes")
         database_api.session.rollback()
         raise click.Abort
+
     LOG.info("Database successfully setup")

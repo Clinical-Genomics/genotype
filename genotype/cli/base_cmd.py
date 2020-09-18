@@ -11,12 +11,13 @@ import yaml
 from genotype import __title__, __version__
 from genotype.store import api
 
-from .serve import serve_cmd
+from .delete_cmd import delete_cmd
 from .init_cmd import init_cmd
 from .load_cmd import load_cmd
-from .delete_cmd import delete_cmd
-from .match_cmd import match_cmd, check_cmd
-from .store_cmd import add_sex, mip_sex, view, ls, sample, export_sample, export_sample_analysis
+from .match_cmd import check_cmd, match_cmd
+from .serve import serve_cmd
+from .store_cmd import (add_sex, export_sample, export_sample_analysis, ls,
+                        mip_sex, sample, view)
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def root(context, config, database, log_level, log_file):
     # read in config file if it exists
     if os.path.exists(config):
         with codecs.open(config) as conf_handle:
-            context.obj = yaml.load(conf_handle)
+            context.obj = yaml.load(conf_handle, Loader=yaml.FullLoader)
     else:
         context.obj = {}
 
