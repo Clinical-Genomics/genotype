@@ -6,9 +6,9 @@ import math
 import click
 
 from genotype.constants import TYPES
-from genotype.store.models import Analysis
-from genotype.store import api
 from genotype.match.core import compare_analyses
+from genotype.store import api
+from genotype.store.models import Analysis
 
 LOG = logging.getLogger(__name__)
 
@@ -41,8 +41,8 @@ def log_result(sample_id, result, hide_fail=False):
 def match_cmd(context, sample_ids, analysis):
     """Match genotypes for an analysis against all samples."""
     if len(sample_ids) == 0:
-        click.echo("you must supply at least one sample id")
-        raise context.Abort
+        LOG.warning("you must supply at least one sample id")
+        raise click.Abort
 
     sample_id = sample_ids[0]
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
