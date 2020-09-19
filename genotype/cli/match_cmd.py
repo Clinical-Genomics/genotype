@@ -65,10 +65,12 @@ def match_cmd(context, sample_ids, analysis):
 @click.pass_context
 def check_cmd(context, sample_id):
     """Check integrity of a sample."""
+    LOG.info("Running genotype check")
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
 
     # 1. check no calls from genotyping (could be sign of contamination)
     total_snps = api.snps().count()
+    LOG.info("Nr snps in db: %s", total_snps)
     cutoff = math.floor(total_snps / 3)
     genotype_analysis = sample_obj.analysis("genotype")
     if genotype_analysis:
@@ -76,9 +78,9 @@ def check_cmd(context, sample_id):
         if calls["unknown"] >= cutoff:
             LOG.warning("genotyping: fail (%s no-calls)", calls["unknown"])
         else:
-            LOG.debug("no-calls from genotyping: %s", calls["unknown"])
+            LOG.info("no-calls from genotyping: %s", calls["unknown"])
     else:
-        LOG.debug("no genotyping analysis loaded")
+        LOG.info("no genotyping analysis loaded")
 
     # 2. compare genotypes across analyses (sign of sample mixup)
     if len(sample_obj.analyses) == 2:

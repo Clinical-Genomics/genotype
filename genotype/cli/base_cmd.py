@@ -12,7 +12,7 @@ from genotype import __title__, __version__
 from genotype.store import api
 
 from .delete_cmd import delete_cmd
-from .export_cmd import export_sample, export_sample_analysis
+from .export_cmd import export_sample, export_sample_analysis, snps_cmd
 from .init_cmd import init_cmd
 from .load_cmd import load_cmd
 from .match_cmd import check_cmd, match_cmd
@@ -69,3 +69,4 @@ root.add_command(ls)
 root.add_command(sample)
 root.add_command(export_sample)
 root.add_command(export_sample_analysis)
+root.add_command(snps_cmd)

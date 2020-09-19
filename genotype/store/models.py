@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
+
+import json
 from collections import Counter
 from datetime import datetime
-import json
 
 from alchy import ModelBase, make_declarative_base
 from flask_login import UserMixin
@@ -11,7 +12,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
 
 from genotype.constants import SEXES, TYPES
-from genotype.exc import UnknownAllelesError, InsufficientAnalysesError
+from genotype.exc import InsufficientAnalysesError, UnknownAllelesError
 from genotype.match.core import compare_analyses
 
 
@@ -144,14 +145,14 @@ class Sample(Model):
 
     def update_status(self, new_status, comment_update):
         """Update the status with a required comment."""
-        comment_update = u"""MANUAL STATUS UPDATE: {old} -> {new}
+        comment_update = """MANUAL STATUS UPDATE: {old} -> {new}
 Date: {date}
 {comment}""".format(
             old=self.status, new=new_status, date=datetime.now(), comment=comment_update
         )
         self.status = new_status
         if self.comment:
-            self.comment = u"{}\n\n{}".format(self.comment, comment_update)
+            self.comment = "{}\n\n{}".format(self.comment, comment_update)
         else:
             self.comment = comment_update
 
@@ -213,6 +214,9 @@ class SNP(Model):
     ref = Column(types.String(1))
     chrom = Column(types.String(5))
     pos = Column(types.Integer)
+
+    def __str__(self):
+        return f"{self.id}|{self.ref}|{self.chrom}|{self.pos}"
 
 
 class User(Model, UserMixin):

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import click
 
 from genotype.store import api, export
+from genotype.store.models import SNP
 
 LOG = logging.getLogger(__name__)
 
@@ -65,3 +66,19 @@ def export_sample_analysis(context, days):
         sample_dict = export.get_analysis_equalities(session, sample=recent_sample)
         samples_dict[recent_sample.id] = sample_dict
     click.echo(json.dumps(samples_dict))
+
+
+@click.command("snps")
+@click.pass_context
+def snps_cmd(context):
+    """
+    Export the snp definitions
+    """
+    snp_objects = SNP.query
+    LOG.info("Nr of SNPs in definition set %s", snp_objects.count())
+    json_snps = []
+    LOG.info(" id | ref | chrom | pos")
+    for snp in snp_objects:
+        LOG.info(snp)
+        json_snps.append(snp.to_dict())
+    click.echo(json.dumps(json_snps))
