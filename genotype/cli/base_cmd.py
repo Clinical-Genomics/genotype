@@ -12,11 +12,12 @@ from genotype import __title__, __version__
 from genotype.store import api
 
 from .delete_cmd import delete_cmd
+from .export_cmd import export_sample, export_sample_analysis
 from .init_cmd import init_cmd
 from .load_cmd import load_cmd
 from .match_cmd import check_cmd, match_cmd
 from .serve import serve_cmd
-from .store_cmd import add_sex, export_sample, export_sample_analysis, ls, mip_sex, sample, view
+from .store_cmd import add_sex, ls, mip_sex, sample, view
 
 LOG = logging.getLogger(__name__)
 
