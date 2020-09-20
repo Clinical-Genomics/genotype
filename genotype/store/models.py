@@ -4,6 +4,7 @@ from __future__ import division
 import json
 from collections import Counter
 from datetime import datetime
+from typing import Dict, Iterable, List, Tuple
 
 from alchy import ModelBase, make_declarative_base
 from flask_login import UserMixin
@@ -25,7 +26,7 @@ def json_serial(obj):
 
 
 class JsonModel(ModelBase):
-    def to_json(self, pretty=False):
+    def to_json(self, pretty: bool = False) -> str:
         """Serialize Model to JSON."""
         kwargs = dict(indent=4, sort_keys=True) if pretty else dict()
         return json.dumps(self.to_dict(), default=json_serial, **kwargs)
@@ -54,23 +55,23 @@ class Genotype(Model):
     allele_2 = Column(types.String(1))
 
     @property
-    def alleles(self):
+    def alleles(self) -> List[str]:
         """Return sorted because we are not dealing with phased data."""
         alleles = sorted([self.allele_1, self.allele_2])
         return alleles
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Compare if two genotypes are the same."""
         if "0" in self.alleles or "0" in other.alleles:
             raise UnknownAllelesError()
         return self.alleles == other.alleles
 
-    def stringify(self):
+    def stringify(self) -> str:
         """Stringify genotype."""
         return "{}{}".format(*self.alleles)
 
     @property
-    def is_ok(self):
+    def is_ok(self) -> bool:
         """Check that the allele determination is okey."""
         if "0" in self.alleles:
             return False
@@ -113,7 +114,7 @@ class Analysis(Model):
         parts = [self.sample_id, self.type, self.sex or "[sex]"] + genotype_strs
         return "\t".join(parts)
 
-    def check(self):
+    def check(self) -> Dict[str, int]:
         """Check that genotypes look okey."""
         calls = ["known" if genotype.is_ok else "unknown" for genotype in self.genotypes]
         counter = Counter(calls)
@@ -143,7 +144,7 @@ class Sample(Model):
         parts = [self.id, self.status or "[status]", self.sex or "[sex]"]
         return "\t".join(parts)
 
-    def update_status(self, new_status, comment_update):
+    def update_status(self, new_status: str, comment_update: str) -> None:
         """Update the status with a required comment."""
         comment_update = """MANUAL STATUS UPDATE: {old} -> {new}
 Date: {date}
@@ -156,19 +157,19 @@ Date: {date}
         else:
             self.comment = comment_update
 
-    def analysis(self, type):
+    def analysis(self, type: str) -> Analysis:
         """Return the analysis corresponding to the given type."""
         for analysis in self.analyses:
             if analysis.type == type:
                 return analysis
 
-    def compare(self):
+    def compare(self) -> Dict[str, int]:
         """Compare genotypes across related analyses."""
         if len(self.analyses) < 2:
             raise InsufficientAnalysesError()
         return compare_analyses(*self.analyses)
 
-    def genotype_comparisons(self):
+    def genotype_comparisons(self) -> Iterable[Tuple[Genotype, Genotype, str]]:
         """Return compared genotypes."""
         genotype_pairs = zip(
             self.analysis("genotype").genotypes, self.analysis("sequence").genotypes
@@ -181,7 +182,7 @@ Date: {date}
             else:
                 yield gt1, gt2, "mismatch"
 
-    def check_sex(self):
+    def check_sex(self) -> bool:
         """Check that the sex determination is okey."""
         assert self.sex is not None, "need to set expected sex on sample"
         assert self.sex is not "unknown", "need to specify known sex on sample"
@@ -197,7 +198,7 @@ Date: {date}
             return False
 
     @property
-    def sexes(self):
+    def sexes(self) -> Iterable[str]:
         """Return all the sex determinations."""
         if self.sex:
             yield self.sex
@@ -229,7 +230,7 @@ class User(Model, UserMixin):
     plates = relationship("Plate", backref="user")
 
     @property
-    def first_name(self):
+    def first_name(self) -> str:
         """First part of name."""
         return self.name.split(" ")[0]
 
@@ -250,7 +251,7 @@ class Plate(Model):
     analyses = relationship("Analysis", backref="plate")
 
     @property
-    def percent_done(self):
+    def percent_done(self) -> float:
         """Calculate percent of samples completed."""
         all_samples = self.analyses
         all_samples_count = len(all_samples)
