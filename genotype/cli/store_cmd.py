@@ -4,11 +4,9 @@ import logging
 from datetime import date as make_date
 
 import click
-import yaml
 
 from genotype.constants import SEXES, TYPES
 from genotype.store import api
-from genotype.store.parsemip import parse_mipsex
 
 LOG = logging.getLogger(__name__)
 
@@ -37,20 +35,6 @@ def add_sex(context, sample, analysis, sample_id):
         analysis_obj.sex = sex
 
     genotype_db.commit()
-
-
-@click.command("mip-sex")
-@click.option("-s", "--sample", help="limit to a single sample")
-@click.argument("qc_metrics", type=click.File("r"))
-def mip_sex(sample, qc_metrics):
-    """Parse out analysis determined sex of sample."""
-    qcm_data = yaml.load(qc_metrics)
-    samples_sex = parse_mipsex(qcm_data)
-    if sample:
-        click.echo(samples_sex[sample], nl=False)
-    else:
-        for sample_id, sex in samples_sex.items():
-            click.echo("{}: {}".format(sample_id, sex))
 
 
 @click.command()
