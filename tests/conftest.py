@@ -11,6 +11,7 @@ from alchy import Manager
 from click.testing import CliRunner
 
 from genotype.cli import root
+from genotype.cli.load_cmd import load_cmd
 from genotype.init.utils import read_snps
 from genotype.store import api
 from genotype.store.models import SNP, Analysis, Genotype, Sample
@@ -46,7 +47,7 @@ def fixture_snp_path(fixtures_path: Path) -> Path:
 @pytest.fixture(name="bcf_path")
 def fixture_bcf_path(fixtures_path: Path) -> Path:
     """Return the path to a bcf file with variants"""
-    return fixtures_path / "sequence.bcf"
+    return fixtures_path / "single_sequence.bcf"
 
 
 @pytest.fixture(name="excel_path")
@@ -56,7 +57,7 @@ def fixture_excel_path(fixtures_path: Path) -> Path:
 
 
 @pytest.fixture(name="excel_single_path")
-def fixture_excel_path(fixtures_path: Path) -> Path:
+def fixture_excel_single_path(fixtures_path: Path) -> Path:
     """Return the path to a excel file with snp information for one sample"""
     return fixtures_path / "single_genotype.xlsx"
 
@@ -98,14 +99,14 @@ def fixture_vcf(bcf_path: Path) -> cyvcf2.VCF:
 @pytest.yield_fixture(scope="function", name="empty_db")
 def fixture_empty_db() -> Manager:
     """Return a manager with a empty instantiated database"""
-    _genotype_db = api.connect("sqlite://")
-    _genotype_db.create_all()
-    yield _genotype_db
-    _genotype_db.drop_all()
+    _db = api.connect("sqlite://")
+    _db.create_all()
+    yield _db
+    _db.drop_all()
 
 
-@pytest.yield_fixture(scope="function", name="genotype_db")
-def fixture_genotype_db(empty_db: Manager, snps: List[SNP]) -> Manager:
+@pytest.yield_fixture(scope="function", name="snp_db")
+def fixture_snp_db(empty_db: Manager, snps: List[SNP]) -> Manager:
     """Return a manager with a database populated with snps"""
     empty_db.add_commit(snps)
     return empty_db
@@ -121,12 +122,18 @@ def fixture_existing_db(tmpdir) -> Manager:
     genotype_db.drop_all()
 
 
-@pytest.yield_fixture(scope="function", name="populated_db")
-def populated_db(existing_db: Manager, snps: List[SNP], sample: Sample) -> Manager:
-    """Return a manager with a database populated with snps and a sample"""
-    existing_db.add_commit(snps)
-    existing_db.add_commit(sample)
-    return existing_db
+@pytest.yield_fixture(scope="function", name="sample_db")
+def sample_db(snp_db: Manager, sample: Sample) -> Manager:
+    """Return a manager with a database populated with snps and a sample with a genotype analysis"""
+    snp_db.add_commit(sample)
+    return snp_db
+
+
+@pytest.yield_fixture(scope="function", name="sequence_db")
+def sequence_db(snp_db: Manager, bcf_path: Path, cli_runner: CliRunner) -> Manager:
+    """Return a manager with a database populated with snps and a sample with a sequence analysis"""
+    cli_runner.invoke(load_cmd, [str(bcf_path)], obj={"db": snp_db})
+    return snp_db
 
 
 @pytest.yield_fixture(scope="function")
