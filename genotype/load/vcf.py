@@ -1,26 +1,23 @@
-# -*- coding: utf-8 -*-
+"""Functions for loading VCF information"""
+
+import logging
 import os
 from collections import namedtuple
+from typing import List, Iterable
 
-from cyvcf2 import VCF
+from cyvcf2 import VCF, Variant
 
 from genotype.compat import itervalues
-from genotype.store.models import Analysis, Genotype
+from genotype.store.models import Analysis, Genotype, SNP
 
 Result = namedtuple("Result", ["sample", "genotypes"])
 RawGenotype = namedtuple("RawGenotype", ["sample", "allele_1", "allele_2"])
 
+LOG = logging.getLogger(__name__)
 
-def load_vcf(vcf_file, snps):
-    """Load genotypes from a BCF/VCF.gz file.
 
-    Args:
-        vcf_file (path): path to to BCF/VCF.gz file (indexed)
-        snps (List[SNP]): list of SNPs to consider
-
-    Returns:
-        List[Analysis]: list of Analysis records
-    """
+def load_vcf(vcf_file: str, snps: List[SNP]) -> List[Analysis]:
+    """Load genotypes from a BCF/VCF.gz file."""
     vcf = VCF(vcf_file)
     # generate Analysis records for each included sample
     source = os.path.abspath(vcf_file)
@@ -46,7 +43,7 @@ def load_vcf(vcf_file, snps):
     return itervalues(analyses)
 
 
-def variant_genotypes(sample_ids, variant):
+def variant_genotypes(sample_ids: List[str], variant: Variant) -> Iterable[RawGenotype]:
     """Build Genotype objects from a BCF variant."""
     for sample_id, bases in zip(sample_ids, variant.gt_bases):
         bases = bases.replace("|", "/")
@@ -54,16 +51,17 @@ def variant_genotypes(sample_ids, variant):
         yield RawGenotype(sample_id, allele_1, allele_2)
 
 
-def fetch_snp(vcf, snp):
+def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
     """Fetch an SNP from the BCF file by position."""
     pos_str = "{chrom}:{pos}-{pos}".format(chrom=snp.chrom, pos=snp.pos)
     variants = list(vcf(pos_str))
+    if len(variants) == 0:
+        LOG.debug("No variant found for %s", pos_str)
+        return None
+
     if len(variants) == 1:
         # everything OK
         variant = variants[0]
         return variant
-    elif len(variants) == 0:
-        return None
-    else:  # pragma: no cover
-        # weird SNP position lookup, not even possible; right?
-        raise ValueError("multiple variants found for SNP")
+    # weird SNP position lookup, not even possible; right?
+    raise ValueError("multiple variants found for SNP")

@@ -1,5 +1,8 @@
-# -*- coding: utf-8 -*-
+"""API to the genotype store"""
+
 import logging
+from datetime import datetime
+from typing import Optional
 
 from alchy import Manager
 from sqlalchemy import func, or_
@@ -9,7 +12,7 @@ from genotype.store.models import Analysis, Genotype, Model, Sample, SNP, Plate
 log = logging.getLogger(__name__)
 
 
-def connect(uri):
+def connect(uri: str) -> Manager:
     log.debug("open connection to database: %s", uri)
     manager = Manager(config=dict(SQLALCHEMY_DATABASE_URI=uri), Model=Model)
     return manager
@@ -37,7 +40,7 @@ def failing():
     return query
 
 
-def get_samples_after(date):
+def get_samples_after(date: datetime):
     """Return samples created since date"""
     query = Sample.query.filter(Sample.created_at > date)
     return query
@@ -97,7 +100,7 @@ def snps():
     return query
 
 
-def sample(sample_id, notfound_cb=None):
+def sample(sample_id: str, notfound_cb=None) -> Sample:
     """Get sample from database and abort context if not found."""
     sample_obj = Sample.query.get(sample_id)
     if sample_obj is None:
@@ -153,7 +156,7 @@ Sex: {analysis.sex}
     db.commit()
 
 
-def add_analysis(db, new_analysis, replace=False):
+def add_analysis(db: Manager, new_analysis: Analysis, replace: bool = False) -> Optional[Analysis]:
     """Add a new analysis to the database.
 
     The analysis record should only have the `sample_id` field filled in.

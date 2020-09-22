@@ -32,7 +32,6 @@ pip-log.txt
 nosetests.xml
 htmlcov
 .cache/
-.coverage*
 
 # Translations
 *.mo
@@ -50,6 +49,9 @@ alembic.ini
 
 # SublimeText: workspace files are user-specific
 *.sublime-workspace
+
+# Local stuff
+local/
 
 # project files should be version controlled, unless a significant
 # proportion of contributors will probably not be using SublimeText

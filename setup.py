@@ -68,26 +68,7 @@ setup(
     zip_safe=False,
     # Install requirements loaded from ``requirements.txt``
     install_requires=parse_reqs(),
-    entry_points={
-        "console_scripts": [
-            "genotype = genotype.cli:root",
-        ],
-        "genotype.subcommands.2": [
-            "init = genotype.init.cli:init",
-            "load = genotype.load.cli:load",
-            "add-sex = genotype.store.cli:add_sex",
-            "mip-sex = genotype.store.cli:mip_sex",
-            "view = genotype.store.cli:view",
-            "match = genotype.match.cli:match",
-            "check = genotype.match.cli:check",
-            "delete = genotype.load.cli:delete",
-            "serve = genotype.server.cli:serve",
-            "ls = genotype.store.cli:ls",
-            "sample = genotype.store.cli:sample",
-            "export-sample = genotype.store.cli:export_sample",
-            "export-sample-analysis = genotype.store.cli:export_sample_analysis",
-        ],
-    },
+    entry_points={"console_scripts": ["genotype = genotype.__main__:root"]},
     # See: http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are:

@@ -16,6 +16,11 @@ Try to use the follwing format:
 
 ### Fixed
 
+## [2.5.2]
+
+### Changed
+- Moves CLI functions to same module
+
 ## [2.5.1]
 
 ### Changed

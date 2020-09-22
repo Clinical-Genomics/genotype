@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
-from collections import namedtuple, Counter
+"""Code for matching entities in the database"""
+
 import logging
+from collections import Counter, namedtuple
+from typing import Dict
 
 from genotype.compat import zip
 
@@ -8,7 +10,7 @@ log = logging.getLogger(__name__)
 Result = namedtuple("Result", ["match", "mismatch", "unknown"])
 
 
-def compare_genotypes(genotype, other_genotype):
+def compare_genotypes(genotype, other_genotype) -> str:
     """Compare two genotypes if they have the same alleles."""
     if "0" in genotype.alleles or "0" in other_genotype.alleles:
         return "unknown"
@@ -18,7 +20,7 @@ def compare_genotypes(genotype, other_genotype):
         return "mismatch"
 
 
-def compare_analyses(analysis, other_analysis):
+def compare_analyses(analysis, other_analysis) -> Dict[str, int]:
     """Compare and score analyses."""
     genotype_pairs = zip(analysis.genotypes, other_analysis.genotypes)
     results = (
