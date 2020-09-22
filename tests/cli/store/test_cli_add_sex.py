@@ -1,5 +1,7 @@
 """Tests for updating sex in the database"""
 
+import logging
+
 from alchy import Manager
 from click.testing import CliRunner
 
@@ -57,3 +59,23 @@ def test_add_sex_analysis(cli_runner: CliRunner, sequence_db: Manager):
     # THEN the CLI should be OK and the analysis sex should be updated
     assert result.exit_code == 0
     assert Analysis.query.first().sex == sex
+
+
+def test_add_sex_non_existing_analysis(cli_runner: CliRunner, sequence_db: Manager, caplog):
+    caplog.set_level(logging.DEBUG)
+    # GIVEN an existing database with sample + analysis
+    sample_id = Sample.query.first().id
+    analysis_type = "genotype"
+    # GIVEN that an analysis that does not exist
+    assert Analysis.query.filter_by(sample_id=sample_id, type=analysis_type).first() is None
+
+    sex = "male"
+    # WHEN updating the analysis sex determination
+    result = cli_runner.invoke(
+        add_sex, [sample_id, "-a", analysis_type, sex], obj={"db": sequence_db}
+    )
+
+    # THEN the CLI should be OK
+    assert result.exit_code == 0
+    # THEN assert it was communicated that the analysis did not exist
+    assert f"analysis not found: {sample_id}-{analysis_type}" in caplog.text
