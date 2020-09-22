@@ -24,9 +24,9 @@ def fixture_sample_id() -> str:
 
 
 @pytest.fixture(name="vcf_sample_id")
-def fixture_vcf_sample_id() -> str:
+def fixture_vcf_sample_id(sample_id: str) -> str:
     """Return a sample id that exists in the test VCF"""
-    return "000139T"
+    return sample_id
 
 
 # Test paths fixtures
@@ -36,35 +36,35 @@ def fixture_fixtures_path() -> Path:
     return Path("tests/fixtures")
 
 
-@pytest.fixture(name="sample_dir")
-def fixture_sample_dir(fixtures_path: Path) -> Path:
-    """Path to sample specific fixtures"""
-    return fixtures_path / "sample"
-
-
 # File fixtures
 @pytest.fixture(name="snp_path")
 def fixture_snp_path(fixtures_path: Path) -> Path:
-    """Return the path to a file with snps"""
-    return fixtures_path / "snps.sample.txt"
+    """Return the path to a file with snp definitions"""
+    return fixtures_path / "snps.grch37.txt"
 
 
 @pytest.fixture(name="bcf_path")
 def fixture_bcf_path(fixtures_path: Path) -> Path:
     """Return the path to a bcf file with variants"""
-    return fixtures_path / "sample.bcf"
+    return fixtures_path / "sequence.bcf"
 
 
 @pytest.fixture(name="excel_path")
 def fixture_excel_path(fixtures_path: Path) -> Path:
-    """Return the path to a excel file with snp information"""
-    return fixtures_path / "simple.xlsx"
+    """Return the path to a excel file with snp information for three samples"""
+    return fixtures_path / "genotype.xlsx"
+
+
+@pytest.fixture(name="excel_single_path")
+def fixture_excel_path(fixtures_path: Path) -> Path:
+    """Return the path to a excel file with snp information for one sample"""
+    return fixtures_path / "single_genotype.xlsx"
 
 
 @pytest.fixture(name="config_path")
-def fixture_config_path(sample_dir: Path) -> Path:
+def fixture_config_path(fixtures_path: Path) -> Path:
     """Return the path to a genotype config file"""
-    return sample_dir / "config.yaml"
+    return fixtures_path / "config.yaml"
 
 
 # snp fixtures
