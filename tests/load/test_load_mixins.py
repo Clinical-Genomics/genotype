@@ -1,6 +1,7 @@
 """Tests for the load mixins"""
 
 from typing import List
+
 from alchy import Manager
 
 from genotype.store import api

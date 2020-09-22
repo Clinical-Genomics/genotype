@@ -4,8 +4,8 @@ import logging
 
 import click
 
-from genotype.store import api
 from genotype.constants import TYPES
+from genotype.store import api
 from genotype.store.models import Sample
 
 LOG = logging.getLogger(__name__)

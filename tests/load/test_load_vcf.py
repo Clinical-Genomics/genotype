@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 
 from genotype.load import vcf as vcf_mod
-from genotype.store.models import Analysis, SNP
+from genotype.store.models import SNP, Analysis
 
 
 def test_load_vcf(bcf_path: Path, snps: List[SNP]):

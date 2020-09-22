@@ -1,5 +1,6 @@
 """Utilities for initialising the database"""
 from typing import Iterable, List
+
 from genotype.store.models import SNP
 
 

@@ -1,11 +1,12 @@
 """Fixtures for the load functions"""
 
 from typing import List
+
 import pytest
 from alchy import Manager
 
-from genotype.store.models import Analysis, Genotype, Sample
 from genotype.store import api
+from genotype.store.models import Analysis, Genotype, Sample
 
 
 @pytest.fixture(name="genotype_obj")
