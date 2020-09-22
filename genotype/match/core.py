@@ -5,13 +5,12 @@ from collections import Counter, namedtuple
 from typing import Dict
 
 from genotype.compat import zip
-from genotype.store.models import Analysis, Genotype
 
 log = logging.getLogger(__name__)
 Result = namedtuple("Result", ["match", "mismatch", "unknown"])
 
 
-def compare_genotypes(genotype: Genotype, other_genotype: Genotype) -> str:
+def compare_genotypes(genotype, other_genotype) -> str:
     """Compare two genotypes if they have the same alleles."""
     if "0" in genotype.alleles or "0" in other_genotype.alleles:
         return "unknown"
@@ -21,7 +20,7 @@ def compare_genotypes(genotype: Genotype, other_genotype: Genotype) -> str:
         return "mismatch"
 
 
-def compare_analyses(analysis: Analysis, other_analysis: Analysis) -> Dict[str, int]:
+def compare_analyses(analysis, other_analysis) -> Dict[str, int]:
     """Compare and score analyses."""
     genotype_pairs = zip(analysis.genotypes, other_analysis.genotypes)
     results = (
