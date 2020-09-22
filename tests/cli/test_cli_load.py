@@ -15,7 +15,11 @@ def test_load_bcf(
     # GIVEN a database with some SNPs loaded and one sample
     assert SNP.query.count() > 0
     assert Sample.query.count() == 1
-    assert Analysis.query.count() == 1
+    # GIVEN that the sample has a genotype analysis
+    analysis_obj = Analysis.query.first()
+    assert analysis_obj
+    assert analysis_obj.type == "genotype"
+
     context = {"db": populated_db}
     # WHEN loading a BCF from the command line (single sample)
 
