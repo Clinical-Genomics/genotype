@@ -30,13 +30,12 @@ def add_sex(context, sample, analysis, sample_id):
     for analysis_type, sex in analysis:
         LOG.debug("looking up analysis: '%s-%s'", sample_id, analysis_type)
         analysis_obj = api.analysis(sample_id, analysis_type).first()
-        if analysis_obj:
-            LOG.info(
-                "marking analysis '%s-%s' as '%s'", analysis_obj.sample_id, analysis_obj.type, sex
-            )
-            analysis_obj.sex = sex
-        else:
+        if not analysis_obj:
             LOG.warning("analysis not found: %s-%s", sample_id, analysis_type)
+            continue
+        LOG.info("marking analysis '%s-%s' as '%s'", analysis_obj.sample_id, analysis_obj.type, sex)
+        analysis_obj.sex = sex
+
     genotype_db.commit()
 
 
