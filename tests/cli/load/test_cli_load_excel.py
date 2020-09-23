@@ -9,15 +9,14 @@ from genotype.cli.load_cmd import load_cmd
 from genotype.store.models import SNP, Analysis, Sample
 
 
-def test_load_genotype_analysis(cli_runner: CliRunner, excel_single_path: Path, snp_db: Manager):
+def test_load_genotype_analysis(cli_runner: CliRunner, excel_single_path: Path, snp_ctx: dict):
     """Test to load a genotype analysis from a excel document"""
     # GIVEN a database with some SNPs loaded and no samples
     assert SNP.query.count() > 0
     assert Sample.query.count() == 0
-    context = {"db": snp_db}
 
     # WHEN loading an Excel book from the command line (multi-sample)
-    result = cli_runner.invoke(load_cmd, [str(excel_single_path), "-k", "ID-CG-"], obj=context)
+    result = cli_runner.invoke(load_cmd, [str(excel_single_path), "-k", "ID-CG-"], obj=snp_ctx)
 
     # THEN it works and loads a sample with an analysis
     assert result.exit_code == 0
@@ -27,7 +26,7 @@ def test_load_genotype_analysis(cli_runner: CliRunner, excel_single_path: Path, 
 
 
 def test_load_genotype_analysis_existing_sequence(
-    cli_runner: CliRunner, excel_single_path: Path, sequence_db: Manager
+    cli_runner: CliRunner, excel_single_path: Path, sequence_ctx: dict
 ):
     """Test to load a genotype analysis from a excel document when the sequence analysis exists"""
 
@@ -35,10 +34,9 @@ def test_load_genotype_analysis_existing_sequence(
     assert SNP.query.count() > 0
     assert Sample.query.count() == 1
     assert Analysis.query.count() == 1
-    context = {"db": sequence_db}
 
     # WHEN loading an Excel book from the command line (multi-sample)
-    result = cli_runner.invoke(load_cmd, [str(excel_single_path), "-k", "ID-CG-"], obj=context)
+    result = cli_runner.invoke(load_cmd, [str(excel_single_path), "-k", "ID-CG-"], obj=sequence_ctx)
 
     # THEN it works and loads a sample with an analysis
     assert result.exit_code == 0
@@ -49,15 +47,14 @@ def test_load_genotype_analysis_existing_sequence(
 
 
 def test_load_genotype_analysis_sex(
-    cli_runner: CliRunner, excel_single_path: Path, snp_db: Manager, vcf_sample_id: str, caplog
+    cli_runner: CliRunner, excel_single_path: Path, snp_ctx: dict, vcf_sample_id: str, caplog
 ):
     """Test to load a genotype analysis and check if there was any sex added"""
     # GIVEN a database with some SNPs loaded and one sample
     # GIVEN a vcf with one sample
 
-    context = {"db": snp_db}
     # WHEN loading a BCF from the command line (single sample)
-    result = cli_runner.invoke(load_cmd, [str(excel_single_path)], obj=context)
+    cli_runner.invoke(load_cmd, [str(excel_single_path)], obj=snp_ctx)
 
     # THEN assert that the sample should have no sex since it has not been set
     sample_obj = Sample.query.first()

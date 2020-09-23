@@ -9,7 +9,7 @@ from genotype.cli.store_cmd import add_sex
 from genotype.store.models import Analysis, Sample
 
 
-def test_add_sex(cli_runner: CliRunner, sequence_db: Manager):
+def test_add_sex(cli_runner: CliRunner, sequence_ctx: dict):
     """Test to update sex for a sample with the CLI"""
     # GIVEN an existing database with a sample without sex
     sample_obj = Sample.query.first()
@@ -18,7 +18,7 @@ def test_add_sex(cli_runner: CliRunner, sequence_db: Manager):
 
     # WHEN adding information about the sex of the sample with the CLI
     sex = "female"
-    result = cli_runner.invoke(add_sex, [sample_id, "-s", sex], obj={"db": sequence_db})
+    result = cli_runner.invoke(add_sex, [sample_id, "-s", sex], obj=sequence_ctx)
 
     # THEN the command should exit successfully
     assert result.exit_code == 0
@@ -26,7 +26,7 @@ def test_add_sex(cli_runner: CliRunner, sequence_db: Manager):
     assert Sample.query.get(sample_id).sex == sex
 
 
-def test_add_sex_non_existing_sample(cli_runner: CliRunner, sequence_db: Manager):
+def test_add_sex_non_existing_sample(cli_runner: CliRunner, sequence_ctx: dict):
     """Try to update the sex for a non existing sample"""
     # GIVEN a database with a sample without a gender
     # GIVEN the id to a non existing sample
@@ -35,13 +35,13 @@ def test_add_sex_non_existing_sample(cli_runner: CliRunner, sequence_db: Manager
 
     # WHEN trying to add information about a non-existing sample
     sex = "female"
-    result = cli_runner.invoke(add_sex, ["idontexist", "-s", sex], obj={"db": sequence_db})
+    result = cli_runner.invoke(add_sex, ["idontexist", "-s", sex], obj=sequence_ctx)
 
     # THEN it the CLI should exit with a non zero exit code
     assert result.exit_code != 0
 
 
-def test_add_sex_analysis(cli_runner: CliRunner, sequence_db: Manager):
+def test_add_sex_analysis(cli_runner: CliRunner, sequence_ctx: dict):
     # GIVEN an existing database with sample + analysis
     sample_obj = Sample.query.first()
     sample_id = sample_obj.id
@@ -52,16 +52,14 @@ def test_add_sex_analysis(cli_runner: CliRunner, sequence_db: Manager):
 
     sex = "male"
     # WHEN updating the analysis sex determination
-    result = cli_runner.invoke(
-        add_sex, [sample_id, "-a", analysis_type, sex], obj={"db": sequence_db}
-    )
+    result = cli_runner.invoke(add_sex, [sample_id, "-a", analysis_type, sex], obj=sequence_ctx)
 
     # THEN the CLI should be OK and the analysis sex should be updated
     assert result.exit_code == 0
     assert Analysis.query.first().sex == sex
 
 
-def test_add_sex_non_existing_analysis(cli_runner: CliRunner, sequence_db: Manager, caplog):
+def test_add_sex_non_existing_analysis(cli_runner: CliRunner, sequence_ctx: dict, caplog):
     caplog.set_level(logging.DEBUG)
     # GIVEN an existing database with sample + analysis
     sample_id = Sample.query.first().id
@@ -71,9 +69,7 @@ def test_add_sex_non_existing_analysis(cli_runner: CliRunner, sequence_db: Manag
 
     sex = "male"
     # WHEN updating the analysis sex determination
-    result = cli_runner.invoke(
-        add_sex, [sample_id, "-a", analysis_type, sex], obj={"db": sequence_db}
-    )
+    result = cli_runner.invoke(add_sex, [sample_id, "-a", analysis_type, sex], obj=sequence_ctx)
 
     # THEN the CLI should be OK
     assert result.exit_code == 0

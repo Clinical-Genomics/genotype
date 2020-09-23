@@ -12,7 +12,7 @@ from genotype.store.models import SNP, Analysis, Sample
 
 
 def test_load_bcf_analysis(
-    cli_runner: CliRunner, bcf_path: Path, snp_db: Manager, vcf_sample_id: str, caplog
+    cli_runner: CliRunner, bcf_path: Path, snp_ctx: dict, vcf_sample_id: str, caplog
 ):
     # GIVEN a database with some SNPs loaded and one sample
     assert SNP.query.count() > 0
@@ -22,10 +22,8 @@ def test_load_bcf_analysis(
     vcf_obj = VCF(str(bcf_path))
     assert len(vcf_obj.samples) == 1
 
-    context = {"db": snp_db}
-
     # WHEN loading a BCF from the command line (single sample)
-    result = cli_runner.invoke(load_cmd, [str(bcf_path)], obj=context)
+    result = cli_runner.invoke(load_cmd, [str(bcf_path)], obj=snp_ctx)
 
     # THEN assert the command works
     assert result.exit_code == 0
@@ -39,15 +37,14 @@ def test_load_bcf_analysis(
 
 
 def test_load_bcf_analysis_sex(
-    cli_runner: CliRunner, bcf_path: Path, snp_db: Manager, vcf_sample_id: str, caplog
+    cli_runner: CliRunner, bcf_path: Path, snp_ctx: dict, vcf_sample_id: str, caplog
 ):
     """Test to load a sequence analysis and check if there was any sex added"""
     # GIVEN a database with some SNPs loaded and one sample
     # GIVEN a vcf with one sample
 
-    context = {"db": snp_db}
     # WHEN loading a BCF from the command line (single sample)
-    result = cli_runner.invoke(load_cmd, [str(bcf_path)], obj=context)
+    cli_runner.invoke(load_cmd, [str(bcf_path)], obj=snp_ctx)
 
     sample_obj = Sample.query.first()
     # THEN assert that the sample has no sex since there is no such information
@@ -58,32 +55,30 @@ def test_load_bcf_analysis_sex(
 
 
 def test_load_bcf_analysis_exists(
-    cli_runner: CliRunner, bcf_path: Path, sequence_db: Manager, vcf_sample_id: str, caplog
+    cli_runner: CliRunner, bcf_path: Path, sequence_ctx: dict, vcf_sample_id: str, caplog
 ):
     caplog.set_level(logging.DEBUG)
     # GIVEN the database is already loaded with one analysis
     analysis_obj = Analysis.query.first()
     assert analysis_obj
     assert analysis_obj.type == "sequence"
-    context = {"db": sequence_db}
-    cli_runner.invoke(load_cmd, [str(bcf_path)], obj=context)
+    cli_runner.invoke(load_cmd, [str(bcf_path)], obj=sequence_ctx)
 
     # WHEN loading the same resource again (same sample id)
-    result = cli_runner.invoke(load_cmd, [str(bcf_path)], obj=context)
+    result = cli_runner.invoke(load_cmd, [str(bcf_path)], obj=sequence_ctx)
 
-    # THEN it should exit succesfully but log a warning
+    # THEN it should exit successfully but log a warning
     assert result.exit_code == 0
     assert "found previous analysis, skip" in caplog.text
 
 
-def test_load_unknown_format(cli_runner: CliRunner, config_path: Path, snp_db: Manager, caplog):
+def test_load_unknown_format(cli_runner: CliRunner, config_path: Path, snp_ctx: dict, caplog):
     caplog.set_level(logging.DEBUG)
     # GIVEN a database with some SNPs loaded
     assert SNP.query.count() > 0
 
-    context = {"db": snp_db}
     # WHEN loading an and using a file in unknown format
-    result = cli_runner.invoke(load_cmd, [str(config_path)], obj=context)
+    result = cli_runner.invoke(load_cmd, [str(config_path)], obj=snp_ctx)
 
     # THEN it should exit with non zero exit code
     assert result.exit_code == 1
