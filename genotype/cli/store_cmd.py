@@ -87,7 +87,9 @@ def sample(context, sample_id):
     sample_obj = api.sample(sample_id, notfound_cb=context.abort)
     click.echo(sample_obj.status)
     if sample_obj.status != "pass":
-        context.abort()
+        LOG.warning("Sample '%s' has NOT passed", sample_id)
+        raise click.Abort
+    LOG.info("Sample '%s' passed check", sample_id)
 
 
 def parse_date(date_str):
