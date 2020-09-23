@@ -16,6 +16,15 @@ Try to use the follwing format:
 
 ### Fixed
 
+## [3.0.0]
+
+### Added
+- New tests for loading data from the CLI
+
+### Changed
+- Removes support for parsing old MIP analysis files. This logic has nothing to do with the genotype package
+
+
 ## [2.5.2]
 
 ### Changed
