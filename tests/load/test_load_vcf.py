@@ -7,10 +7,9 @@ from genotype.load import vcf as vcf_mod
 from genotype.store.models import SNP, Analysis
 
 
-def test_load_vcf(bcf_path: Path, snps: List[SNP]):
+def test_load_vcf(bcf_path: Path, snps: List[SNP], sample_id: str):
     """Test to load a vcf"""
     # GIVEN a BCF file with one sample and a list of SNP records
-    sample_id = "000139T"
     nr_snps = len(snps)
 
     # WHEN building sequence analyses records

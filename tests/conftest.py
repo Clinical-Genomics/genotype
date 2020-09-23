@@ -30,6 +30,12 @@ def fixture_vcf_sample_id(sample_id: str) -> str:
     return sample_id
 
 
+@pytest.fixture(name="excel_sample_prefix")
+def excel_sample_prefix() -> str:
+    """Return the prefix that is used for samples in the excel sheets"""
+    return "ID-CG-"
+
+
 # Test paths fixtures
 @pytest.fixture(name="fixtures_path")
 def fixture_fixtures_path() -> Path:
@@ -130,9 +136,20 @@ def sample_db(snp_db: Manager, sample: Sample) -> Manager:
 
 
 @pytest.yield_fixture(scope="function", name="sequence_db")
-def sequence_db(snp_db: Manager, bcf_path: Path, cli_runner: CliRunner) -> Manager:
+def fixture_sequence_db(snp_db: Manager, bcf_path: Path, cli_runner: CliRunner) -> Manager:
     """Return a manager with a database populated with snps and a sample with a sequence analysis"""
     cli_runner.invoke(load_cmd, [str(bcf_path)], obj={"db": snp_db})
+    return snp_db
+
+
+@pytest.yield_fixture(scope="function", name="genotype_db")
+def fixture_genotype_db(
+    snp_db: Manager, excel_single_path: Path, cli_runner: CliRunner, excel_sample_prefix: str
+) -> Manager:
+    """Return a manager with a database populated with snps and a sample with a genotype analysis"""
+    cli_runner.invoke(
+        load_cmd, [str(excel_single_path), "-k", excel_sample_prefix], obj={"db": snp_db}
+    )
     return snp_db
 
 

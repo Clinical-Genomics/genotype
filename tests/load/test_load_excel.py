@@ -50,10 +50,10 @@ def test_parse_sex_ambiguous():
         excel.parse_sex(sex_cells)
 
 
-def test_find_sheet(excel_path):
+def test_find_sheet(excel_single_path):
     # GIVEN an Excel book with a sheet
-    book = xlrd.open_workbook(excel_path)
-    sheet_id = "Sheet1"
+    book = xlrd.open_workbook(excel_single_path)
+    sheet_id = book._sheet_names[0]
 
     # WHEN finding a sheet by name (str)
     sheet = excel.find_sheet(book, sheet_id=sheet_id)
