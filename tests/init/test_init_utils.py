@@ -1,7 +1,8 @@
 """Test the init utilities"""
 
-from genotype.init import utils
 from typing import List
+
+from genotype.init import utils
 
 
 def test_read_snp(snp_sequence: List[str]):

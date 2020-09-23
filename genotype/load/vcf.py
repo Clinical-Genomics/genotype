@@ -3,12 +3,12 @@
 import logging
 import os
 from collections import namedtuple
-from typing import List, Iterable
+from typing import Iterable, List
 
 from cyvcf2 import VCF, Variant
 
 from genotype.compat import itervalues
-from genotype.store.models import Analysis, Genotype, SNP
+from genotype.store.models import SNP, Analysis, Genotype
 
 Result = namedtuple("Result", ["sample", "genotypes"])
 RawGenotype = namedtuple("RawGenotype", ["sample", "allele_1", "allele_2"])

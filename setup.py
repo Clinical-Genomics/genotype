@@ -4,7 +4,7 @@ import io
 import os
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 NAME = "genotype"
 DESCRIPTION = (

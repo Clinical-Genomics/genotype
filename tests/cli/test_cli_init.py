@@ -54,12 +54,12 @@ def test_init_db_cli(cli_runner: CliRunner, config_path: Path, snp_path: Path, c
     assert "Database successfully setup" in caplog.text
 
 
-def test_init_existing_db_cli(cli_runner: CliRunner, genotype_db: Manager, snp_path: Path, caplog):
+def test_init_existing_db_cli(cli_runner: CliRunner, snp_ctx: dict, snp_path: Path, caplog):
     caplog.set_level(logging.DEBUG)
     # GIVEN a a existing database and path to snp file
 
     # WHEN running the CLI with the config
-    result = cli_runner.invoke(init_cmd, [str(snp_path)], obj={"db": genotype_db})
+    result = cli_runner.invoke(init_cmd, [str(snp_path)], obj=snp_ctx)
 
     # THEN the command should fail
     assert result.exit_code == 1
@@ -67,14 +67,12 @@ def test_init_existing_db_cli(cli_runner: CliRunner, genotype_db: Manager, snp_p
     assert "database already setup with genotypes" in caplog.text
 
 
-def test_init_existing_db_reset(
-    cli_runner: CliRunner, genotype_db: Manager, snp_path: Path, caplog
-):
+def test_init_existing_db_reset(cli_runner: CliRunner, snp_ctx: dict, snp_path: Path, caplog):
     caplog.set_level(logging.DEBUG)
     # GIVEN a a existing database and path to snp file
 
     # WHEN running the CLI with the config
-    result = cli_runner.invoke(init_cmd, [str(snp_path), "--reset"], obj={"db": genotype_db})
+    result = cli_runner.invoke(init_cmd, [str(snp_path), "--reset"], obj=snp_ctx)
 
     # THEN the command should work
     assert result.exit_code == 0

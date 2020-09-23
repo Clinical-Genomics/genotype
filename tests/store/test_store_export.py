@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 """Tests for store export"""
-from genotype.store.export import (
-    get_analysis_equalities,
-    _get_equality,
-    _get_snp_dict,
-    get_sample,
-)
-from genotype.store.models import Sample, Genotype, Analysis
+
+from alchy import Manager
+
+from genotype.store.export import _get_equality, _get_snp_dict, get_analysis_equalities, get_sample
+from genotype.store.models import Analysis, Genotype, Sample
 
 
-def test_get_analysis_equalities(genotype_db):
+def test_get_analysis_equalities(snp_db: Manager):
     # GIVEN a sample with two analyses
 
     sample_id = "test"
@@ -27,10 +24,10 @@ def test_get_analysis_equalities(genotype_db):
         Genotype(id=4, analysis_id=2, rsnumber="rs2", allele_1="A", allele_2="G"),
     ]
 
-    genotype_db.add_commit(sample, analyses, genotypes)
+    snp_db.add_commit(sample, analyses, genotypes)
 
     # WHEN running get_analysis_equalities
-    genotype_doc = get_analysis_equalities(genotype_db, sample)
+    genotype_doc = get_analysis_equalities(snp_db, sample)
 
     # THEN it should return a dictionary like this:
     doc = {
@@ -44,13 +41,13 @@ def test_get_analysis_equalities(genotype_db):
     assert genotype_doc == doc
 
 
-def test_get_analysis_equalities_no_analysis(genotype_db):
+def test_get_analysis_equalities_no_analysis(snp_db: Manager):
     # GIVEN a sample with no analysis
     sample = Sample(id="test")
-    genotype_db.add_commit(sample)
+    snp_db.add_commit(sample)
 
     # WHEN running get_analysis_equalities
-    genotype_doc = get_analysis_equalities(genotype_db, sample)
+    genotype_doc = get_analysis_equalities(snp_db, sample)
 
     # THEN it should return a dictionary like this:
     doc = {"snps": {}}
@@ -58,7 +55,7 @@ def test_get_analysis_equalities_no_analysis(genotype_db):
     assert genotype_doc == doc
 
 
-def test_get_sample(genotype_db):
+def test_get_sample(snp_db: Manager):
     # GIVEN a sample id that exits in the database
 
     sample_sex = "male"
@@ -69,7 +66,7 @@ def test_get_sample(genotype_db):
     sample.status = sample_status
     sample.sex = sample_sex
     sample.comment = sample_comment
-    genotype_db.add_commit(sample)
+    snp_db.add_commit(sample)
     date_time = sample.created_at
 
     # WHEN running get_sample
@@ -86,11 +83,11 @@ def test_get_sample(genotype_db):
     assert genotype_doc == doc
 
 
-def test_get_sample_no_atributes(genotype_db):
+def test_get_sample_no_atributes(snp_db: Manager):
     # GIVEN a sample id that exits in the database
 
     sample = Sample(id="test")
-    genotype_db.add_commit(sample)
+    snp_db.add_commit(sample)
     date_time = sample.created_at
 
     # WHEN running get_sample
@@ -107,27 +104,27 @@ def test_get_sample_no_atributes(genotype_db):
     assert genotype_doc == doc
 
 
-def test_get_snp_dict(genotype_db):
+def test_get_snp_dict(snp_db: Manager):
     # GIVEN two genotypes in the database, with the same analysis_id
     genotypes = [
         Genotype(id=1, analysis_id=1, rsnumber="rs1", allele_1="T", allele_2="C"),
         Genotype(id=2, analysis_id=1, rsnumber="rs2", allele_1="A", allele_2="G"),
     ]
-    genotype_db.add_commit(genotypes)
+    snp_db.add_commit(genotypes)
 
     # WHEN running _get_snp_dict for that analysis_id = 1
-    snp_dict = _get_snp_dict(genotype_db, analysis_id=1)
+    snp_dict = _get_snp_dict(snp_db, analysis_id=1)
 
     # THEN it shoould return a dict holding the rs numbers and allels from the two genotypes
     assert snp_dict == {"rs1": ["T", "C"], "rs2": ["A", "G"]}
 
 
-def test_get_snp_dict_wrong_analysis(genotype_db):
+def test_get_snp_dict_wrong_analysis(snp_db: Manager):
     # GIVEN a analysis_id that does not exist in the database
     analysis_id = 1
 
     # WHEN running _get_snp_dict for that analysis_id
-    snp_dict = _get_snp_dict(genotype_db, analysis_id)
+    snp_dict = _get_snp_dict(snp_db, analysis_id)
 
     # THEN it shoould return a empty dict
     assert snp_dict == {}
@@ -145,7 +142,7 @@ def test_compare():
     assert compare_dict == {"rs1": False, "rs2": True}
 
 
-def test_get_analysis_equalities_one_analysi_missing(genotype_db):
+def test_get_analysis_equalities_one_analysis_missing(snp_db: Manager):
     # GIVEN a sample with two analyses
 
     sample = Sample(id="test")
@@ -155,10 +152,10 @@ def test_get_analysis_equalities_one_analysi_missing(genotype_db):
         Genotype(id=2, analysis_id=1, rsnumber="rs2", allele_1="A", allele_2="G"),
     ]
 
-    genotype_db.add_commit(sample, analysis, genotypes)
+    snp_db.add_commit(sample, analysis, genotypes)
 
     # WHEN running get_analysis_equalities
-    genotype_doc = get_analysis_equalities(genotype_db, sample)
+    genotype_doc = get_analysis_equalities(snp_db, sample)
 
     # THEN it should return a dictionary like this:
     doc = {"snps": {"genotype": {"rs1": ["C", "T"], "rs2": ["A", "G"]}}}

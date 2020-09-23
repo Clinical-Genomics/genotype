@@ -7,7 +7,7 @@ from typing import Optional
 from alchy import Manager
 from sqlalchemy import func, or_
 
-from genotype.store.models import Analysis, Genotype, Model, Sample, SNP, Plate
+from genotype.store.models import SNP, Analysis, Genotype, Model, Plate, Sample
 
 log = logging.getLogger(__name__)
 

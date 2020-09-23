@@ -17,7 +17,7 @@ from .init_cmd import init_cmd
 from .load_cmd import load_cmd
 from .match_cmd import check_cmd, match_cmd
 from .serve import serve_cmd
-from .store_cmd import add_sex, ls, mip_sex, sample, view
+from .store_cmd import add_sex, ls, sample, view
 
 LOG = logging.getLogger(__name__)
 
@@ -63,7 +63,6 @@ root.add_command(delete_cmd)
 root.add_command(match_cmd)
 root.add_command(check_cmd)
 root.add_command(add_sex)
-root.add_command(mip_sex)
 root.add_command(view)
 root.add_command(ls)
 root.add_command(sample)
