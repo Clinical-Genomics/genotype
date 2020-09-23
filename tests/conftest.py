@@ -153,14 +153,6 @@ def fixture_genotype_db(
     return snp_db
 
 
-@pytest.yield_fixture(scope="function")
-def setexist_db(existing_db: Manager, snps: List[SNP], sample: Sample) -> Manager:
-    """Return a manager with a populated database"""
-    existing_db.add_commit(snps)
-    existing_db.add_commit(sample)
-    return existing_db
-
-
 @pytest.yield_fixture(scope="function", name="sample_db")
 def fixture_sample_db(genotype_db: Manager, snps: List[SNP]) -> Manager:
     genotype_db.add_commit(snps)
