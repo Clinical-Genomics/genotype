@@ -15,13 +15,22 @@ Genotype if following the [GitHub flow][gh-flow] branching model which means tha
 1. Make sure you are on `master` (`git checkout master`) and bump version according to step 1, example: `bumpversion minor`
 1. Push the commit: `git push`
 1. Push the tag: `git push --tags`
+### hasta
 1. First deploy on stage so log into hasta and run:
     - `us`
-    - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-genotype-stage.sh master`
+    - `cg deploy genotype`
 1. Deploy in productions by running the following commands:
     - `down`
     - `up`
-    - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-genotype-prod.sh`
+    - `cg deploy genotype`
+### clinical-db
+1. First deploy on stage so log into hasta and run:
+    - `us`
+    - `bash /home/proj/production/servers/resources/clinical-db.scilifelab.se/update-genotype-stage.sh master`
+1. Deploy in productions by running the following commands:
+    - `down`
+    - `up`
+    - `bash /home/proj/production/servers/resources/clinical-db.scilifelab.se/update-genotype-prod.sh`
 1. Take a screen shot that includes the name of the environment and publish it as a comment on the PR: ![Deployed][confirm-deploy]
 1. Great job :whale2:
 

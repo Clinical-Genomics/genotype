@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from flask import Flask, render_template, redirect, url_for
-from flask_login import current_user
+from flask import Flask, redirect, render_template, url_for
 from flask_bootstrap import Bootstrap
+from flask_login import current_user
 from flask_reverse_proxy import FlaskReverseProxied
 from werkzeug.contrib.fixers import ProxyFix
 

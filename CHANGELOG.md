@@ -16,6 +16,11 @@ Try to use the follwing format:
 
 ### Fixed
 
+## [3.0.1]
+
+### Changed
+- Update deployment instructions
+
 ## [3.0.0]
 
 ### Added
