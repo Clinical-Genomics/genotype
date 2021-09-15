@@ -12,8 +12,7 @@ ENV SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
 WORKDIR /home/src/app
 COPY . /home/src/app
 
-RUN pip install -r requirements.txt
-RUN pip install -e .
+RUN pip install --no-cache-dir -r requirements.txt -e .
 
 
 CMD gunicorn \
