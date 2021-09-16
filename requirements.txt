@@ -24,3 +24,4 @@ werkzeug<1.0.0  #due to breaking change
 Flask-Login
 Flask-Dance
 ruamel.yaml
+gunicorn
