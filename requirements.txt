@@ -6,7 +6,7 @@ Alchy
 SQLAlchemy
 pymysql
 
-cyvcf2<0.10.0
+cyvcf2
 xlrd
 pysam==0.15.2           # due to inability to rebuild newer pysam version
 pyyaml
@@ -14,7 +14,7 @@ coloredlogs
 click
 
 # server
-Flask>=1.1.1
+Flask==1.1.1
 Flask-Bootstrap
 Flask-Reverse-Proxy
 Flask-SQLAlchemy==2.1
@@ -24,3 +24,4 @@ werkzeug<1.0.0  #due to breaking change
 Flask-Login
 Flask-Dance
 ruamel.yaml
+gunicorn
