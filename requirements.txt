@@ -1,5 +1,6 @@
 # build
 cython
+wheel
 
 # database
 Alchy
