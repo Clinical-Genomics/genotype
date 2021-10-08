@@ -3,7 +3,7 @@ cython
 
 # database
 Alchy
-SQLAlchemy
+SQLAlchemy<1.4
 pymysql
 
 cyvcf2
