@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.6-slim
 
 ENV GUNICORN_WORKERS=1
 ENV GUNICORN_TREADS=1
