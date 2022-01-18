@@ -7,6 +7,7 @@ import click
 
 from genotype.constants import SEXES, TYPES
 from genotype.store import api
+from genotype.store import models
 
 LOG = logging.getLogger(__name__)
 
@@ -77,6 +78,16 @@ def ls(context, since, limit, offset, missing, plate, no_status):
             click.echo(record.sample_id)
         else:
             click.echo(record.id)
+
+
+@click.command("list-users")
+def ls_users():
+    """List users from the database."""
+
+    query = models.User.query
+
+    for record in query:
+        click.echo(record.email)
 
 
 @click.command()
