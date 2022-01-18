@@ -9,7 +9,7 @@ pymysql
 
 cyvcf2
 xlrd==1.2.0
-pysam==0.15.2           # due to inability to rebuild newer pysam version
+pysam
 pyyaml
 coloredlogs
 click

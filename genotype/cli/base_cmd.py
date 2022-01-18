@@ -11,13 +11,13 @@ import yaml
 from genotype import __title__, __version__
 from genotype.store import api
 
-from .delete_cmd import delete_cmd
+from .delete_cmd import delete_cmd, delete_user
 from .export_cmd import export_sample, export_sample_analysis, snps_cmd
 from .init_cmd import init_cmd
 from .load_cmd import load_cmd
 from .match_cmd import check_cmd, match_cmd
 from .serve import serve_cmd
-from .store_cmd import add_sex, ls, sample, view
+from .store_cmd import add_sex, ls_users, ls, sample, view
 
 LOG = logging.getLogger(__name__)
 
@@ -60,11 +60,13 @@ root.add_command(serve_cmd)
 root.add_command(init_cmd)
 root.add_command(load_cmd)
 root.add_command(delete_cmd)
+root.add_command(delete_user)
 root.add_command(match_cmd)
 root.add_command(check_cmd)
 root.add_command(add_sex)
 root.add_command(view)
 root.add_command(ls)
+root.add_command(ls_users)
 root.add_command(sample)
 root.add_command(export_sample)
 root.add_command(export_sample_analysis)
