@@ -3,7 +3,7 @@ pytest>=5.2     # due to pytest-flask, pytest-cov
 pytest-mock
 
 mkdocs
-mkdocs-material
+mkdocs-material==8.3.0
 
 
 
