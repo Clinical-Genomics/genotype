@@ -13,6 +13,7 @@ pysam
 pyyaml
 coloredlogs
 click
+jinja2==2.11.2
 
 # server
 Flask==1.1.1

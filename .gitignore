@@ -64,3 +64,6 @@ output/*/index.html
 # Docs
 docs/_build
 _book/
+
+# Pycharm
+.idea/
