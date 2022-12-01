@@ -37,7 +37,7 @@ the title if not.
 9. Deploy in productions by running the following commands:
     - `down`
     - `up`
-    - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-genotype-prod.sh`
+    - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-tool-prod.sh -e P_genotype -t genotype -b master`
 10. Take a screen shot that includes the name of the environment and publish it as a comment on the PR: ![Deployed][confirm-deploy]
 11. Great job :whale2:
 
