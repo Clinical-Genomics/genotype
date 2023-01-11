@@ -72,5 +72,5 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
 def return_alternatives(variants: List[Variant]) -> str:
     alternatives = []
     for variant in variants:
-        alternatives.append(variant.ALT)
+        alternatives.append(f"{variant.REF}/{','.join(variant.ALT)}")
     return ", ".join(alternatives)
