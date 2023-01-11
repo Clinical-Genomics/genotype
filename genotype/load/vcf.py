@@ -66,4 +66,4 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
     # weird SNP position lookup, not even possible; right?
     raise ValueError(
         f"Multiple variants {len(variants)} found for SNP at position {pos_str}: {variants}.\n The associated BCF file can be found here: {vcf.fname}"
-        )
+    )
