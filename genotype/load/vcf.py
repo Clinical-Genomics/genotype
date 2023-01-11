@@ -65,7 +65,7 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
         return variant
     # weird SNP position lookup, not even possible; right?
     raise ValueError(
-        f"Multiple variants {len(variants)} found for SNP at position {pos_str}: {return_alternatives(variants)}."
+        f"Multiple variants ({len(variants)}) found for SNP at position {pos_str}: {return_alternatives(variants)}."
     )
 
 
