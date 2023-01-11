@@ -65,12 +65,12 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
         return variant
     # weird SNP position lookup, not even possible; right?
     raise ValueError(
-        f"Multiple variants ({len(variants)}) found for SNP at position {pos_str}: {return_alternatives(variants)}."
+        f"Multiple variants ({len(variants)}) found for SNP at position {pos_str}: {return_multiple_variant_alleles(variants=variants)}."
     )
 
 
-def return_alternatives(variants: List[Variant]) -> str:
-    alternatives = []
+def return_multiple_variant_alleles(variants: List[Variant]) -> str:
+    multiple_variant_alleles: List = []
     for variant in variants:
-        alternatives.append(f"{variant.REF}/{','.join(variant.ALT)}")
-    return ", ".join(alternatives)
+        multiple_variant_alleles.append(f"{variant.REF}/{','.join(variant.ALT)}")
+    return ", ".join(multiple_variant_alleles)
