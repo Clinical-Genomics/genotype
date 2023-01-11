@@ -59,14 +59,17 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
         LOG.debug("No variant found for %s", pos_str)
         return None
 
-    if len(variants) == 1:
+    elif len(variants) == 1:
         # everything OK
         variant = variants[0]
         return variant
     # weird SNP position lookup, not even possible; right?
-    raise ValueError(
-        f"Multiple variants ({len(variants)}) found for SNP at position {pos_str}: {return_multiple_variant_alleles(variants=variants)}."
-    )
+
+    else:
+        LOG.debug(
+            f"Multiple variants ({len(variants)}) found for SNP at position {pos_str}: {return_multiple_variant_alleles(variants=variants)}."
+        )
+        return None
 
 
 def return_multiple_variant_alleles(variants: List[Variant]) -> str:
