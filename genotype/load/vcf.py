@@ -56,7 +56,7 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
     pos_str = "{chrom}:{pos}-{pos}".format(chrom=snp.chrom, pos=snp.pos)
     variants = list(vcf(pos_str))
     if len(variants) == 0:
-        LOG.debug("No variant found for %s", pos_str)
+        LOG.info("No variant found for %s", pos_str)
         return None
 
     elif len(variants) == 1:
