@@ -56,7 +56,7 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
     pos_str = "{chrom}:{pos}-{pos}".format(chrom=snp.chrom, pos=snp.pos)
     variants = list(vcf(pos_str))
     if len(variants) == 0:
-        LOG.info("No variant found for %s", pos_str)
+        LOG.debug("No variant found for %s", pos_str)
         return None
 
     elif len(variants) == 1:
@@ -66,7 +66,7 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
     # weird SNP position lookup, not even possible; right?
 
     else:
-        LOG.debug(
+        LOG.info(
             f"Multiple variants ({len(variants)}) found for SNP at position {pos_str}: {return_multiple_variant_alleles(variants=variants)}."
         )
         return None
