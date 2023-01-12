@@ -70,6 +70,7 @@ def fetch_snp(vcf: VCF, snp: SNP) -> Variant:
 
 
 def return_multiple_variant_alleles(variants: List[Variant]) -> str:
+    """Takes in a list of Variant, returns all allele variants as str"""
     multiple_variant_alleles: List = []
     for variant in variants:
         multiple_variant_alleles.append(f"{variant.REF}/{','.join(variant.ALT)}")
