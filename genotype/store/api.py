@@ -100,11 +100,20 @@ def snps():
     return query
 
 
+def validate_sample_id(sample_id: str) -> bool:
+    """Validate whether the provided user-provided sample_id is not malicious"""
+    for char in sample_id:
+        if not ord(char) >= 48 and ord(char) <= 57 and not ord(char) >= 65 and ord(char) <= 90:
+            return False
+    return True
+
+
 def sample(sample_id: str, notfound_cb=None) -> Sample:
     """Get sample from database and abort context if not found."""
     sample_obj = Sample.query.get(sample_id)
     if sample_obj is None:
-        log.error("sample id not found in database: %s", sample_id)
+        if validate_sample_id(sample_id):
+            log.error(f"sample id not found in database: {sample_id}")
         return notfound_cb() if notfound_cb else notfound_cb
     return sample_obj
 
