@@ -103,7 +103,7 @@ def snps():
 def validate_sample_id(sample_id: str) -> bool:
     """Validate whether the provided user-provided sample_id is not malicious"""
     for char in sample_id:
-        if not ord(char) >= 48 and ord(char) <= 57 and not ord(char) >= 65 and ord(char) <= 90:
+        if not ord(char) > 47 and ord(char) < 58 and not ord(char) > 64 and ord(char) < 91:
             return False
     return True
 
