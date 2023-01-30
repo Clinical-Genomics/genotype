@@ -104,7 +104,6 @@ def sample(sample_id: str, notfound_cb=None) -> Sample:
     """Get sample from database and abort context if not found."""
     sample_obj = Sample.query.get(sample_id)
     if sample_obj is None:
-        log.error("sample id not found in database: %s", sample_id)
         return notfound_cb() if notfound_cb else notfound_cb
     return sample_obj
 
