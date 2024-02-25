@@ -1,16 +1,46 @@
+
+[tool.poetry]
+name = "genotype"
+version = "4.1.7"
+description = "Simple genotype comparison of VCF files"
+authors = ["henrikstranneheim <henrik.stranneheim@scilifelab.se>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.9.17"
+alchy = "^2.2.2"
+SQLAlchemy = "<1.4"
+pymysql = "^1.1.0"
+cyvcf2 = "^0.30.28"
+xlrd = "1.2.0"
+pysam = "*"
+PyYAML = "^6.0.1"
+coloredlogs = "^15.0.1"
+click = "^8.1.7"
+Jinja2 = "2.11.2"
+MarkupSafe = "2.0.1"
+itsdangerous = "1.1.0"
+numpy = "1.26.1"
+Flask = "1.1.1"
+Flask-Bootstrap = "^3.3.7.1"
+flask-reverse-proxy = "^0.2.0.2"
+Flask-SQLAlchemy = "2.1"
+Flask-Alchy = "^0.5.0"
+Flask-Security = "^3.0.0"
+Werkzeug = "<1.0.0"
+Flask-Login = "0.5.0"
+Flask-Dance = "3.0.0"
+"ruamel.yaml" = "^0.18.6"
+gunicorn = "^21.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "5.2"
+pytest-mock = "^3.12.0"
+pre-commit = "^3.6.2"
+mkdocs = "^1.5.3"
+mkdocs-material = "8.3.0"
+
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel", "cython"]
-build-backend = "setuptools.build_meta"
-
-[tool.black]
-line-length = 100
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-testpaths = [
-    "tests",
-]
-
-[tool.isort]
-profile = "black"
-line_length = 100
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
