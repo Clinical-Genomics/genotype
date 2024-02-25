@@ -1,11 +1,21 @@
 name: Black
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.6.0
-      - uses: actions/setup-python@v4.3.1
-      - uses: psf/black@stable
+      - name: Check out git repository
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+
+      - name: Set up Black
+        uses: psf/black@stable
+        with:
+          options: ". --check --line-length 100"
+          version: "~=24.1.0"
