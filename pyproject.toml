@@ -8,7 +8,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.9.17"
+python = "3.9.18"
 alchy = "^2.2.2"
 SQLAlchemy = "<1.4"
 pymysql = "^1.1.0"
