@@ -35,7 +35,9 @@ Flask-Dance = "3.0.0"
 gunicorn = "^21.2.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "5.2"
+pytest = "7.4.2"
+coveralls = "*"
+pytest-cov = "*"
 pytest-mock = "^3.12.0"
 pre-commit = "^3.6.2"
 mkdocs = "^1.5.3"
