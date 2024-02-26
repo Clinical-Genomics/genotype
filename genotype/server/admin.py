@@ -1,4 +1,5 @@
 """Admin views"""
+
 from pathlib import Path
 from flask import current_app
 from flask_dance.contrib.google import make_google_blueprint
@@ -22,7 +23,6 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class UserManagement(object):
-
     """Provide usermanagement for a Flask app.
     ENV variables:
     GOOGLE_OAUTH_CLIENT_ID
@@ -121,7 +121,6 @@ class UserManagement(object):
 
 
 class UserAdmin(object):
-
     """docstring for UserAdmin"""
 
     def __init__(self, database_path=None):

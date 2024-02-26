@@ -36,7 +36,6 @@ Model = make_declarative_base(Base=JsonModel)
 
 
 class Genotype(Model):
-
     """Represent a genotype call for a position.
 
     Attributes:
@@ -83,7 +82,6 @@ class Genotype(Model):
 
 
 class Analysis(Model):
-
     """Represent a SNP analysis (genotyping, sequencing).
 
     Attributes:
@@ -122,7 +120,6 @@ class Analysis(Model):
 
 
 class Sample(Model):
-
     """Represent a sample.
 
     Attributes:
@@ -208,7 +205,6 @@ Date: {date}
 
 
 class SNP(Model):
-
     """Represent a SNP position under investigation."""
 
     id = Column(types.String(32), primary_key=True)
@@ -236,7 +232,6 @@ class User(Model, UserMixin):
 
 
 class Plate(Model):
-
     """Describe a MAF plate of samples and it's status."""
 
     id = Column(types.Integer, primary_key=True)

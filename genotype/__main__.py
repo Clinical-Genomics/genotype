@@ -13,6 +13,7 @@ The main entry point for the command line interface.
 Invoke as ``genotype`` (if installed)
 or ``python -m genotype`` (no install required).
 """
+
 import sys
 
 from genotype.cli.base_cmd import root

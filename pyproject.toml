@@ -33,6 +33,7 @@ Flask-Login = "0.5.0"
 Flask-Dance = "3.0.0"
 "ruamel.yaml" = "^0.18.6"
 gunicorn = "^21.2.0"
+black = "24.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.4.2"
