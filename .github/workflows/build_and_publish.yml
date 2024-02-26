@@ -1,20 +1,19 @@
-name: CI
+name: Publish to PyPI
 
 on:
-  pull_request:
-  push:
-    branches:
-      - master
+  release:
+    types:
+      - created
 
 jobs:
-  tests-coverage:
+  build-n-publish:
+    name: Build and publish Python distribution to PyPI
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Check out git repository
         uses: actions/checkout@v4.1.1
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
@@ -24,22 +23,11 @@ jobs:
         with:
           virtualenvs-create: false
 
-      - name: Install Dependencies
-        run: poetry install --no-interaction
-
-      - name: Test with pytest & Coveralls
-        run: |
-          pytest --cov=.
-          coveralls
+      - name: Build and Publish Distribution to PyPI 📦
         env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
-  finish:
-    needs: tests-coverage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2.2.3
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel-finished: true
+          PYPI_USERNAME: __token__
+          PYPI_PASSWORD: ${{ secrets.pypi_password }}
+        run: |
+          poetry publish --no-interaction --build \
+            --username $PYPI_USERNAME \
+            --password $PYPI_PASSWORD
