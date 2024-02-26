@@ -185,7 +185,7 @@ Date: {date}
     def check_sex(self) -> bool:
         """Check that the sex determination is okey."""
         assert self.sex is not None, "need to set expected sex on sample"
-        assert self.sex is not "unknown", "need to specify known sex on sample"
+        assert self.sex != "unknown", "need to specify known sex on sample"
         sexes = list(self.sexes)
         if len(sexes) == 1:
             raise ValueError("need to add sex information to analyses")
