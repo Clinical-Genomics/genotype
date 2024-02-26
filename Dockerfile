@@ -13,7 +13,7 @@ WORKDIR /home/src/app
 COPY . /home/src/app
 
 # install dependencies
-RUN pip install poetry
+RUN pip install  --no-cache-dir poetry
 RUN poetry config virtualenvs.create false \
   && poetry install
 
