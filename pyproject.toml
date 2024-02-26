@@ -6,6 +6,7 @@ description = "Simple genotype comparison of VCF files"
 authors = ["henrikstranneheim <henrik.stranneheim@scilifelab.se>"]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "genotype"}]
 
 [tool.poetry.dependencies]
 python = ">3.9,<3.13"
