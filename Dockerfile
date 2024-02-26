@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM docker.io/library/python:3.9-slim-bullseye
 
 ENV GUNICORN_WORKERS=1
 ENV GUNICORN_TREADS=1
