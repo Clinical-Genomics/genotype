@@ -36,7 +36,6 @@ Model = make_declarative_base(Base=JsonModel)
 
 
 class Genotype(Model):
-
     """Represent a genotype call for a position.
 
     Attributes:
@@ -83,7 +82,6 @@ class Genotype(Model):
 
 
 class Analysis(Model):
-
     """Represent a SNP analysis (genotyping, sequencing).
 
     Attributes:
@@ -122,7 +120,6 @@ class Analysis(Model):
 
 
 class Sample(Model):
-
     """Represent a sample.
 
     Attributes:
@@ -185,7 +182,7 @@ Date: {date}
     def check_sex(self) -> bool:
         """Check that the sex determination is okey."""
         assert self.sex is not None, "need to set expected sex on sample"
-        assert self.sex is not "unknown", "need to specify known sex on sample"
+        assert self.sex != "unknown", "need to specify known sex on sample"
         sexes = list(self.sexes)
         if len(sexes) == 1:
             raise ValueError("need to add sex information to analyses")
@@ -208,7 +205,6 @@ Date: {date}
 
 
 class SNP(Model):
-
     """Represent a SNP position under investigation."""
 
     id = Column(types.String(32), primary_key=True)
@@ -236,7 +232,6 @@ class User(Model, UserMixin):
 
 
 class Plate(Model):
-
     """Describe a MAF plate of samples and it's status."""
 
     id = Column(types.Integer, primary_key=True)

@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM docker.io/library/python:3.9-slim-bullseye
 
 ENV GUNICORN_WORKERS=1
 ENV GUNICORN_TREADS=1
@@ -12,9 +12,10 @@ ENV SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
 WORKDIR /home/src/app
 COPY . /home/src/app
 
-RUN pip install -r requirements.txt
-RUN pip install -e .
-
+# install dependencies
+RUN pip install  --no-cache-dir poetry
+RUN poetry config virtualenvs.create false \
+  && poetry install
 
 CMD gunicorn \
   --workers=$GUNICORN_WORKERS \

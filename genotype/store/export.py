@@ -1,4 +1,5 @@
 """Export functions."""
+
 import logging
 from genotype.store.models import Sample
 from genotype.store.api import genotypes_by_analysis, analysis_by_sample

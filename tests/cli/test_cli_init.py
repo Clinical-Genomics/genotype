@@ -1,4 +1,5 @@
 """Test the cli init cmds"""
+
 import logging
 from pathlib import Path
 
