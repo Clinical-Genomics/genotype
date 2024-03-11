@@ -19,7 +19,7 @@ itsdangerous==1.1.0
 numpy==1.19.2
 
 # server
-Flask==1.1.1
+Flask==2.3.2
 Flask-Bootstrap
 Flask-Reverse-Proxy
 Flask-SQLAlchemy==2.1
