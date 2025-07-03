@@ -21,6 +21,17 @@ Manage SNP calling comparisons at Clinical Genomics. The package exposes a CLI a
 $ conda install -c bioconda pysam pyyaml sqlalchemy flask
 $ pip install genotype
 ```
+### Selection of cutoff
+
+We launched an investigation to figure out a reasonable cutoff to differentiate between concordant and discordant results. Results from 5 MAF plates (ID7-11) were loaded into a new database. Correspondingly, results from sequencing were also imported across all customers and from both exome and whole genome sequencing.
+
+The results were plotted as a histogram based on number of mismatches per comparison.
+
+![Graph](/docs/comparison_of_mismatches.png)
+
+Clustering to the left are the 200 true hits. Clustering around 26 mismatches are the random hits. The gap between true and random hits is very obvious. This lets us set the cutoff rather liberally since we have confirmed that random hits have at least 14 mismatches.
+
+Chosen cutoff: **3 mismatches**. Anything above that should launch an investigation.
 
 ## Help?
 
